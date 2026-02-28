@@ -60,10 +60,10 @@ Initialize a production-ready Python project structure and implement a robust, t
 - pyproject.toml for project metadata
 
 ### Definition of Done
-- [ ] `python -m pytest tests/` passes with 0 failures
-- [ ] `python -c "from madousho.config import load_config"` succeeds
-- [ ] Config loading completes in <100ms
-- [ ] All Pydantic models validate correctly
+- [x] `python -m pytest tests/` passes with 0 failures
+- [x] `python -c "from madousho.config import load_config"` succeeds
+- [x] Config loading completes in <100ms
+- [x] All Pydantic models validate correctly
 
 ### Must Have
 - Pydantic v2 validation for all config sections
@@ -184,10 +184,10 @@ Max Concurrent: 3 (Waves 1, 2, 3)
   - src/ layout pattern: https://hynek.me/articles/testing-packaging/
 
   **Acceptance Criteria**:
-  - [ ] src/madousho/__init__.py exists with __version__ = "0.1.0"
-  - [ ] tests/conftest.py exists (empty is OK)
-  - [ ] pyproject.toml is valid TOML with required fields
-  - [ ] python -m pytest --collect-only shows 0 tests collected (no errors)
+  - [x] src/madousho/__init__.py exists with __version__ = "0.1.0"
+  - [x] tests/conftest.py exists (empty is OK)
+  - [x] pyproject.toml is valid TOML with required fields
+  - [x] python -m pytest --collect-only shows 0 tests collected (no errors)
 
   **QA Scenarios**:
   ```
@@ -214,8 +214,8 @@ Max Concurrent: 3 (Waves 1, 2, 3)
   ```
 
   **Evidence to Capture**:
-  - [ ] Directory structure listing
-  - [ ] pytest collection output
+  - [x] Directory structure listing
+  - [x] pytest collection output
 
   **Commit**: YES (groups with 2, 3)
   - Message: `chore(python): init project structure`
@@ -255,10 +255,10 @@ Max Concurrent: 3 (Waves 1, 2, 3)
   - pytest docs: https://docs.pytest.org/
 
   **Acceptance Criteria**:
-  - [ ] requirements.txt exists with all 5 dependencies
-  - [ ] All versions are pinned with >= and < constraints
-  - [ ] pip install -r requirements.txt succeeds
-  - [ ] python -c "import yaml, pydantic, pytest" succeeds
+  - [x] requirements.txt exists with all 5 dependencies
+  - [x] All versions are pinned with >= and < constraints
+  - [x] pip install -r requirements.txt succeeds
+  - [x] python -c "import yaml, pydantic, pytest" succeeds
 
   **QA Scenarios**:
   ```
@@ -283,8 +283,8 @@ Max Concurrent: 3 (Waves 1, 2, 3)
   ```
 
   **Evidence to Capture**:
-  - [ ] pip install output
-  - [ ] Import verification output
+  - [x] pip install output
+  - [x] Import verification output
 
   **Commit**: YES (groups with 1, 3)
   - Message: `chore(python): init project structure`
@@ -324,10 +324,10 @@ Max Concurrent: 3 (Waves 1, 2, 3)
   - conftest.py pattern: https://docs.pytest.org/en/latest/how-to/fixtures.html
 
   **Acceptance Criteria**:
-  - [ ] pytest.ini or [tool.pytest] in pyproject.toml exists
-  - [ ] tests/config/__init__.py exists
-  - [ ] tests/config/test_loader.py exists with at least 1 test
-  - [ ] python -m pytest tests/ passes with 0 failures
+  - [x] pytest.ini or [tool.pytest] in pyproject.toml exists
+  - [x] tests/config/__init__.py exists
+  - [x] tests/config/test_loader.py exists with at least 1 test
+  - [x] python -m pytest tests/ passes with 0 failures
 
   **QA Scenarios**:
   ```
@@ -352,8 +352,8 @@ Max Concurrent: 3 (Waves 1, 2, 3)
   ```
 
   **Evidence to Capture**:
-  - [ ] pytest run output
-  - [ ] Test discovery output
+  - [x] pytest run output
+  - [x] Test discovery output
 
   **Commit**: YES (groups with 1, 2)
   - Message: `chore(python): init project structure`
@@ -394,11 +394,11 @@ Max Concurrent: 3 (Waves 1, 2, 3)
   - config/madousho.yaml - actual config structure to match
 
   **Acceptance Criteria**:
-  - [ ] src/madousho/config/models.py exists with all 4 model classes
-  - [ ] All models use Pydantic BaseModel
-  - [ ] Field validators for port range and host format
-  - [ ] model_config with extra='forbid' on all models
-  - [ ] python -c "from madousho.config.models import Config" succeeds
+  - [x] src/madousho/config/models.py exists with all 4 model classes
+  - [x] All models use Pydantic BaseModel
+  - [x] Field validators for port range and host format
+  - [x] model_config with extra='forbid' on all models
+  - [x] python -c "from madousho.config.models import Config" succeeds
 
   **QA Scenarios**:
   ```
@@ -434,8 +434,8 @@ except Exception as e:
   ```
 
   **Evidence to Capture**:
-  - [ ] Valid model instantiation output
-  - [ ] Invalid port rejection output
+  - [x] Valid model instantiation output
+  - [x] Invalid port rejection output
 
   **Commit**: YES (groups with 5)
   - Message: `feat(config): add Pydantic models`
@@ -478,11 +478,11 @@ except Exception as e:
   - config/madousho.yaml - test data
 
   **Acceptance Criteria**:
-  - [ ] src/madousho/config/loader.py exists with all 4 functions
-  - [ ] load_config() returns validated Config model
-  - [ ] Environment variables override YAML values
-  - [ ] Clear error messages for missing/invalid config
-  - [ ] Loading completes in <100ms
+  - [x] src/madousho/config/loader.py exists with all 4 functions
+  - [x] load_config() returns validated Config model
+  - [x] Environment variables override YAML values
+  - [x] Clear error messages for missing/invalid config
+  - [x] Loading completes in <100ms
 
   **QA Scenarios**:
   ```
@@ -530,9 +530,9 @@ except Exception as e:
   ```
 
   **Evidence to Capture**:
-  - [ ] YAML loading output
-  - [ ] Env override output
-  - [ ] Error handling output
+  - [x] YAML loading output
+  - [x] Env override output
+  - [x] Error handling output
 
   **Commit**: YES (groups with 4)
   - Message: `feat(config): implement loader`
@@ -571,11 +571,11 @@ except Exception as e:
   - src/madousho/__init__.py - package-level exports pattern
 
   **Acceptance Criteria**:
-  - [ ] src/madousho/config/__init__.py exists
-  - [ ] from madousho.config import load_config succeeds
-  - [ ] from madousho.config import Config succeeds
-  - [ ] __all__ list defined with all public exports
-  - [ ] Module docstring with usage example
+  - [x] src/madousho/config/__init__.py exists
+  - [x] from madousho.config import load_config succeeds
+  - [x] from madousho.config import Config succeeds
+  - [x] __all__ list defined with all public exports
+  - [x] Module docstring with usage example
 
   **QA Scenarios**:
   ```
@@ -606,8 +606,8 @@ print('load_config' in dir(cfg))"
   ```
 
   **Evidence to Capture**:
-  - [ ] Public API import output
-  - [ ] Exports verification output
+  - [x] Public API import output
+  - [x] Exports verification output
 
   **Commit**: YES
   - Message: `chore(ci): finalize config module`
@@ -647,10 +647,10 @@ print('load_config' in dir(cfg))"
   - tests/conftest.py - shared fixtures
 
   **Acceptance Criteria**:
-  - [ ] tests/config/test_models.py exists with 10+ test functions
-  - [ ] All tests pass with pytest
-  - [ ] Coverage on models.py >= 90%
-  - [ ] Tests cover: valid instantiation, validation errors, extra fields rejected
+  - [x] tests/config/test_models.py exists with 10+ test functions
+  - [x] All tests pass with pytest
+  - [x] Coverage on models.py >= 90%
+  - [x] Tests cover: valid instantiation, validation errors, extra fields rejected
 
   **QA Scenarios**:
   ```
@@ -676,8 +676,8 @@ print('load_config' in dir(cfg))"
   ```
 
   **Evidence to Capture**:
-  - [ ] pytest output showing all tests pass
-  - [ ] Coverage report showing >= 90%
+  - [x] pytest output showing all tests pass
+  - [x] Coverage report showing >= 90%
 
   **Commit**: YES (groups with 8, 9)
   - Message: `test(config): add test suite`
@@ -717,10 +717,10 @@ print('load_config' in dir(cfg))"
   - config/madousho.example.yaml - test data
 
   **Acceptance Criteria**:
-  - [ ] tests/config/test_loader.py exists with 15+ test functions
-  - [ ] All tests pass with pytest
-  - [ ] Coverage on loader.py >= 90%
-  - [ ] Tests cover: YAML loading, env overrides, merge logic, error handling
+  - [x] tests/config/test_loader.py exists with 15+ test functions
+  - [x] All tests pass with pytest
+  - [x] Coverage on loader.py >= 90%
+  - [x] Tests cover: YAML loading, env overrides, merge logic, error handling
 
   **QA Scenarios**:
   ```
@@ -756,9 +756,9 @@ print('load_config' in dir(cfg))"
   ```
 
   **Evidence to Capture**:
-  - [ ] pytest output
-  - [ ] Coverage report
-  - [ ] Env override test output
+  - [x] pytest output
+  - [x] Coverage report
+  - [x] Env override test output
 
   **Commit**: YES (groups with 7, 9)
   - Message: `test(config): add test suite`
@@ -798,11 +798,11 @@ print('load_config' in dir(cfg))"
   - tests/config/test_loader.py - test patterns
 
   **Acceptance Criteria**:
-  - [ ] tests/config/test_integration.py exists with 5+ integration tests
-  - [ ] All integration tests pass
-  - [ ] Full config module coverage >= 90%
-  - [ ] pytest.ini has mincoverage = 90 configured
-  - [ ] python -m pytest tests/ --cov=madousho.config passes
+  - [x] tests/config/test_integration.py exists with 5+ integration tests
+  - [x] All integration tests pass
+  - [x] Full config module coverage >= 90%
+  - [x] pytest.ini has mincoverage = 90 configured
+  - [x] python -m pytest tests/ --cov=madousho.config passes
 
   **QA Scenarios**:
   ```
@@ -838,9 +838,9 @@ print('load_config' in dir(cfg))"
   ```
 
   **Evidence to Capture**:
-  - [ ] Full test suite output
-  - [ ] Coverage report with >= 90%
-  - [ ] Integration test output
+  - [x] Full test suite output
+  - [x] Coverage report with >= 90%
+  - [x] Integration test output
 
   **Commit**: YES (groups with 7, 8)
   - Message: `test(config): add test suite`
@@ -889,7 +889,7 @@ python -c "from madousho.config import load_config; cfg = load_config(); print(c
 ```
 
 ### Final Checklist
-- [ ] All "Must Have" present
-- [ ] All "Must NOT Have" absent
-- [ ] All tests pass with 90%+ coverage
-- [ ] Config loading <100ms startup time
+- [x] All "Must Have" present
+- [x] All "Must NOT Have" absent
+- [x] All tests pass with 90%+ coverage
+- [x] Config loading <100ms startup time
