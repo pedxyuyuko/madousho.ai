@@ -179,3 +179,7 @@ pyrightconfig.json
 
 # End of https://www.toptal.com/developers/gitignore/api/python
 
+# Additional Python-specific ignores
+.mypy_cache/
+.coverage
+htmlcov/
