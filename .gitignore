@@ -1,4 +1,6 @@
 .sisyphus/boulder.json
+.sisyphus/evidence
+
 config/madousho.yaml
 madousho.db
 
