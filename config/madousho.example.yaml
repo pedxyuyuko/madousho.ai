@@ -1,0 +1,21 @@
+# Madousho Configuration File
+# All settings can be overridden via environment variables with MADOUSHO_ prefix
+
+# Server settings
+api:
+  # 如果为空则创建一个随机的
+  token: ""  # API authentication token
+  host: "0.0.0.0"
+  port: 8000
+
+provider:
+  example_provider:
+    type: "openai-compatible"
+    endpoint: "https://example.com/v1"
+    api-key: "sk-xxxxyourapi"
+
+model_groups:
+  example_group:
+    - "example_provider/gpt-5.2"
+    - "example_provider/fallback1"
+    - "example_provider/fallback2"
