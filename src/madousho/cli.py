@@ -94,6 +94,7 @@ def callback(
     ctx: typer.Context,
     config: Optional[Path] = typer.Option(None, "--config", "-c", help="Configuration file path"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Enable verbose output"),
+    json: bool = typer.Option(False, "--json", "-j", help="Output logs in JSON format"),
     version: Optional[bool] = typer.Option(None, "--version", callback=version_callback, help="Show version and exit"),
 ):
     """
@@ -111,6 +112,8 @@ def callback(
     ctx.obj = {
         "config_path": config_path,
         "verbose": verbose,
+        "json": json,
+    
     }
 
 
