@@ -1,5 +1,7 @@
 """Run command - Start the madousho service."""
 
+from madousho.logger import logger
+
 import typer
 
 
@@ -17,10 +19,7 @@ def run_cmd(ctx: typer.Context):
     from madousho.config.loader import load_config
     config = load_config(str(config_path))
     
-    typer.echo("Starting madousho service...")
+    logger.info("Starting madousho service...")
     
     if verbose:
-        typer.echo(f"Configuration loaded from: {config_path}")
-        typer.echo(f"API host: {config.api.host}")
-        typer.echo(f"API port: {config.api.port}")
-        typer.echo(f"Model groups: {list(config.model_groups.keys())}")
+        logger.info("Configuration loaded", config_path=str(config_path), api_host=config.api.host, api_port=config.api.port, model_groups=list(config.model_groups.keys()))
