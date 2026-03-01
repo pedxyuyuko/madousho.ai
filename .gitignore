@@ -190,3 +190,7 @@ pyrightconfig.json
 htmlcov/
 
 logs/
+
+
+# setuptools_scm generated version file
+src/madousho/_version.py

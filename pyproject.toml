@@ -87,5 +87,7 @@ addopts = [
 
 [tool.setuptools_scm]
 write_to = "src/madousho/_version.py"
+# Only tagged commits can generate versions - forces proper release workflow
 version_scheme = "guess-next-dev"
-local_scheme = "no-local-version"  # PyPI doesn't accept local versions (the +HASH part)
+# Push to master uses dev version on TestPyPI, Release with tag goes to official PyPI
+local_scheme = "no-local-version"  # PyPI rejects local versions (+HASH)
