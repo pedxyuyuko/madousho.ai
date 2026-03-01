@@ -299,6 +299,7 @@ api:
   host: localhost
   port: 8080
 
+default_model_group: "default"
 provider:
   example:
     type: openai
@@ -333,6 +334,7 @@ api:
   host: localhost
   port: 8080
 
+default_model_group: "default"
 provider:
   example:
     type: openai
@@ -400,6 +402,7 @@ api:
   host: localhost
   port: 8080
 
+default_model_group: "default-group"
 provider:
   my-provider:
     type: openai
