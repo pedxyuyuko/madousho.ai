@@ -71,6 +71,7 @@ provider:
     endpoint: https://api.example.com/v1
     api-key: sk-test123
 
+default_model_group: "default-group"
 model-groups:
   default-group:
     - my-provider/gpt-4
@@ -105,6 +106,7 @@ provider:
     endpoint: https://api.example.com/v1
     api-key: sk-test
 
+default_model_group: ""
 model-groups: {}
 """
         yaml_file = tmp_path / "config.yaml"
@@ -133,6 +135,7 @@ model-groups: {}
                     "api_key": "sk-base"
                 }
             },
+            "default_model_group": "",
             "model_groups": {}
         }
         
@@ -181,6 +184,7 @@ provider:
     endpoint: https://api.anthropic.com/v1
     api-key: sk-anthropic
 
+default_model_group: "chat_group"
 model-groups:
   chat_group:
     - primary_provider/gpt-4
@@ -225,6 +229,7 @@ provider:
     endpoint: https://api.example.com/v1
     api-key: sk-test
 
+default_model_group: "my-model-group"
 model-groups:
   my-model-group:
     - my-test-provider/model-1
@@ -257,6 +262,7 @@ provider:
     endpoint: https://api.example.com/v1
     api-key: sk-test
 
+default_model_group: "default"
 model-groups:
   default:
     - test/model-1
@@ -307,6 +313,7 @@ provider:
     endpoint: https://api.example.com/v1
     api-key: sk-b
 
+default_model_group: "group-a"
 model-groups:
   group-a:
     - provider-a/model-1
@@ -397,6 +404,7 @@ provider:
     endpoint: https://api.anthropic.com/v1
     api-key: sk-anthropic-prod
 
+default_model_group: "production-chat"
 model-groups:
   production-chat:
     - openai-primary/gpt-4-turbo
