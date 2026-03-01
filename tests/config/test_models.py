@@ -124,6 +124,7 @@ class TestConfig:
                     api_key="sk-test"
                 )
             },
+            default_model_group="gpt-models",
             model_groups={
                 "gpt-models": ["gpt-3.5-turbo", "gpt-4"]
             }
@@ -150,6 +151,7 @@ class TestConfig:
                     api_key="sk-anthropic"
                 )
             },
+            default_model_group="chat",
             model_groups={
                 "chat": ["gpt-4", "claude-3"],
                 "completion": ["text-davinci-003"]
@@ -165,6 +167,7 @@ class TestConfig:
             Config(
                 api=APIConfig(host="localhost", port=8080),
                 provider={},
+                default_model_group="",
                 model_groups={},
                 extra_field="should fail"
             )
@@ -176,6 +179,7 @@ class TestConfig:
             Config(
                 api=APIConfig(host="localhost", port=8080, extra="reject"),
                 provider={},
+                default_model_group="",
                 model_groups={}
             )
         assert "Extra inputs are not permitted" in str(exc_info.value)
@@ -185,6 +189,7 @@ class TestConfig:
         config = Config(
             api=APIConfig(host="localhost", port=8080),
             provider={},
+            default_model_group="",
             model_groups={}
         )
         assert config.provider == {}
@@ -196,6 +201,7 @@ class TestConfig:
             Config(
                 api=APIConfig(host="localhost", port=0),
                 provider={},
+                default_model_group="",
                 model_groups={}
             )
         assert "port must be between 1 and 65535" in str(exc_info.value)
@@ -213,6 +219,7 @@ class TestConfig:
                         extra_field="should_fail"
                     )
                 },
+                default_model_group="",
                 model_groups={}
             )
         assert "Extra inputs are not permitted" in str(exc_info.value)
@@ -242,6 +249,7 @@ class TestModelValidation:
         config = Config(
             api=APIConfig(host="localhost", port=8080),
             provider={"test": ProviderConfig(type="test", endpoint="http://test", api_key="key")},
+            default_model_group="group",
             model_groups={"group": ["model1"]}
         )
         config_dict = config.model_dump()
