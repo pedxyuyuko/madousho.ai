@@ -7,7 +7,7 @@ import importlib.metadata
 from typer import CallbackParam
 import os
 
-from .commands import run_cmd, validate_cmd, show_config_cmd
+from .commands import run_cmd, validate_cmd
 
 
 app = typer.Typer()
@@ -120,7 +120,6 @@ def callback(
 # Register subcommands
 app.command("run")(run_cmd)
 app.command("validate")(validate_cmd)
-app.command("show-config")(show_config_cmd)
 
 
 if __name__ == "__main__":
