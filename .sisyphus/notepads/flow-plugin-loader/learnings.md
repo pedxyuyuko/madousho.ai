@@ -89,3 +89,64 @@ python -c "from madousho.flow.loader import load_pyproject_metadata, import_flow
 - CLI integration will be added in Task 10
 - The loader properly separates concerns: config validation (Task 7) vs. module loading (Task 9)
 - Flow instantiation happens after all validation, ensuring clean error messages
+
+
+## Task 11: Integration Tests - Summary
+
+Successfully created comprehensive integration tests in `tests/flow/test_integration.py` with 23 test cases covering:
+
+### Test Coverage
+1. **Happy Path Tests (3 tests)**
+   - Complete plugin loading workflow
+   - Plugin with full configuration
+   - Plugin execution after loading
+
+2. **Error Handling Tests (7 tests)**
+   - Missing config.yaml (2 tests)
+   - Invalid config.yaml (2 tests)
+   - Missing FlowClass export (3 tests)
+
+3. **MODEL_GROUP Validation Tests (4 tests)**
+   - Model group not in global config
+   - Empty model group with no default
+   - Model group success with valid config
+   - Model group uses global default
+
+4. **Mixed Mode Error Reporting (2 tests)**
+   - Multiple plugins with mixed success/failure
+   - Clear error messages for different failure types
+
+5. **Flow Registration & Retrieval (4 tests)**
+   - Register loaded flow to registry
+   - Register multiple flows
+   - Prevent duplicate registration
+   - End-to-end: load → register → execute
+
+6. **Edge Cases (3 tests)**
+   - Empty pyproject.toml
+   - Unicode content support
+   - Nested directory structures
+
+### Results
+- **All 23 tests pass** ✓
+- **Integration test coverage: 89.63%** (loader.py: 85%, base.py: 91%, registry.py: 97%, models.py: 100%)
+- **Combined with unit tests: 93.78% coverage** ✓
+
+### Key Features
+- Module-level helper function `create_valid_plugin()` for reusable test setup
+- Realistic temporary directory structures for each test
+- Comprehensive error message validation
+- End-to-end workflow testing (load → register → execute)
+- Mixed mode testing (some plugins succeed, others fail with clear errors)
+
+### Files Created
+1. `tests/flow/test_integration.py` - 809 lines, 23 tests
+
+### Test Execution
+```bash
+# Run integration tests
+pytest tests/flow/test_integration.py -v -p no:asyncio
+
+# Run with coverage
+pytest tests/flow/test_integration.py tests/flow/test_loader.py --cov=madousho.flow --cov-fail-under=90
+```
