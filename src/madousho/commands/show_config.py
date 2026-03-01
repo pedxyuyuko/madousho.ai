@@ -2,6 +2,7 @@
 
 import typer
 import yaml
+from madousho.logger import logger
 
 
 def show_config_cmd(ctx: typer.Context):
@@ -19,4 +20,4 @@ def show_config_cmd(ctx: typer.Context):
     # Convert Config to dict and output as YAML
     config_dict = config.model_dump()
     yaml_output = yaml.dump(config_dict, default_flow_style=False, sort_keys=False)
-    typer.echo(yaml_output)
+    logger.info(yaml_output)
