@@ -14,7 +14,7 @@ logger.add(
 
 # JSON file handler
 logger.add(
-    "logs/app.json",
+    "logs/app.log",
     format="{message}",
     level="INFO",
     serialize=True,

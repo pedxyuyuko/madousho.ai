@@ -188,3 +188,5 @@ pyrightconfig.json
 .mypy_cache/
 .coverage
 htmlcov/
+
+logs/
