@@ -88,4 +88,4 @@ addopts = [
 [tool.setuptools_scm]
 write_to = "src/madousho/_version.py"
 version_scheme = "guess-next-dev"
-local_scheme = "node-and-date"
+local_scheme = "no-local-version"  # PyPI doesn't accept local versions (the +HASH part)
