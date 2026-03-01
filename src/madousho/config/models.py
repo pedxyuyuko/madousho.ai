@@ -37,4 +37,5 @@ class Config(BaseModel):
 
     api: APIConfig
     provider: Dict[str, ProviderConfig]
+    default_model_group: str
     model_groups: Dict[str, List[str]]
