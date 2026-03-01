@@ -1,0 +1,62 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+
+[project]
+name = "madousho-ai-example-flow"
+version = "0.0.1.dev0"
+
+authors = [
+
+    {name = "pedxyuyuko", email = "uuz@sakurauuz.moe"}
+
+]
+
+maintainers = [
+
+    {name = "pedxyuyuko", email = "uuz@sakurauuz.moe"}
+
+]
+
+description = "This is an example workflow design for madousho-ai"
+
+readme = {file = "README.md", content-type = "text/markdown"}
+
+license = "MIT"
+
+requires-python = ">=3.10"
+
+dependencies = [
+    "pyyaml>=6.0,<7.0",
+]
+
+# Madousho-AI 的配置项
+[tools.madousho-ai]
+# 这里写依赖的 tools/mcps
+# 格式是 github 的 "username/repo" 或者 "username/repo@版本"
+dependencies-tools = []
+dependencies-mcps = []
+
+[project.urls]
+
+Homepage = "https://github.com/pedxyuyuko/madousho-ai"
+
+Repository = "https://github.com/pedxyuyuko/madousho-ai.git"
+
+Bug-Tracker = "https://github.com/pedxyuyuko/madousho-ai/issues"
+
+
+
+[project.scripts]
+
+madousho = "madousho.cli:app"
+
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--strict-markers",
+    "--strict-config"
+]

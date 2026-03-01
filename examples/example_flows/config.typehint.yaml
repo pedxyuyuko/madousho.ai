@@ -1,0 +1,7 @@
+# 这个配置项是硬性规定的，程序会读取下面的 type hint
+# 只在某个配置需要 typehint 的时候才填，这是可选的 你不写也行
+field_typehint:
+  # 路径: 类型
+  # 这个对应 config.yaml 的key 
+  # 期望的类型是一个 model group，如果为空则使用 madousho.yaml 定义的 "default_model_group"
+  ".example_use_model_group": "MODEL_GROUP"

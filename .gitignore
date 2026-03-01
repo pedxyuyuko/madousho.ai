@@ -1,3 +1,6 @@
+# symlink
+plugins/flows/example_flows
+
 .sisyphus/boulder.json
 .sisyphus/evidence
 

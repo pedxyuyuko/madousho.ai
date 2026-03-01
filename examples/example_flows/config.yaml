@@ -1,0 +1,5 @@
+# flow 的配置
+# 这里面的配置项都是自定义的 没有硬性规定
+
+example_use_model_group: ""
+example_endpoint: ""
