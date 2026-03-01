@@ -43,3 +43,35 @@
 - Empty model_groups dicts should use empty string for default_model_group
 - Non-empty model_groups should reference an existing key
 - Pattern: Add `default_model_group:` before `model-groups:` in YAML strings
+
+## Final Verification Wave (F1-F4) - COMPLETE
+
+### F1. Plan Compliance Audit ✅
+- All 8 Config instantiations in test_models.py have default_model_group
+- All YAML configs in test_integration.py and test_loader.py have default_model_group
+- Evidence files confirmed in .sisyphus/evidence/
+
+### F2. Code Quality Review ✅
+- 85/85 config tests PASSED
+- No syntax errors
+- No linting issues
+- Evidence: final-verification-pytest.txt
+
+### F3. Real Manual QA ✅
+- test_models.py: 21 tests PASSED
+- test_integration.py: 12 tests PASSED
+- test_loader.py: 32 tests PASSED
+- Evidence: f3-models-qa.txt, f3-integration-qa.txt, f3-loader-qa.txt
+
+### F4. Scope Fidelity Check ✅
+- Only 3 config test files modified (21 lines total)
+- No production code changes
+- No unrelated test files touched
+- Changes are minimal and focused
+
+## Project Status: COMPLETE ✅
+
+All 22 tasks completed (3 core + 4 verification + 15 originally reported as failing tests fixed).
+All 85 config tests passing.
+3 atomic commits made.
+

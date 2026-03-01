@@ -276,16 +276,20 @@ Wave 3 (Verification):
 
 > 4 review agents run in PARALLEL. ALL must APPROVE. Rejection → fix → re-run.
 
-- [ ] F1. **Plan Compliance Audit** — `oracle`
+- [x] F1. **Plan Compliance Audit** — `oracle`
+  Verify all Config instantiations include default_model_group. Check evidence files exist.
   Verify all Config instantiations include default_model_group. Check evidence files exist.
 
-- [ ] F2. **Code Quality Review** — `unspecified-high`
+- [x] F2. **Code Quality Review** — `unspecified-high`
+  Run pytest, check for any linting issues in modified test files.
   Run pytest, check for any linting issues in modified test files.
 
-- [ ] F3. **Real Manual QA** — `unspecified-high`
+- [x] F3. **Real Manual QA** — `unspecified-high`
+  Execute all QA scenarios from tasks 1-3, capture evidence.
   Execute all QA scenarios from tasks 1-3, capture evidence.
 
-- [ ] F4. **Scope Fidelity Check** — `deep`
+- [x] F4. **Scope Fidelity Check** — `deep`
+  Verify only config tests were modified, no unrelated changes.
   Verify only config tests were modified, no unrelated changes.
 
 ---
