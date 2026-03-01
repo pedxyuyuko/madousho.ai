@@ -1,3 +1,5 @@
+from madousho.logger import logger
+
 """Validate command - Validate the configuration file."""
 
 import typer
@@ -15,7 +17,7 @@ def validate_cmd(ctx: typer.Context):
     try:
         from madousho.config.loader import load_config
         load_config(str(config_path))
-        typer.echo("✓ Configuration is valid")
+        logger.success("Configuration is valid")
     except Exception as e:
-        typer.echo(f"✗ Configuration error: {e}", err=True)
+        logger.error(f"Configuration error: {e}")
         raise typer.Exit(code=1) from None
