@@ -132,8 +132,8 @@ Wave 3 (Verification):
   - `config/madousho.example.yaml:17-20` - Example of correct default_model_group usage
 
   **Acceptance Criteria**:
-  - [ ] All Config instantiations in test_models.py include default_model_group
-  - [ ] python -m pytest tests/config/test_models.py returns exit code 0
+  - [x] All Config instantiations in test_models.py include default_model_group
+  - [x] python -m pytest tests/config/test_models.py returns exit code 0
 
   **QA Scenarios**:
 
@@ -196,9 +196,9 @@ Wave 3 (Verification):
   - Task 1 output - Same pattern applied to test_models.py
 
   **Acceptance Criteria**:
-  - [ ] All Config instantiations in test_integration.py include default_model_group
-  - [ ] All YAML strings in tests include default_model_group key
-  - [ ] python -m pytest tests/config/test_integration.py returns exit code 0
+  - [x] All Config instantiations in test_integration.py include default_model_group
+  - [x] All YAML strings in tests include default_model_group key
+  - [x] python -m pytest tests/config/test_integration.py returns exit code 0
 
   **QA Scenarios**:
 
@@ -248,10 +248,10 @@ Wave 3 (Verification):
   - None needed
 
   **Acceptance Criteria**:
-  - [ ] python -m pytest tests/config/ returns exit code 0
-  - [ ] All tests in test_models.py pass
-  - [ ] All tests in test_integration.py pass
-  - [ ] No new test failures in other test files
+  - [x] python -m pytest tests/config/ returns exit code 0
+  - [x] All tests in test_models.py pass
+  - [x] All tests in test_integration.py pass
+  - [x] No new test failures in other test files
 
   **QA Scenarios**:
 
@@ -312,9 +312,9 @@ python -m pytest tests/config/ -v  # Expected: 0 failures
 ```
 
 ### Final Checklist
-- [ ] All Config instantiations include default_model_group
-- [ ] All YAML test configs include default_model_group key
-- [ ] test_models.py passes (4 previously failing tests now pass)
-- [ ] test_integration.py passes (8 previously failing tests now pass)
-- [ ] No new test failures introduced
-- [ ] Evidence files captured in .sisyphus/evidence/
+- [x] All Config instantiations include default_model_group
+- [x] All YAML test configs include default_model_group key
+- [x] test_models.py passes (4 previously failing tests now pass)
+- [x] test_integration.py passes (8 previously failing tests now pass)
+- [x] No new test failures introduced
+- [x] Evidence files captured in .sisyphus/evidence/
