@@ -13,7 +13,7 @@ from madousho.flow.tasks.base import TaskBase
 
 
 # Test fixtures
-class TestTask(TaskBase):
+class TaskFixture(TaskBase):
     """Simple test task for FlowBase tests."""
     
     def __init__(self, value: int = 42, label: str = "test"):
@@ -35,7 +35,7 @@ class FailingTask(TaskBase):
         raise Exception(self.error_msg)
 
 
-class TestFlow(FlowBase):
+class FlowFixture(FlowBase):
     """Test flow implementation."""
     
     def run(self, **kwargs):
@@ -47,7 +47,7 @@ class TestFlowBaseInit:
     
     def test_create_flow_with_minimal_params(self):
         """Test creating FlowBase with minimal parameters."""
-        flow = TestFlow()
+        flow = FlowFixture()
         
         assert flow.uuid is not None
         assert flow.name is not None
@@ -56,33 +56,33 @@ class TestFlowBaseInit:
     
     def test_create_flow_with_name(self):
         """Test creating FlowBase with custom name."""
-        flow = TestFlow(name="my_flow")
+        flow = FlowFixture(name="my_flow")
         
         assert flow.name == "my_flow"
     
     def test_create_flow_with_description(self):
         """Test creating FlowBase with description."""
-        flow = TestFlow(description="A test flow")
+        flow = FlowFixture(description="A test flow")
         
         assert flow.description == "A test flow"
     
     def test_create_flow_with_context(self):
         """Test creating FlowBase with context."""
-        flow = TestFlow(context={"key": "value", "number": 42})
+        flow = FlowFixture(context={"key": "value", "number": 42})
         
         assert flow.context == {"key": "value", "number": 42}
     
     def test_create_flow_with_uuid(self):
         """Test creating FlowBase with custom UUID."""
         custom_uuid = str(uuid4())
-        flow = TestFlow(uuid=custom_uuid)
+        flow = FlowFixture(uuid=custom_uuid)
         
         assert flow.uuid == custom_uuid
         assert flow.flow_uuid == custom_uuid
     
     def test_flow_uuid_and_uuid_are_same(self):
         """Test that flow_uuid and uuid properties return same value."""
-        flow = TestFlow()
+        flow = FlowFixture()
         
         assert flow.uuid == flow.flow_uuid
 
@@ -92,8 +92,8 @@ class TestFlowBaseRegisterTask:
     
     def test_register_task_returns_uuid(self):
         """Test that register_task returns task UUID."""
-        flow = TestFlow()
-        task = TestTask()
+        flow = FlowFixture()
+        task = TaskFixture()
         
         task_uuid = flow.register_task(task)
         
@@ -102,8 +102,8 @@ class TestFlowBaseRegisterTask:
     
     def test_register_task_sets_task_uuid(self):
         """Test that register_task sets task._uuid."""
-        flow = TestFlow()
-        task = TestTask()
+        flow = FlowFixture()
+        task = TaskFixture()
         
         flow.register_task(task)
         
@@ -111,8 +111,8 @@ class TestFlowBaseRegisterTask:
     
     def test_register_task_sets_task_flow(self):
         """Test that register_task sets task._flow reference."""
-        flow = TestFlow()
-        task = TestTask()
+        flow = FlowFixture()
+        task = TaskFixture()
         
         flow.register_task(task)
         
@@ -120,8 +120,8 @@ class TestFlowBaseRegisterTask:
     
     def test_register_task_sets_state_to_pending(self):
         """Test that register_task sets task._state to pending."""
-        flow = TestFlow()
-        task = TestTask()
+        flow = FlowFixture()
+        task = TaskFixture()
         
         flow.register_task(task)
         
@@ -129,8 +129,8 @@ class TestFlowBaseRegisterTask:
     
     def test_register_task_with_custom_timeout(self):
         """Test that register_task accepts custom timeout."""
-        flow = TestFlow()
-        task = TestTask()
+        flow = FlowFixture()
+        task = TaskFixture()
         
         # Should not raise
         task_uuid = flow.register_task(task, timeout=60.0)
@@ -143,7 +143,7 @@ class TestFlowBaseGetTasks:
     
     def test_get_tasks_empty(self):
         """Test get_tasks when no tasks registered."""
-        flow = TestFlow()
+        flow = FlowFixture()
         
         tasks = flow.get_tasks("nonexistent")
         
@@ -151,11 +151,11 @@ class TestFlowBaseGetTasks:
     
     def test_get_tasks_returns_matching_label(self):
         """Test that get_tasks returns tasks with matching label."""
-        flow = TestFlow()
+        flow = FlowFixture()
         
-        flow.register_task(TestTask(label="search"))
-        flow.register_task(TestTask(label="search"))
-        flow.register_task(TestTask(label="fetch"))
+        flow.register_task(TaskFixture(label="search"))
+        flow.register_task(TaskFixture(label="search"))
+        flow.register_task(TaskFixture(label="fetch"))
         
         search_tasks = flow.get_tasks("search")
         
@@ -163,11 +163,11 @@ class TestFlowBaseGetTasks:
     
     def test_get_tasks_returns_in_registration_order(self):
         """Test that get_tasks returns tasks in registration order."""
-        flow = TestFlow()
+        flow = FlowFixture()
         
-        flow.register_task(TestTask(value=1, label="same"))
-        flow.register_task(TestTask(value=2, label="same"))
-        flow.register_task(TestTask(value=3, label="same"))
+        flow.register_task(TaskFixture(value=1, label="same"))
+        flow.register_task(TaskFixture(value=2, label="same"))
+        flow.register_task(TaskFixture(value=3, label="same"))
         
         tasks = flow.get_tasks("same")
         
@@ -180,8 +180,8 @@ class TestFlowBaseRunTask:
     
     def test_run_task_executes_task(self):
         """Test that run_task executes the task."""
-        flow = TestFlow()
-        task = TestTask(value=100)
+        flow = FlowFixture()
+        task = TaskFixture(value=100)
         
         result = flow.run_task(task)
         
@@ -189,8 +189,8 @@ class TestFlowBaseRunTask:
     
     def test_run_task_returns_result(self):
         """Test that run_task returns task result."""
-        flow = TestFlow()
-        task = TestTask(value=42)
+        flow = FlowFixture()
+        task = TaskFixture(value=42)
         
         result = flow.run_task(task)
         
@@ -198,7 +198,7 @@ class TestFlowBaseRunTask:
     
     def test_run_task_propagates_exception(self):
         """Test that run_task propagates task exceptions."""
-        flow = TestFlow()
+        flow = FlowFixture()
         task = FailingTask(error_msg="Test error")
         
         with pytest.raises(Exception) as exc_info:
@@ -208,8 +208,8 @@ class TestFlowBaseRunTask:
     
     def test_run_task_saves_state_on_success(self):
         """Test that run_task saves state on success."""
-        flow = TestFlow()
-        task = TestTask(value=42)
+        flow = FlowFixture()
+        task = TaskFixture(value=42)
         
         flow.run_task(task)
         
@@ -218,7 +218,7 @@ class TestFlowBaseRunTask:
     
     def test_run_task_saves_state_on_failure(self):
         """Test that run_task saves state on failure."""
-        flow = TestFlow()
+        flow = FlowFixture()
         task = FailingTask()
         
         try:
@@ -235,21 +235,21 @@ class TestFlowBaseRunParallel:
     
     def test_run_parallel_executes_all_tasks(self):
         """Test that run_parallel executes all tasks."""
-        flow = TestFlow()
+        flow = FlowFixture()
         
-        tasks = [TestTask(value=i) for i in range(3)]
+        tasks = [TaskFixture(value=i) for i in range(3)]
         results = flow.run_parallel(*tasks)
         
         assert results == [0, 1, 2]
     
     def test_run_parallel_returns_results_in_order(self):
         """Test that run_parallel returns results in input order."""
-        flow = TestFlow()
+        flow = FlowFixture()
         
         tasks = [
-            TestTask(value=10),
-            TestTask(value=20),
-            TestTask(value=30),
+            TaskFixture(value=10),
+            TaskFixture(value=20),
+            TaskFixture(value=30),
         ]
         results = flow.run_parallel(*tasks)
         
@@ -257,12 +257,12 @@ class TestFlowBaseRunParallel:
     
     def test_run_parallel_propagates_exception(self):
         """Test that run_parallel propagates exceptions."""
-        flow = TestFlow()
+        flow = FlowFixture()
         
         tasks = [
-            TestTask(value=1),
+            TaskFixture(value=1),
             FailingTask("Parallel error"),
-            TestTask(value=3),
+            TaskFixture(value=3),
         ]
         
         with pytest.raises(Exception) as exc_info:
@@ -272,9 +272,9 @@ class TestFlowBaseRunParallel:
     
     def test_run_parallel_with_single_task(self):
         """Test that run_parallel works with single task."""
-        flow = TestFlow()
+        flow = FlowFixture()
         
-        results = flow.run_parallel(TestTask(value=42))
+        results = flow.run_parallel(TaskFixture(value=42))
         
         assert results == [42]
 
@@ -284,13 +284,13 @@ class TestFlowBaseRetryUntil:
     
     def test_retry_until_succeeds_on_first_try(self):
         """Test retry_until when condition is met on first try."""
-        flow = TestFlow()
+        flow = FlowFixture()
         
         attempt_count = {"count": 0}
         
         def create_task():
             attempt_count["count"] += 1
-            return TestTask(value=100)
+            return TaskFixture(value=100)
         
         def check_success(result):
             return result >= 50
@@ -302,14 +302,14 @@ class TestFlowBaseRetryUntil:
     
     def test_retry_until_succeeds_after_retries(self):
         """Test retry_until when condition is met after retries."""
-        flow = TestFlow()
+        flow = FlowFixture()
         
         attempt_count = {"count": 0}
         
         def create_task():
             attempt_count["count"] += 1
             # Return attempt number as value
-            return TestTask(value=attempt_count["count"])
+            return TaskFixture(value=attempt_count["count"])
         
         def check_success(result):
             return result >= 3
@@ -321,10 +321,10 @@ class TestFlowBaseRetryUntil:
     
     def test_retry_until_exhausts_max_retries(self):
         """Test retry_until when max_retries is exhausted."""
-        flow = TestFlow()
+        flow = FlowFixture()
         
         def create_task():
-            return TestTask(value=1)  # Always returns 1
+            return TaskFixture(value=1)  # Always returns 1
         
         def check_success(result):
             return result >= 10  # Never succeeds
@@ -337,7 +337,7 @@ class TestFlowBaseRetryUntil:
     
     def test_retry_until_with_exception(self):
         """Test retry_until when task raises exception."""
-        flow = TestFlow()
+        flow = FlowFixture()
         
         attempt_count = {"count": 0}
         
@@ -345,7 +345,7 @@ class TestFlowBaseRetryUntil:
             attempt_count["count"] += 1
             if attempt_count["count"] < 3:
                 raise Exception("Temporary failure")
-            return TestTask(value=42)
+            return TaskFixture(value=42)
         
         def check_success(result):
             return result == 42
@@ -357,7 +357,7 @@ class TestFlowBaseRetryUntil:
     
     def test_retry_until_all_retries_fail_with_exception(self):
         """Test retry_until when all retries fail with exception."""
-        flow = TestFlow()
+        flow = FlowFixture()
         
         def create_always_failing_task():
             raise Exception("Always fails")
@@ -373,31 +373,31 @@ class TestFlowBaseProperties:
     
     def test_uuid_is_string(self):
         """Test that uuid property returns string."""
-        flow = TestFlow()
+        flow = FlowFixture()
         
         assert isinstance(flow.uuid, str)
     
     def test_flow_uuid_is_string(self):
         """Test that flow_uuid property returns string."""
-        flow = TestFlow()
+        flow = FlowFixture()
         
         assert isinstance(flow.flow_uuid, str)
     
     def test_name_is_string(self):
         """Test that name property returns string."""
-        flow = TestFlow(name="test")
+        flow = FlowFixture(name="test")
         
         assert isinstance(flow.name, str)
     
     def test_description_is_string(self):
         """Test that description property returns string."""
-        flow = TestFlow(description="test")
+        flow = FlowFixture(description="test")
         
         assert isinstance(flow.description, str)
     
     def test_context_is_dict(self):
         """Test that context property returns dict."""
-        flow = TestFlow(context={"key": "value"})
+        flow = FlowFixture(context={"key": "value"})
         
         assert isinstance(flow.context, dict)
 
