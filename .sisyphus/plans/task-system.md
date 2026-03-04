@@ -205,16 +205,15 @@ Wave 1 (Start Immediately - 基础设施):
 └── Task 4B: 崩溃恢复机制 [quick]
 
 Wave 2 (After Wave 1 - FlowBase 扩展):
-├── Task 5: FlowBase 扩展 - register_task/get_tasks [deep]
-├── Task 6: FlowBase 扩展 - wait_for_task [unspecified-high]
-├── Task 7: FlowBase 扩展 - run_parallel [deep]
-└── Task 8: FlowBase 扩展 - retry_until [quick]
+├── Task 5: FlowBase 扩展 - register_task/get_tasks/run_task [deep]
+├── Task 6: FlowBase 扩展 - run_parallel [deep]
+└── Task 7: FlowBase 扩展 - retry_until [quick]
 
 Wave 3 (After Wave 2 - 示例 + 测试):
-├── Task 9: 示例 Flow 和 Task 实现 [visual-engineering]
-├── Task 10: 单元测试 - TaskBase [deep]
-├── Task 11: 单元测试 - FlowStorage [deep]
-└── Task 12: 单元测试 - FlowBase 扩展 [deep]
+├── Task 8: 示例 Flow 和 Task 实现 [visual-engineering]
+├── Task 9: 单元测试 - TaskBase [deep]
+├── Task 10: 单元测试 - FlowStorage [deep]
+└── Task 11: 单元测试 - FlowBase 扩展 [deep]
 
 Wave FINAL (After ALL tasks - 验证):
 ├── F1: Plan Compliance Audit (oracle)
@@ -222,7 +221,7 @@ Wave FINAL (After ALL tasks - 验证):
 ├── F3: Real Manual QA (unspecified-high)
 └── F4: Scope Fidelity Check (deep)
 
-Critical Path: Task 1 → Task 4 → Task 5 → Task 9 → Task 10-12 → F1-F4
+Critical Path: Task 1 → Task 4 → Task 5 → Task 8 → Task 9-11 → F1-F4
 Parallel Speedup: ~60% faster than sequential
 Max Concurrent: 5 (Wave 1)
 ```
@@ -231,15 +230,15 @@ Max Concurrent: 5 (Wave 1)
 
 | Task | Depends On | Blocks |
 |------|------------|--------|
-| 1-4, 4B | — | 5-8 |
-| 5-8 | 1-4, 4B | 9-12 |
-| 9-12 | 5-8 | F1-F4 |
+| 1-4, 4B | — | 5-7 |
+| 5-7 | 1-4, 4B | 8-11 |
+| 8-11 | 5-7 | F1-F4 |
 | F1-F4 | 9-12 | — |
 
 ### Agent Dispatch Summary
 
 - **Wave 1**: 5 tasks → `quick` (基础工具类 + 崩溃恢复)
-- **Wave 2**: 4 tasks → `deep`/`unspecified-high` (FlowBase 扩展)
+- **Wave 2**: 3 tasks → `deep`/`quick` (FlowBase 扩展)
 - **Wave 3**: 4 tasks → `deep`/`visual-engineering` (示例 + 测试)
 - **FINAL**: 4 tasks → 并行 review
 
@@ -614,62 +613,7 @@ Max Concurrent: 5 (Wave 1)
 
 ---
 
-- [ ] 6. FlowBase 扩展 - wait_for_task
-
-  **What to do**:
-  - 实现 `wait_for_task(label: str, timeout: float = 30.0) -> Dict` - **同步方法**
-  - 轮询检查 task 状态（每 500ms）
-  - 超时抛出 `TimeoutError`
-  - task 状态为 "completed" 或 "failed" 时返回
-
-  **Must NOT do**:
-  - 不阻塞事件循环（用 asyncio.sleep）
-  - 不无限轮询（必须超时）
-
-  **Recommended Agent Profile**:
-  - **Category**: `unspecified-high`
-  - **Skills**: []
-
-  **Parallelization**:
-  - **Can Run In Parallel**: YES
-  - **Parallel Group**: Wave 2 (with Tasks 5, 7-8)
-  - **Blocks**: Tasks 9-12
-  - **Blocked By**: Tasks 1-4
-
-  **References**:
-  - `src/madousho/flow/storage.py` - FlowStorage.get_task
-
-  **Acceptance Criteria**:
-  - [ ] 轮询间隔 500ms
-  - [ ] 超时抛出 TimeoutError
-  - [ ] task 完成时立即返回
-
-  **QA Scenarios**:
-  ```
-  Scenario: 等待 task 完成
-    Tool: Bash
-    Steps:
-      1. 启动一个异步 task（模拟 2 秒后完成）
-      2. 调用 wait_for_task("test_label", timeout=5.0)
-      3. 验证返回的 task 状态为 "completed"
-    Expected Result: 2 秒后返回，状态正确
-    Evidence: .sisyphus/evidence/task-6-wait-success.json
-
-  Scenario: 等待超时
-    Tool: Bash
-    Steps:
-      1. 不调用 task（保持 pending）
-      2. 调用 wait_for_task("test_label", timeout=1.0)
-      3. 验证抛出 TimeoutError
-    Expected Result: 1 秒后抛出异常
-    Evidence: .sisyphus/evidence/task-6-timeout.txt
-  ```
-
-  **Commit**: YES (groups with 5, 7-8)
-
----
-
-- [ ] 7. FlowBase 扩展 - run_parallel
+- [ ] 6. FlowBase 扩展 - run_parallel
 
   **What to do**:
   - 实现 `run_parallel(*tasks: TaskBase, timeout: float = 30.0) -> List[Any]` - **同步方法**
@@ -678,6 +622,7 @@ Max Concurrent: 5 (Wave 1)
   - 对每个 task 调用 `run_task()` 方法
   - 返回所有 task 的结果列表
   - **阻塞等待所有 tasks 完成**
+
   **Must NOT do**:
   - 不串行执行（必须并发）
   - 不捕获异常（让调用者处理）
@@ -688,8 +633,8 @@ Max Concurrent: 5 (Wave 1)
 
   **Parallelization**:
   - **Can Run In Parallel**: YES
-  - **Parallel Group**: Wave 2 (with Tasks 5-6, 8)
-  - **Blocks**: Tasks 9-12
+  - **Parallel Group**: Wave 2 (with Tasks 5, 7)
+  - **Blocks**: Tasks 8-11
   - **Blocked By**: Tasks 1-4
 
   **References**:
@@ -698,7 +643,7 @@ Max Concurrent: 5 (Wave 1)
 
   **Acceptance Criteria**:
   - [ ] 所有 tasks 并发执行（非串行）
-  - [ ] 返回 task uuid 列表
+  - [ ] 返回结果列表（按输入顺序）
   - [ ] 异常时抛出（不静默失败）
 
   **QA Scenarios**:
@@ -707,26 +652,26 @@ Max Concurrent: 5 (Wave 1)
     Tool: Bash
     Steps:
       1. 创建 3 个 tasks（每个模拟 1 秒延迟）
-      2. 调用 start_parallel(*tasks)
+      2. 调用 run_parallel(*tasks)
       3. 记录总耗时
     Expected Result: 总耗时 ~1 秒（非 3 秒）
-    Evidence: .sisyphus/evidence/task-7-parallel-timing.txt
+    Evidence: .sisyphus/evidence/task-6-parallel-timing.txt
 
   Scenario: 异常传播
     Tool: Bash
     Steps:
       1. 创建 1 个会抛出异常的 task
-      2. 调用 start_parallel(task)
+      2. 调用 run_parallel(task)
       3. 验证异常被抛出
     Expected Result: 异常传播到调用者
-    Evidence: .sisyphus/evidence/task-7-exception.txt
+    Evidence: .sisyphus/evidence/task-6-exception.txt
   ```
 
-  **Commit**: YES (groups with 5-6, 8)
+  **Commit**: YES (groups with 5, 7)
 
 ---
 
-- [ ] 8. FlowBase 扩展 - retry_until
+- [ ] 7. FlowBase 扩展 - retry_until
 
   **What to do**:
   - 实现 `retry_until(task_factory: Callable[[], TaskBase], condition: Callable[[Dict], bool], max_retries: int = 3) -> Any` - **同步方法**
@@ -734,9 +679,8 @@ Max Concurrent: 5 (Wave 1)
   - 达到 max_retries 后抛出异常
   - 返回最后一次 task 的 result
 
-
   **Must NOT do**:
-  - 不无限重试（必须 max_retry 限制）
+  - 不无限重试（必须 max_retries 限制）
   - 不修改 task 内部逻辑
 
   **Recommended Agent Profile**:
@@ -745,15 +689,15 @@ Max Concurrent: 5 (Wave 1)
 
   **Parallelization**:
   - **Can Run In Parallel**: YES
-  - **Parallel Group**: Wave 2 (with Tasks 5-7)
-  - **Blocks**: Tasks 9-12
+  - **Parallel Group**: Wave 2 (with Tasks 5-6)
+  - **Blocks**: Tasks 8-11
   - **Blocked By**: Tasks 1-4
 
   **References**:
   - 设计文档：重试策略
 
+  **Acceptance Criteria**:
   - [ ] 支持自定义 condition 函数
-  - [ ] 达到 max_retries 后停止
   - [ ] 达到 max_retries 后停止
   - [ ] 返回最后一次 result
 
@@ -766,7 +710,7 @@ Max Concurrent: 5 (Wave 1)
       2. 创建 condition 始终返回 True
       3. 调用 retry_until
     Expected Result: 一次成功，返回 result
-    Evidence: .sisyphus/evidence/task-8-success.json
+    Evidence: .sisyphus/evidence/task-7-success.json
 
   Scenario: 重试后成功
     Tool: Bash
@@ -775,7 +719,7 @@ Max Concurrent: 5 (Wave 1)
       2. 创建 condition 检查 result["success"] == True
       3. 调用 retry_until(max_retries=3)
     Expected Result: 第 3 次成功
-    Evidence: .sisyphus/evidence/task-8-retry.json
+    Evidence: .sisyphus/evidence/task-7-retry.json
 
   Scenario: 达到最大重试次数
     Tool: Bash
@@ -784,14 +728,14 @@ Max Concurrent: 5 (Wave 1)
       2. 调用 retry_until(max_retries=3)
       3. 验证抛出异常
     Expected Result: 3 次重试后抛出异常
-    Evidence: .sisyphus/evidence/task-8-max-retry.txt
+    Evidence: .sisyphus/evidence/task-7-max-retry.txt
   ```
 
-  **Commit**: YES (groups with 5-7)
+  **Commit**: YES (groups with 5-6)
 
 ---
 
-- [ ] 9. 示例 Flow 和 Task 实现
+- [ ] 8. 示例 Flow 和 Task 实现
 
   **What to do**:
   - 创建 `examples/task_flow/` 目录
@@ -813,8 +757,8 @@ Max Concurrent: 5 (Wave 1)
   **Parallelization**:
   - **Can Run In Parallel**: NO
   - **Parallel Group**: Wave 3 (sequential after Waves 1-2)
-  - **Blocks**: Tasks 10-12
-  - **Blocked By**: Tasks 5-8
+  - **Blocks**: Tasks 9-11
+  - **Blocked By**: Tasks 5-7
 
   **References**:
   - `examples/example_flows/` - 现有示例 flow 结构
@@ -836,7 +780,7 @@ Max Concurrent: 5 (Wave 1)
       2. 运行：madousho run --file examples/task_flow
       3. 验证输出包含 "Flow completed"
     Expected Result: Flow 成功完成，无错误
-    Evidence: .sisyphus/evidence/task-9-run-flow.txt
+    Evidence: .sisyphus/evidence/task-8-run-flow.txt
 
   Scenario: 验证 JSON 文件生成
     Tool: Bash
@@ -845,14 +789,14 @@ Max Concurrent: 5 (Wave 1)
       2. 检查 flow_{uuid}/meta.json 存在
       3. 检查 task_{uuid}.json 存在
     Expected Result: 所有文件存在且格式正确
-    Evidence: .sisyphus/evidence/task-9-files.json
+    Evidence: .sisyphus/evidence/task-8-files.json
   ```
 
-  **Commit**: YES (groups with 10-12)
+  **Commit**: YES (groups with 9-11)
 
 ---
 
-- [ ] 10. 单元测试 - TaskBase
+- [ ] 9. 单元测试 - TaskBase
 
   **What to do**:
   - 创建 `tests/flow/test_tasks.py`
@@ -871,9 +815,9 @@ Max Concurrent: 5 (Wave 1)
 
   **Parallelization**:
   - **Can Run In Parallel**: YES
-  - **Parallel Group**: Wave 3 (with Tasks 11-12)
+  - **Parallel Group**: Wave 3 (with Tasks 10-11)
   - **Blocks**: F1-F4
-  - **Blocked By**: Tasks 5-9
+  - **Blocked By**: Tasks 5-8
 
   **References**:
   - `tests/flow/test_base.py` - 现有 Flow 测试模式
@@ -892,14 +836,14 @@ Max Concurrent: 5 (Wave 1)
       1. 运行：python -m pytest tests/flow/test_tasks.py -v
       2. 验证所有测试通过
     Expected Result: 0 失败，0 错误
-    Evidence: .sisyphus/evidence/task-10-pytest-output.txt
+    Evidence: .sisyphus/evidence/task-9-pytest-output.txt
   ```
 
-  **Commit**: YES (groups with 9, 11-12)
+  **Commit**: YES (groups with 8, 10-11)
 
 ---
 
-- [ ] 11. 单元测试 - FlowStorage
+- [ ] 10. 单元测试 - FlowStorage
 
   **What to do**:
   - 在 `tests/flow/test_storage.py` 中添加测试
@@ -918,9 +862,9 @@ Max Concurrent: 5 (Wave 1)
 
   **Parallelization**:
   - **Can Run In Parallel**: YES
-  - **Parallel Group**: Wave 3 (with Tasks 10, 12)
+  - **Parallel Group**: Wave 3 (with Tasks 9, 11)
   - **Blocks**: F1-F4
-  - **Blocked By**: Tasks 1-9
+  - **Blocked By**: Tasks 1-8
 
   **References**:
   - `tests/flow/test_base.py` - 现有测试模式
@@ -939,21 +883,21 @@ Max Concurrent: 5 (Wave 1)
       1. 运行：python -m pytest tests/flow/test_storage.py -v
       2. 验证所有测试通过
     Expected Result: 0 失败，0 错误
-    Evidence: .sisyphus/evidence/task-11-pytest-output.txt
+    Evidence: .sisyphus/evidence/task-10-pytest-output.txt
   ```
 
-  **Commit**: YES (groups with 9-10, 12)
+  **Commit**: YES (groups with 8-9, 11)
 
 ---
 
-- [ ] 12. 单元测试 - FlowBase 扩展
+- [ ] 11. 单元测试 - FlowBase 扩展
 
   **What to do**:
   - 在 `tests/flow/test_base.py` 中添加测试
   - 测试 FlowBase 扩展方法
-  - 测试 register_task, get_tasks, wait_for_task
+  - 测试 register_task, get_tasks
   - 测试 run_parallel 并发执行
-
+  - 测试 retry_until 重试逻辑
 
   **Must NOT do**:
   - 不修改现有测试（只添加）
@@ -965,9 +909,9 @@ Max Concurrent: 5 (Wave 1)
 
   **Parallelization**:
   - **Can Run In Parallel**: YES
-  - **Parallel Group**: Wave 3 (with Tasks 10-11)
+  - **Parallel Group**: Wave 3 (with Tasks 9-10)
   - **Blocks**: F1-F4
-  - **Blocked By**: Tasks 5-9
+  - **Blocked By**: Tasks 5-8
 
   **References**:
   - `tests/flow/test_base.py` - 现有 Flow 测试
@@ -985,10 +929,10 @@ Max Concurrent: 5 (Wave 1)
       1. 运行：python -m pytest tests/flow/test_base.py -v
       2. 验证所有测试通过
     Expected Result: 0 失败，0 错误
-    Evidence: .sisyphus/evidence/task-12-pytest-output.txt
+    Evidence: .sisyphus/evidence/task-11-pytest-output.txt
   ```
 
-  **Commit**: YES (groups with 9-11)
+  **Commit**: YES (groups with 8-10)
 
 ---
 
@@ -1019,7 +963,7 @@ Max Concurrent: 5 (Wave 1)
   - Methods: `create_flow()`, `append_flow()`, `register_task()`, `update_task_state()`, `get_tasks()`
 
 - **Wave 2**: `feat(flow): extend FlowBase with task management` — flow/base.py
-  - Methods: `register_task()`, `get_tasks()`, `wait_for_task()`, `run_parallel()`, `retry_until()`
+  - Methods: `register_task()`, `get_tasks()`, `run_task()`, `run_parallel()`, `retry_until()`
 
 - **Wave 3**: `feat(examples): add task_flow example` — examples/task_flow/
 
