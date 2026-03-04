@@ -246,7 +246,7 @@ Max Concurrent: 5 (Wave 1)
 
 ## TODOs
 
-- [ ] 1. TaskBase 抽象类
+- [x] 1. TaskBase 抽象类
 
   **What to do**:
   - 创建 `src/madousho/flow/tasks/__init__.py`（包初始化）
@@ -307,7 +307,7 @@ Max Concurrent: 5 (Wave 1)
 
 ---
 
-- [ ] 2. AtomicJsonWriter 原子写入
+- [x] 2. AtomicJsonWriter 原子写入
 
   **What to do**:
   - 在 `src/madousho/flow/storage.py` 中实现 `AtomicJsonWriter` 类
@@ -363,7 +363,7 @@ Max Concurrent: 5 (Wave 1)
 
 ---
 
-- [ ] 3. FlowIndex JSONL 全局索引
+- [x] 3. FlowIndex JSONL 全局索引
 
   **What to do**:
   - 在 `src/madousho/flow/storage.py` 中实现 `FlowIndex` 类
@@ -422,7 +422,7 @@ Max Concurrent: 5 (Wave 1)
 
 ---
 
-- [ ] 4. FlowStorage 存储层
+- [x] 4. FlowStorage 存储层
 
   **What to do**:
   - 在 `src/madousho/flow/storage.py` 中实现 `FlowStorage` 类
@@ -484,7 +484,7 @@ Max Concurrent: 5 (Wave 1)
 
 ---
 
-- [ ] 4B. 崩溃恢复机制
+- [x] 4B. 崩溃恢复机制
 
   **What to do**:
   - 在 `src/madousho/flow/storage.py` 中实现 `recover_orphaned_tasks()` 方法
@@ -547,7 +547,7 @@ Max Concurrent: 5 (Wave 1)
 
 ---
 
-- [ ] 5. FlowBase 扩展 - register_task/get_tasks/run_task
+- [x] 5. FlowBase 扩展 - register_task/get_tasks/run_task
 
   **What to do**:
   - 扩展 `src/madousho/flow/base.py` 中的 `FlowBase` 类
@@ -613,7 +613,7 @@ Max Concurrent: 5 (Wave 1)
 
 ---
 
-- [ ] 6. FlowBase 扩展 - run_parallel
+- [x] 6. FlowBase 扩展 - run_parallel
 
   **What to do**:
   - 实现 `run_parallel(*tasks: TaskBase, timeout: float = 30.0) -> List[Any]` - **同步方法**
@@ -671,7 +671,7 @@ Max Concurrent: 5 (Wave 1)
 
 ---
 
-- [ ] 7. FlowBase 扩展 - retry_until
+- [x] 7. FlowBase 扩展 - retry_until
 
   **What to do**:
   - 实现 `retry_until(task_factory: Callable[[], TaskBase], condition: Callable[[Dict], bool], max_retries: int = 3) -> Any` - **同步方法**
@@ -735,7 +735,7 @@ Max Concurrent: 5 (Wave 1)
 
 ---
 
-- [ ] 8. 示例 Flow 和 Task 实现
+- [x] 8. 示例 Flow 和 Task 实现
 
   **What to do**:
   - 创建 `examples/task_flow/` 目录
@@ -796,7 +796,7 @@ Max Concurrent: 5 (Wave 1)
 
 ---
 
-- [ ] 9. 单元测试 - TaskBase
+- [x] 9. 单元测试 - TaskBase
 
   **What to do**:
   - 创建 `tests/flow/test_tasks.py`
@@ -843,7 +843,7 @@ Max Concurrent: 5 (Wave 1)
 
 ---
 
-- [ ] 10. 单元测试 - FlowStorage
+- [x] 10. 单元测试 - FlowStorage
 
   **What to do**:
   - 在 `tests/flow/test_storage.py` 中添加测试
@@ -890,7 +890,7 @@ Max Concurrent: 5 (Wave 1)
 
 ---
 
-- [ ] 11. 单元测试 - FlowBase 扩展
+- [x] 11. 单元测试 - FlowBase 扩展
 
   **What to do**:
   - 在 `tests/flow/test_base.py` 中添加测试
