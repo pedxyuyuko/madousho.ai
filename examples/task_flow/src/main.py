@@ -1,5 +1,4 @@
 """Example Flow demonstrating the Task system."""
-
 from madousho.flow.base import FlowBase
 from madousho.flow.tasks.base import TaskBase
 
@@ -11,7 +10,7 @@ class SearchTask(TaskBase):
         super().__init__(label="search")
         self.query = query
     
-    def run(self) -> dict:
+    def run(self):
         return {
             "query": self.query,
             "results": [f"Result {i} for '{self.query}'" for i in range(1, 4)],
@@ -25,7 +24,7 @@ class SummarizeTask(TaskBase):
         super().__init__(label="summarize")
         self.text = text
     
-    def run(self) -> dict:
+    def run(self):
         return {
             "original_length": len(self.text),
             "summary": f"Summary: {self.text[:50]}...",
@@ -43,7 +42,7 @@ class DataFetchTask(TaskBase):
         self.source = source
         self._fail_count = fail_count
     
-    def run(self) -> dict:
+    def run(self):
         DataFetchTask._global_attempt += 1
         
         if DataFetchTask._global_attempt <= self._fail_count:
@@ -59,7 +58,7 @@ class DataFetchTask(TaskBase):
 class ExampleFlow(FlowBase):
     """Example flow demonstrating Task system features."""
     
-    def run(self, **kwargs) -> dict:
+    def run(self):
         print(f"\n🚀 Starting ExampleFlow: {self.name}")
         print(f"   UUID: {self.uuid}")
         
@@ -107,15 +106,5 @@ class ExampleFlow(FlowBase):
         return results
 
 
+# Required export - framework reads this variable
 FlowClass = ExampleFlow
-
-
-if __name__ == "__main__":
-    flow = ExampleFlow(
-        name="example_task_flow",
-        description="Demonstrates Task system features",
-        context={"example": True}
-    )
-    
-    result = flow.run()
-    print(f"\n📊 Final results: {list(result.keys())}")
