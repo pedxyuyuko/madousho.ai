@@ -278,11 +278,11 @@ Max Concurrent: 5 (Wave 1)
   - 设计文档：Task State JSON 格式
 
   **Acceptance Criteria**:
-  - [ ] `src/madousho/flow/tasks/base.py` 存在
-  - [ ] `TaskBase` 是抽象类（继承 ABC）
-  - [ ] `run()` 是抽象方法（`@abstractmethod`）
-  - [ ] `run()` 是**同步方法**（`def run`，不是 `async def`）
-  - [ ] `python -c "from madousho.flow.tasks.base import TaskBase"` → 无错误
+  - [x] `src/madousho/flow/tasks/base.py` 存在
+  - [x] `TaskBase` 是抽象类（继承 ABC）
+  - [x] `run()` 是抽象方法（`@abstractmethod`）
+  - [x] `run()` 是**同步方法**（`def run`，不是 `async def`）
+  - [x] `python -c "from madousho.flow.tasks.base import TaskBase"` → 无错误
 
   **QA Scenarios**:
   ```
@@ -335,10 +335,10 @@ Max Concurrent: 5 (Wave 1)
   - 设计文档：原子写入方案（tempfile + os.replace + fsync）
 
   **Acceptance Criteria**:
-  - [ ] `AtomicJsonWriter.write()` 是异步方法
-  - [ ] 使用临时文件 + 原子替换
-  - [ ] 异常时清理临时文件
-  - [ ] 单元测试验证原子性
+  - [x] `AtomicJsonWriter.write()` 是异步方法
+  - [x] 使用临时文件 + 原子替换
+  - [x] 异常时清理临时文件
+  - [x] 单元测试验证原子性
 
   **QA Scenarios**:
   ```
@@ -392,10 +392,10 @@ Max Concurrent: 5 (Wave 1)
   - 设计文档：JSON Lines 懒加载策略
 
   **Acceptance Criteria**:
-  - [ ] `list_flows()` 支持分页（offset, limit）
-  - [ ] 懒加载：逐行读取，不一次性加载全文件
-  - [ ] 达到 limit 后提前退出
-  - [ ] 追加写入高效（无需重写整个文件）
+  - [x] `list_flows()` 支持分页（offset, limit）
+  - [x] 懒加载：逐行读取，不一次性加载全文件
+  - [x] 达到 limit 后提前退出
+  - [x] 追加写入高效（无需重写整个文件）
 
 
   **QA Scenarios**:
@@ -450,12 +450,12 @@ Max Concurrent: 5 (Wave 1)
   - `src/madousho/flow/storage.py` - AtomicJsonWriter, FlowIndex
   - 设计文档：Flow Meta 和 Task State 格式
 
-  - [ ] `__init__()` 创建 `data/flow/` 目录（如果不存在）
-  - [ ] `create_flow()` 创建 flow 目录和 meta.json
-  - [ ] `register_task()` 更新 meta.json 的 tasks 列表
-  - [ ] `update_task_state()` 实时更新 task 文件 + meta.json 状态
-  - [ ] `get_tasks()` 从 meta.json 索引 + 按需加载 task 文件
-  - [ ] 所有写操作使用 AtomicJsonWriter
+  - [x] `__init__()` 创建 `data/flow/` 目录（如果不存在）
+  - [x] `create_flow()` 创建 flow 目录和 meta.json
+  - [x] `register_task()` 更新 meta.json 的 tasks 列表
+  - [x] `update_task_state()` 实时更新 task 文件 + meta.json 状态
+  - [x] `get_tasks()` 从 meta.json 索引 + 按需加载 task 文件
+  - [x] 所有写操作使用 AtomicJsonWriter
 
   **QA Scenarios**:
   ```
@@ -513,11 +513,11 @@ Max Concurrent: 5 (Wave 1)
   - `src/madousho/flow/storage.py` - FlowStorage 类
 
   **Acceptance Criteria**:
-  - [ ] `recover_orphaned_tasks()` 方法存在
-  - [ ] 扫描所有 flow 目录的 meta.json
-  - [ ] 将 `running` 状态的 tasks 标记为 `failed`
-  - [ ] 更新 meta.json 中的 task 状态
-  - [ ] 应用启动时自动调用
+  - [x] `recover_orphaned_tasks()` 方法存在
+  - [x] 扫描所有 flow 目录的 meta.json
+  - [x] 将 `running` 状态的 tasks 标记为 `failed`
+  - [x] 更新 meta.json 中的 task 状态
+  - [x] 应用启动时自动调用
 
   **QA Scenarios**:
   ```
@@ -575,10 +575,10 @@ Max Concurrent: 5 (Wave 1)
   - `src/madousho/flow/storage.py` - FlowStorage 类
 
   **Acceptance Criteria**:
-  - [ ] FlowBase 可实例化（传入 uuid, name, description）
-  - [ ] `register_task()` 返回 task uuid，创建 task.json 文件
-  - [ ] `get_tasks()` 返回所有匹配的 tasks（label 不唯一，Flow 内唯一）
-  - [ ] `run_task()` 执行完整流程：注册 → 执行 → 保存结果 → 返回
+  - [x] FlowBase 可实例化（传入 uuid, name, description）
+  - [x] `register_task()` 返回 task uuid，创建 task.json 文件
+  - [x] `get_tasks()` 返回所有匹配的 tasks（label 不唯一，Flow 内唯一）
+  - [x] `run_task()` 执行完整流程：注册 → 执行 → 保存结果 → 返回
   **QA Scenarios**:
   ```
   Scenario: FlowBase 实例化
@@ -642,9 +642,9 @@ Max Concurrent: 5 (Wave 1)
   - Python asyncio.gather() 文档
 
   **Acceptance Criteria**:
-  - [ ] 所有 tasks 并发执行（非串行）
-  - [ ] 返回结果列表（按输入顺序）
-  - [ ] 异常时抛出（不静默失败）
+  - [x] 所有 tasks 并发执行（非串行）
+  - [x] 返回结果列表（按输入顺序）
+  - [x] 异常时抛出（不静默失败）
 
   **QA Scenarios**:
   ```
@@ -697,9 +697,9 @@ Max Concurrent: 5 (Wave 1)
   - 设计文档：重试策略
 
   **Acceptance Criteria**:
-  - [ ] 支持自定义 condition 函数
-  - [ ] 达到 max_retries 后停止
-  - [ ] 返回最后一次 result
+  - [x] 支持自定义 condition 函数
+  - [x] 达到 max_retries 后停止
+  - [x] 返回最后一次 result
 
   **QA Scenarios**:
   ```
@@ -766,10 +766,10 @@ Max Concurrent: 5 (Wave 1)
   - `src/madousho/flow/base.py` - FlowBase
 
   **Acceptance Criteria**:
-  - [ ] SearchTask 模拟搜索（返回假数据）
-  - [ ] SummarizeTask 模拟总结
-  - [ ] ExampleFlow 演示 register_task, get_tasks, run_parallel
-  - [ ] 可运行：`madousho run --file examples/task_flow`
+  - [x] SearchTask 模拟搜索（返回假数据）
+  - [x] SummarizeTask 模拟总结
+  - [x] ExampleFlow 演示 register_task, get_tasks, run_parallel
+  - [x] 可运行：`madousho run --file examples/task_flow`
 
   **QA Scenarios**:
   ```
@@ -824,9 +824,9 @@ Max Concurrent: 5 (Wave 1)
   - `src/madousho/flow/tasks/base.py` - TaskBase 实现
 
   **Acceptance Criteria**:
-  - [ ] 测试覆盖 TaskBase 所有公共方法
-  - [ ] 使用 pytest-asyncio 运行异步测试
-  - [ ] 测试通过：`python -m pytest tests/flow/test_tasks.py`
+  - [x] 测试覆盖 TaskBase 所有公共方法
+  - [x] 使用 pytest-asyncio 运行异步测试
+  - [x] 测试通过：`python -m pytest tests/flow/test_tasks.py`
 
   **QA Scenarios**:
   ```
@@ -871,9 +871,9 @@ Max Concurrent: 5 (Wave 1)
   - `src/madousho/flow/storage.py` - FlowStorage 实现
 
   **Acceptance Criteria**:
-  - [ ] 测试覆盖所有存储方法
-  - [ ] 使用临时目录（不污染全局）
-  - [ ] 测试通过：`python -m pytest tests/flow/test_storage.py`
+  - [x] 测试覆盖所有存储方法
+  - [x] 使用临时目录（不污染全局）
+  - [x] 测试通过：`python -m pytest tests/flow/test_storage.py`
 
   **QA Scenarios**:
   ```
@@ -918,8 +918,8 @@ Max Concurrent: 5 (Wave 1)
   - `src/madousho/flow/base.py` - FlowBase 扩展
 
   **Acceptance Criteria**:
-  - [ ] 测试覆盖所有扩展方法
-  - [ ] 测试通过：`python -m pytest tests/flow/test_base.py`
+  - [x] 测试覆盖所有扩展方法
+  - [x] 测试通过：`python -m pytest tests/flow/test_base.py`
 
   **QA Scenarios**:
   ```
