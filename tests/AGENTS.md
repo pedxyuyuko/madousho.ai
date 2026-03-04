@@ -34,7 +34,14 @@ tests/
 
 | Task | Location | Notes |
 |------|----------|-------|
-| Config tests | `tests/config/` | Models, loader, integration |
+| Task | Location | Notes |
+|------|----------|-------|
+| Config tests | `tests/config/` | Models, loader, integration, typehint models |
+| Flow tests | `tests/flow/` | Base, models, loader, registry, storage, tasks |
+| Command tests | `tests/commands/` | CLI command handlers |
+| Fixtures | `conftest.py` | Currently minimal (monkeypatch, tmp_path) |
+| Coverage config | `pytest.ini` | `--cov-fail-under=90` |
+| Pytest config | `pyproject.toml` | `[tool.pytest.ini_options]` - strict markers, strict config |
 | Flow tests | `tests/flow/` | Base, models, loader, registry |
 | Command tests | `tests/commands/` | CLI command handlers |
 | Fixtures | `conftest.py` | Currently minimal (expand as needed) |
@@ -65,6 +72,13 @@ tests/
 - **Boundary testing pattern**: Explicit min/max value tests for validators
 - **Extra fields rejection testing**: Consistent ValidationError assertions
 - **Dual naming support**: Both `test_*.py` and `*_test.py` recognized
+- **Monkeypatch cleanup**: `monkeypatch.delenv(key, raising=False)` before tests
+- **Environment override testing**: MADOUSHO_* prefix patterns tested extensively
+- **Normalization testing**: Hyphen-to-underscore conversion in config loader
+- **Docstring-heavy tests**: Each test method has descriptive documentation
+- **Boundary testing pattern**: Explicit min/max value tests for validators
+- **Extra fields rejection testing**: Consistent ValidationError assertions
+- **Dual naming support**: Both `test_*.py` and `*_test.py` recognized
 
 ## COMMANDS
 
@@ -88,6 +102,13 @@ python -m pytest tests/config/test_models.py::TestAPIConfig::test_valid_port_bou
 ## NOTES
 
 - **Coverage enforcement**: `--cov-fail-under=90` in pytest.ini
+- **Strict markers**: `--strict-markers` prevents undefined markers
+- **Strict config**: `--strict-config` catches invalid pytest config
+- **Python 3.14 target**: Tests target future Python version
+- **No fixtures**: conftest.py currently empty - add fixtures as needed
+- **CI integration**: Tests run automatically on master push (TestPyPI workflow)
+- **Test discovery**: `test_*.py` and `*_test.py` patterns supported
+- **Verbose output**: `-v` flag in pytest.ini for detailed test output
 - **Strict markers**: `--strict-markers` prevents undefined markers
 - **Strict config**: `--strict-config` catches invalid pytest config
 - **Python 3.14 target**: Tests target future Python version

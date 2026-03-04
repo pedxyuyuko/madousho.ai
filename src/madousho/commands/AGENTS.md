@@ -48,3 +48,7 @@ commands/
 - **Config loading**: Each command calls `load_config()` from `config.loader`
 - **Logger**: Import from `madousho.logger` - configured in CLI callback
 - **Context structure**: `ctx.obj` contains `config_path`, `verbose`, `config`
+- **Callback execution**: Config path resolution happens in callback before any command
+- **Config loading**: Each command calls `load_config()` from `config.loader`
+- **Logger**: Import from `madousho.logger` - configured in CLI callback
+- **Context structure**: `ctx.obj` contains `config_path`, `verbose`, `config`

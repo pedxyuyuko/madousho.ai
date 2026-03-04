@@ -60,3 +60,7 @@ config/
 - **Extra fields**: All models reject extra fields - critical for catching typos
 - **Test coverage**: Dedicated test file `tests/config/test_models.py` with 250+ lines
 - **4-layer search**: CLI param → env var → cwd → ~/.config (enforced by cli.py)
+- **Auto-int conversion**: Numeric env vars auto-converted to int (loader.py:85-88)
+- **Extra fields**: All models reject extra fields - critical for catching typos
+- **Test coverage**: Dedicated test file `tests/config/test_models.py` with 250+ lines
+- **4-layer search**: CLI param → env var → cwd → ~/.config (enforced by cli.py)

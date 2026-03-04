@@ -23,7 +23,14 @@ src/madousho/
 │   ├── models.py       # Pydantic v2 config models
 │   ├── loader.py       # YAML loader with env overrides
 │   └── typehint_models.py  # Type-hinted model variants
-└── flow/               # Flow engine
+├── flow/               # Flow engine
+│   ├── base.py         # FlowBase, step primitives
+│   ├── loader.py       # FlowLoader (328 lines)
+│   ├── models.py       # Flow data models
+│   ├── registry.py     # FlowRegistry
+│   ├── storage.py      # FlowStorage (454 lines) - AtomicJsonWriter, JSONL index
+│   └── tasks/          # Task system
+│       └── base.py     # TaskBase abstract class (96 lines)
     ├── base.py         # FlowBase, step primitives
     ├── loader.py       # FlowLoader (328 lines)
     ├── models.py       # Flow data models
@@ -41,6 +48,7 @@ src/madousho/
 | Config loading | `config/loader.py` | `load_config()` with env overrides |
 | Flow engine | `flow/` | See `flow/AGENTS.md` |
 | Logger setup | `logger.py` | Loguru configuration |
+| Flow storage | `flow/storage.py` | AtomicJsonWriter, FlowIndex, FlowStorage |
 
 ## CONVENTIONS
 
@@ -72,4 +80,6 @@ src/madousho/
 - **Config path resolution**: Happens in callback before any command executes
 - **Logger setup**: Loguru-based, configured with CLI flags (--verbose, --json)
 - **Version bug**: `__init__.py` has hardcoded "0.1.0" but should import from `_version.py`
+- **Python version bug**: `pyproject.toml` requires `>=3.14` (should be `>=3.10`)
+- **Missing `__main__.py`**: Prevents `python -m madousho` execution
 - **Python version bug**: `pyproject.toml` requires `>=3.14` (should be `>=3.10`)
