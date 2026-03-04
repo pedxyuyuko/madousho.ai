@@ -208,9 +208,9 @@ Max Concurrent: 3 (Waves 1 & 2)
   - Classifier list helps choose appropriate categories
 
   **Acceptance Criteria**:
-  - [ ] pyproject.toml contains: authors, maintainers, license, readme, classifiers, urls
-  - [ ] `python -m build` succeeds without errors
-  - [ ] `twine check dist/*` passes metadata validation
+  - [x] pyproject.toml contains: authors, maintainers, license, readme, classifiers, urls
+  - [x] `python -m build` succeeds without errors
+  - [x] `twine check dist/*` passes metadata validation
 
   **QA Scenarios**:
 
@@ -281,9 +281,9 @@ Max Concurrent: 3 (Waves 1 & 2)
   - Architecture doc has CLI commands to document
 
   **Acceptance Criteria**:
-  - [ ] README.md contains: description, installation, usage, CLI commands
-  - [ ] README renders correctly on PyPI (valid Markdown)
-  - [ ] pyproject.toml has `readme = "README.md"` field
+  - [x] README.md contains: description, installation, usage, CLI commands
+  - [x] README renders correctly on PyPI (valid Markdown)
+  - [x] pyproject.toml has `readme = "README.md"` field
 
   **QA Scenarios**:
 
@@ -338,9 +338,9 @@ Max Concurrent: 3 (Waves 1 & 2)
   - Package structure affects how setuptools discovers packages
 
   **Acceptance Criteria**:
-  - [ ] `python -m build` produces .tar.gz and .whl in dist/
-  - [ ] `pip install dist/*.whl` succeeds
-  - [ ] `madousho --help` works after installation
+  - [x] `python -m build` produces .tar.gz and .whl in dist/
+  - [x] `pip install dist/*.whl` succeeds
+  - [x] `madousho --help` works after installation
 
   **QA Scenarios**:
 
@@ -399,11 +399,11 @@ Max Concurrent: 3 (Waves 1 & 2)
   - Example shows production-ready workflow pattern
 
   **Acceptance Criteria**:
-  - [ ] Workflow file created at `.github/workflows/pypi-publish.yml`
-  - [ ] Workflow triggers on release published
-  - [ ] Uses `pypa/gh-action-pypi-publish@release/v1` with Trusted Publisher
-  - [ ] Includes `permissions: id-token: write` for OIDC
-  - [ ] Workflow YAML passes syntax validation
+  - [x] Workflow file created at `.github/workflows/pypi-publish.yml`
+  - [x] Workflow triggers on release published
+  - [x] Uses `pypa/gh-action-pypi-publish@release/v1` with Trusted Publisher
+  - [x] Includes `permissions: id-token: write` for OIDC
+  - [x] Workflow YAML passes syntax validation
 
   **QA Scenarios**:
 
@@ -470,10 +470,10 @@ Max Concurrent: 3 (Waves 1 & 2)
   - Can reuse production workflow structure
 
   **Acceptance Criteria**:
-  - [ ] Workflow file created at `.github/workflows/pypi-test-publish.yml`
-  - [ ] Workflow triggers on push to main branch
-  - [ ] Publishes to test.pypi.org (not pypi.org)
-  - [ ] Uses Trusted Publisher with correct repository URL
+  - [x] Workflow file created at `.github/workflows/pypi-test-publish.yml`
+  - [x] Workflow triggers on push to main branch
+  - [x] Publishes to test.pypi.org (not pypi.org)
+  - [x] Uses Trusted Publisher with correct repository URL
 
   **QA Scenarios**:
 
@@ -529,10 +529,10 @@ Max Concurrent: 3 (Waves 1 & 2)
   - Workflows show what OIDC configuration is needed
 
   **Acceptance Criteria**:
-  - [ ] Documentation created with step-by-step instructions
-  - [ ] Includes PyPI Trusted Publisher addition steps
-  - [ ] Includes GitHub repository verification steps
-  - [ ] Includes test publish verification steps
+  - [x] Documentation created with step-by-step instructions
+  - [x] Includes PyPI Trusted Publisher addition steps
+  - [x] Includes GitHub repository verification steps
+  - [x] Includes test publish verification steps
 
   **QA Scenarios**:
 

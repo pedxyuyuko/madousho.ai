@@ -58,10 +58,10 @@
 - `examples/example_flows/src/main.py` - 示例 flow 类
 
 ### Definition of Done
-- [ ] `madousho run` 命令能自动加载 `plugins/flows/` 下的所有 flow
-- [ ] flow 配置独立加载，验证时可引用全局配置
-- [ ] 配置验证失败时有清晰的错误报告
-- [ ] 通过验证的 flow 被实例化并注册到全局注册表
+- [x] `madousho run` 命令能自动加载 `plugins/flows/` 下的所有 flow
+- [x] flow 配置独立加载，验证时可引用全局配置
+- [x] 配置验证失败时有清晰的错误报告
+- [x] 通过验证的 flow 被实例化并注册到全局注册表
 
 ### Must Have
 - FlowBase 基类定义标准接口
@@ -1244,7 +1244,7 @@ def run_cmd(ctx: typer.Context):
 
 > Implementation + Test = ONE Task. Never separate.
 
-- [ ] 1. 定义 FlowBase 基类
+- [x] 1. 定义 FlowBase 基类
 
   **What to do**:
   - 创建 `src/madousho/flow/base.py`
@@ -1272,8 +1272,8 @@ def run_cmd(ctx: typer.Context):
   - `src/madousho/config/models.py` - Pydantic v2 模型定义
 
   **Acceptance Criteria**:
-  - [ ] 测试文件创建：`tests/flow/test_base.py`
-  - [ ] `pytest tests/flow/test_base.py` → PASS
+  - [x] 测试文件创建：`tests/flow/test_base.py`
+  - [x] `pytest tests/flow/test_base.py` → PASS
 
   **QA Scenarios**:
   ```
@@ -1310,7 +1310,7 @@ def run_cmd(ctx: typer.Context):
   - Files: `src/madousho/flow/base.py`, `tests/flow/test_base.py`
   - Pre-commit: `pytest tests/flow/test_base.py`
 
-- [ ] 2. 创建插件相关的 Pydantic 模型
+- [x] 2. 创建插件相关的 Pydantic 模型
 
   **What to do**:
   - 创建 `src/madousho/flow/models.py`
@@ -1336,15 +1336,15 @@ def run_cmd(ctx: typer.Context):
   - `src/madousho/config/models.py:6-40` - Pydantic v2 模型定义
 
   **Acceptance Criteria**:
-  - [ ] 测试文件创建：`tests/flow/test_models.py`
-  - [ ] `pytest tests/flow/test_models.py` → PASS
+  - [x] 测试文件创建：`tests/flow/test_models.py`
+  - [x] `pytest tests/flow/test_models.py` → PASS
 
   **Commit**: YES (groups with 1, 3-6)
   - Message: `feat(flow): add plugin pydantic models`
   - Files: `src/madousho/flow/models.py`, `tests/flow/test_models.py`
   - Pre-commit: `pytest tests/flow/test_models.py`
 
-- [ ] 3. 创建 typehint 验证模型
+- [x] 3. 创建 typehint 验证模型
 
   **What to do**:
   - 创建 `src/madousho/config/typehint_models.py`
@@ -1369,15 +1369,15 @@ def run_cmd(ctx: typer.Context):
   - `src/madousho/config/models.py:15-20` - field_validator 用法
 
   **Acceptance Criteria**:
-  - [ ] 测试文件创建：`tests/config/test_typehint_models.py`
-  - [ ] `pytest tests/config/test_typehint_models.py` → PASS
+  - [x] 测试文件创建：`tests/config/test_typehint_models.py`
+  - [x] `pytest tests/config/test_typehint_models.py` → PASS
 
   **Commit**: YES (groups with 1-2, 4-6)
   - Message: `feat(config): add typehint definition and validator models`
   - Files: `src/madousho/config/typehint_models.py`, `tests/config/test_typehint_models.py`
   - Pre-commit: `pytest tests/config/test_typehint_models.py`
 
-- [ ] 4. 实现全局 flow 注册表
+- [x] 4. 实现全局 flow 注册表
 
   **What to do**:
   - 创建 `src/madousho/flow/registry.py`
@@ -1402,15 +1402,15 @@ def run_cmd(ctx: typer.Context):
   - `src/madousho/cli.py:13` - Typer app 注册模式
 
   **Acceptance Criteria**:
-  - [ ] 测试文件创建：`tests/flow/test_registry.py`
-  - [ ] `pytest tests/flow/test_registry.py` → PASS
+  - [x] 测试文件创建：`tests/flow/test_registry.py`
+  - [x] `pytest tests/flow/test_registry.py` → PASS
 
   **Commit**: YES (groups with 1-3, 5-6)
   - Message: `feat(flow): add global flow registry with thread safety`
   - Files: `src/madousho/flow/registry.py`, `tests/flow/test_registry.py`
   - Pre-commit: `pytest tests/flow/test_registry.py`
 
-- [ ] 5. 创建示例 flow 的 config.typehint.yaml
+- [x] 5. 创建示例 flow 的 config.typehint.yaml
 
   **What to do**:
   - 创建 `examples/example_flows/config.typehint.yaml`
@@ -1434,14 +1434,14 @@ def run_cmd(ctx: typer.Context):
   - `examples/example_flows/config.yaml:9-12` - typehint 注释
 
   **Acceptance Criteria**:
-  - [ ] YAML 文件语法正确
+  - [x] YAML 文件语法正确
 
   **Commit**: YES (groups with 1-4, 6)
   - Message: `docs(example): add config.typehint.yaml example`
   - Files: `examples/example_flows/config.typehint.yaml`
   - Pre-commit: N/A
 
-- [ ] 6. 创建示例 flow 的 src/main.py（继承 FlowBase + 导出 FlowClass）
+- [x] 6. 创建示例 flow 的 src/main.py（继承 FlowBase + 导出 FlowClass）
 
   **What to do**:
   - 创建 `examples/example_flows/src/main.py`
@@ -1471,18 +1471,18 @@ def run_cmd(ctx: typer.Context):
   - `examples/example_flows/pyproject.toml` - 元数据来源
 
   **Acceptance Criteria**:
-  - [ ] main.py 可以被导入
-  - [ ] 包含继承 FlowBase 的类
-  - [ ] 只实现 `run()` 方法（`get_metadata` 和 `validate_config` 不存在）
-  - [ ] 导出 `FlowClass = ExampleFlow`
-  - [ ] 可以实例化：`ExampleFlow(flow_config={}, global_config={})`
+  - [x] main.py 可以被导入
+  - [x] 包含继承 FlowBase 的类
+  - [x] 只实现 `run()` 方法（`get_metadata` 和 `validate_config` 不存在）
+  - [x] 导出 `FlowClass = ExampleFlow`
+  - [x] 可以实例化：`ExampleFlow(flow_config={}, global_config={})`
 
   **Commit**: YES (groups with 1-5)
   - Message: `feat(example): add example flow class with FlowClass export`
   - Files: `examples/example_flows/src/main.py`
   - Pre-commit: N/A
 
-- [ ] 7. 实现 flow 配置验证逻辑
+- [x] 7. 实现 flow 配置验证逻辑
 
   **What to do**:
   - 在 `src/madousho/flow/loader.py` 中实现 `validate_flow_config()`
@@ -1509,15 +1509,15 @@ def run_cmd(ctx: typer.Context):
   - `src/madousho/config/typehint_models.py` (Task 3) - TypeHintValidator
 
   **Acceptance Criteria**:
-  - [ ] 测试文件创建：`tests/flow/test_config_validation.py`
-  - [ ] `pytest tests/flow/test_config_validation.py` → PASS
+  - [x] 测试文件创建：`tests/flow/test_config_validation.py`
+  - [x] `pytest tests/flow/test_config_validation.py` → PASS
 
   **Commit**: YES (groups with 8)
   - Message: `feat(flow): implement flow config validation with typehint support`
   - Files: `src/madousho/flow/loader.py`, `tests/flow/test_config_validation.py`
   - Pre-commit: `pytest tests/flow/test_config_validation.py`
 
-- [ ] 8. 实现依赖验证逻辑
+- [x] 8. 实现依赖验证逻辑
 
   **What to do**:
   - 在 `src/madousho/flow/loader.py` 中实现 `validate_dependencies()`
@@ -1541,15 +1541,15 @@ def run_cmd(ctx: typer.Context):
   - `examples/example_flows/pyproject.toml:33-37` - 依赖声明格式
 
   **Acceptance Criteria**:
-  - [ ] 测试文件创建：`tests/flow/test_dependency_validation.py`
-  - [ ] `pytest tests/flow/test_dependency_validation.py` → PASS
+  - [x] 测试文件创建：`tests/flow/test_dependency_validation.py`
+  - [x] `pytest tests/flow/test_dependency_validation.py` → PASS
 
   **Commit**: YES (groups with 7)
   - Message: `feat(flow): implement dependency validation for tools/mcps`
   - Files: `src/madousho/flow/loader.py`, `tests/flow/test_dependency_validation.py`
   - Pre-commit: `pytest tests/flow/test_dependency_validation.py`
 
-- [ ] 9. 实现 flow 加载器核心（实例化 flow 类）
+- [x] 9. 实现 flow 加载器核心（实例化 flow 类）
 
   **What to do**:
   - 在 `src/madousho/flow/loader.py` 中实现 `load_plugin()`
@@ -1582,15 +1582,15 @@ def run_cmd(ctx: typer.Context):
   - `src/madousho/flow/registry.py` (Task 4) - 注册表 API
 
   **Acceptance Criteria**:
-  - [ ] 测试文件创建：`tests/flow/test_loader.py`
-  - [ ] `pytest tests/flow/test_loader.py` → PASS
+  - [x] 测试文件创建：`tests/flow/test_loader.py`
+  - [x] `pytest tests/flow/test_loader.py` → PASS
 
   **Commit**: YES (groups with 10)
   - Message: `feat(flow): implement plugin loader with flow instantiation`
   - Files: `src/madousho/flow/loader.py`, `tests/flow/test_loader.py`
   - Pre-commit: `pytest tests/flow/test_loader.py`
 
-- [ ] 10. 集成到 CLI 启动流程
+- [x] 10. 集成到 CLI 启动流程
 
   **What to do**:
   - 修改 `src/madousho/commands/run.py` 的 `run_cmd()`
@@ -1616,15 +1616,15 @@ def run_cmd(ctx: typer.Context):
   - `src/madousho/commands/run.py:8-25` - 现有 run_cmd 实现
 
   **Acceptance Criteria**:
-  - [ ] `madousho run` 能自动加载 flow 插件
-  - [ ] 输出包含插件加载报告
+  - [x] `madousho run` 能自动加载 flow 插件
+  - [x] 输出包含插件加载报告
 
   **Commit**: YES (groups with 9)
   - Message: `feat(cli): integrate flow loader into run command`
   - Files: `src/madousho/commands/run.py`
   - Pre-commit: `pytest tests/flow/test_integration.py`
 
-- [ ] 11. 端到端测试 + 错误报告
+- [x] 11. 端到端测试 + 错误报告
 
   **What to do**:
   - 创建集成测试 `tests/flow/test_integration.py`
@@ -1645,9 +1645,9 @@ def run_cmd(ctx: typer.Context):
   - **Blocked By**: Task 10
 
   **Acceptance Criteria**:
-  - [ ] 测试文件创建：`tests/flow/test_integration.py`
-  - [ ] `pytest tests/flow/test_integration.py` → PASS
-  - [ ] 测试覆盖率 ≥90%
+  - [x] 测试文件创建：`tests/flow/test_integration.py`
+  - [x] `pytest tests/flow/test_integration.py` → PASS
+  - [x] 测试覆盖率 ≥90%
 
   **Commit**: YES (groups with 9-10)
   - Message: `test(flow): add comprehensive integration tests`
@@ -1660,10 +1660,10 @@ def run_cmd(ctx: typer.Context):
 
 > 4 review agents run in PARALLEL. ALL must APPROVE.
 
-- [ ] F1. **Plan Compliance Audit** — `oracle`
-- [ ] F2. **Code Quality Review** — `unspecified-high`
-- [ ] F3. **Real Manual QA** — `unspecified-high`
-- [ ] F4. **Scope Fidelity Check** — `deep`
+- [x] F1. **Plan Compliance Audit** — `oracle`
+- [x] F2. **Code Quality Review** — `unspecified-high`
+- [x] F3. **Real Manual QA** — `unspecified-high`
+- [x] F4. **Scope Fidelity Check** — `deep`
 
 ---
 
@@ -1692,8 +1692,8 @@ madousho run --verbose
 ```
 
 ### Final Checklist
-- [ ] All "Must Have" present
-- [ ] All "Must NOT Have" absent
-- [ ] All tests pass (90% coverage)
-- [ ] Evidence files captured for all QA scenarios
-- [ ] Final verification wave APPROVE
+- [x] All "Must Have" present
+- [x] All "Must NOT Have" absent
+- [x] All tests pass (90% coverage)
+- [x] Evidence files captured for all QA scenarios
+- [x] Final verification wave APPROVE

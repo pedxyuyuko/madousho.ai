@@ -50,11 +50,11 @@
 - `src/madousho/__init__.py` - 确保 `__version__` 导出
 
 ### Definition of Done
-- [ ] `python -m madousho --help` 显示帮助信息
-- [ ] `madousho --version` 输出 "0.1.0"
-- [ ] `madousho --config /path/to/config.yaml run` 可执行
-- [ ] 所有子命令响应 `--help`
-- [ ] `pip install -e .` 后 `madousho` 命令可用
+- [x] `python -m madousho --help` 显示帮助信息
+- [x] `madousho --version` 输出 "0.1.0"
+- [x] `madousho --config /path/to/config.yaml run` 可执行
+- [x] 所有子命令响应 `--help`
+- [x] `pip install -e .` 后 `madousho` 命令可用
 
 ### Must Have
 - Typer callback 实现全局选项
@@ -121,7 +121,7 @@ Task 1 → Task 2 → Task 3 → Task 4 → Task 5 → Task 6
 
 ## TODOs
 
-- [ ] 1. 安装 Typer 依赖
+- [x] 1. 安装 Typer 依赖
 
   **What to do**:
   - 在 `pyproject.toml` 的 `[project]` 部分添加 `dependencies` 列表
@@ -149,10 +149,10 @@ Task 1 → Task 2 → Task 3 → Task 4 → Task 5 → Task 6
   - Typer 官方文档：https://typer.tiangolo.com/ - 版本兼容性参考
 
   **Acceptance Criteria**:
-  - [ ] `pyproject.toml` 包含 `dependencies` 字段
-  - [ ] dependencies 包含 `typer>=0.9.0,<1.0.0`
-  - [ ] `pip install -e .` 成功执行
-  - [ ] `python -c "import typer"` 无错误
+  - [x] `pyproject.toml` 包含 `dependencies` 字段
+  - [x] dependencies 包含 `typer>=0.9.0,<1.0.0`
+  - [x] `pip install -e .` 成功执行
+  - [x] `python -c "import typer"` 无错误
 
   **QA Scenarios**:
 
@@ -175,7 +175,7 @@ Task 1 → Task 2 → Task 3 → Task 4 → Task 5 → Task 6
 
 ---
 
-- [ ] 2. 创建 CLI 入口骨架
+- [x] 2. 创建 CLI 入口骨架
 
   **What to do**:
   - 创建文件 `src/madousho/cli.py`
@@ -206,11 +206,11 @@ Task 1 → Task 2 → Task 3 → Task 4 → Task 5 → Task 6
   - `src/madousho/__init__.py` - 获取版本号
 
   **Acceptance Criteria**:
-  - [ ] `src/madousho/cli.py` 文件创建
-  - [ ] 包含 `app = typer.Typer()` 实例化
-  - [ ] 包含 `@app.callback()` 装饰的函数
-  - [ ] callback 接收 --config, --verbose, --version 参数
-  - [ ] 包含 `if __name__ == "__main__": app()`
+  - [x] `src/madousho/cli.py` 文件创建
+  - [x] 包含 `app = typer.Typer()` 实例化
+  - [x] 包含 `@app.callback()` 装饰的函数
+  - [x] callback 接收 --config, --verbose, --version 参数
+  - [x] 包含 `if __name__ == "__main__": app()`
 
   **QA Scenarios**:
 
@@ -229,7 +229,7 @@ Task 1 → Task 2 → Task 3 → Task 4 → Task 5 → Task 6
 
 ---
 
-- [ ] 3. 实现配置文件查找逻辑
+- [x] 3. 实现配置文件查找逻辑
 
   **What to do**:
   - 在 `cli.py` 中实现 `find_config_file(custom_path: Optional[str] = None) -> Path` 函数
@@ -263,10 +263,10 @@ Task 1 → Task 2 → Task 3 → Task 4 → Task 5 → Task 6
   - `config/madousho.example.yaml` - 示例配置文件位置
 
   **Acceptance Criteria**:
-  - [ ] `find_config_file` 函数实现
-  - [ ] 支持 4 层查找顺序
-  - [ ] 找不到文件时抛出清晰的错误信息
-  - [ ] 使用 pathlib.Path 处理路径
+  - [x] `find_config_file` 函数实现
+  - [x] 支持 4 层查找顺序
+  - [x] 找不到文件时抛出清晰的错误信息
+  - [x] 使用 pathlib.Path 处理路径
 
   **QA Scenarios**:
 
@@ -304,7 +304,7 @@ Task 1 → Task 2 → Task 3 → Task 4 → Task 5 → Task 6
 
 ---
 
-- [ ] 4. 实现 3 个子命令
+- [x] 4. 实现 3 个子命令
 
   **What to do**:
   - 实现 `@app.command("run")` 函数：
@@ -343,11 +343,11 @@ Task 1 → Task 2 → Task 3 → Task 4 → Task 5 → Task 6
   - `config/madousho.yaml` - 示例配置内容
 
   **Acceptance Criteria**:
-  - [ ] `run` 子命令实现（stub）
-  - [ ] `validate` 子命令实现（验证配置）
-  - [ ] `show-config` 子命令实现（YAML 输出）
-  - [ ] 所有子命令响应 `--help`
-  - [ ] 错误时显示清晰的错误信息
+  - [x] `run` 子命令实现（stub）
+  - [x] `validate` 子命令实现（验证配置）
+  - [x] `show-config` 子命令实现（YAML 输出）
+  - [x] 所有子命令响应 `--help`
+  - [x] 错误时显示清晰的错误信息
 
   **QA Scenarios**:
 
@@ -404,7 +404,7 @@ Task 1 → Task 2 → Task 3 → Task 4 → Task 5 → Task 6
 
 ---
 
-- [ ] 5. 注册命令行入口点
+- [x] 5. 注册命令行入口点
 
   **What to do**:
   - 在 `pyproject.toml` 添加 `[project.scripts]` 部分
@@ -434,11 +434,11 @@ Task 1 → Task 2 → Task 3 → Task 4 → Task 5 → Task 6
   - PEP 621 规范：https://peps.python.org/pep-0621/#entry-points
 
   **Acceptance Criteria**:
-  - [ ] `pyproject.toml` 包含 `[project.scripts]` 部分
-  - [ ] 入口点格式正确：`madousho = madousho.cli:app`
-  - [ ] `src/madousho/__init__.py` 包含 `__version__ = "0.1.0"`
-  - [ ] `pip install -e .` 成功执行
-  - [ ] `madousho --help` 命令可用
+  - [x] `pyproject.toml` 包含 `[project.scripts]` 部分
+  - [x] 入口点格式正确：`madousho = madousho.cli:app`
+  - [x] `src/madousho/__init__.py` 包含 `__version__ = "0.1.0"`
+  - [x] `pip install -e .` 成功执行
+  - [x] `madousho --help` 命令可用
 
   **QA Scenarios**:
 
@@ -470,7 +470,7 @@ Task 1 → Task 2 → Task 3 → Task 4 → Task 5 → Task 6
 
 ---
 
-- [ ] 6. 最终验证
+- [x] 6. 最终验证
 
   **What to do**:
   - 运行所有 QA 场景，确保所有功能正常
@@ -498,10 +498,10 @@ Task 1 → Task 2 → Task 3 → Task 4 → Task 5 → Task 6
   - `.sisyphus/evidence/` - 证据文件存储目录
 
   **Acceptance Criteria**:
-  - [ ] 所有 QA 场景通过
-  - [ ] 所有证据文件存在
-  - [ ] 无未处理的异常
-  - [ ] 错误信息清晰友好
+  - [x] 所有 QA 场景通过
+  - [x] 所有证据文件存在
+  - [x] 无未处理的异常
+  - [x] 错误信息清晰友好
 
   **QA Scenarios**:
 
@@ -528,16 +528,16 @@ Task 1 → Task 2 → Task 3 → Task 4 → Task 5 → Task 6
 
 ## Final Verification Wave
 
-- [ ] F1. **Plan Compliance Audit** — `oracle`
+- [x] F1. **Plan Compliance Audit** — `oracle`
   验证所有 "Must Have" 已实现，所有 "Must NOT Have" 未出现。
 
-- [ ] F2. **Code Quality Review** — `unspecified-high`
+- [x] F2. **Code Quality Review** — `unspecified-high`
   运行类型检查和代码审查，确保无 `as any`、空 catch、未使用导入等。
 
-- [ ] F3. **Real Manual QA** — `unspecified-high`
+- [x] F3. **Real Manual QA** — `unspecified-high`
   执行所有 QA 场景，验证 CLI 功能完整性。
 
-- [ ] F4. **Scope Fidelity Check** — `deep`
+- [x] F4. **Scope Fidelity Check** — `deep`
   验证实现与计划 1:1 匹配，无范围蔓延。
 
 ---
@@ -563,7 +563,7 @@ madousho --verbose run       # Expected: 显示详细输出
 ```
 
 ### Final Checklist
-- [ ] 所有 "Must Have" 已实现
-- [ ] 所有 "Must NOT Have" 未出现
-- [ ] 所有 QA 场景通过
-- [ ] 证据文件完整
+- [x] 所有 "Must Have" 已实现
+- [x] 所有 "Must NOT Have" 未出现
+- [x] 所有 QA 场景通过
+- [x] 证据文件完整
