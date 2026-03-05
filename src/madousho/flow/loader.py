@@ -2,7 +2,11 @@
 
 import importlib.util
 import sys
-import tomllib
+# Compatibility import: tomllib is 3.11+, tomli is backport for 3.10
+try:
+    import tomllib  # Python 3.11+
+except ImportError:
+    import tomli as tomllib  # Python 3.10 fallback
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
