@@ -144,11 +144,11 @@ class TypeHintValidator:
             # 空值，回退到全局配置的默认值
             if "default_model_group" not in self.global_config:
                 self.errors.append(
-                    f"Field '{field_path}' is empty but no 'default_model_group' defined in global config"
+                    f"[Config Validation] Field '{field_path}' is empty but no 'default_model_group' defined in global config"
                 )
             else:
                 self.warnings.append(
-                    f"Field '{field_path}' is empty, using global default_model_group: "
+                    f"[Config Validation] Field '{field_path}' is empty, using global default_model_group: "
                     f"'{self.global_config['default_model_group']}'"
                 )
             return
@@ -157,7 +157,7 @@ class TypeHintValidator:
         model_groups = self.global_config.get("model_groups", {})
         if value not in model_groups:
             self.errors.append(
-                f"Field '{field_path}' references non-existent model group '{value}'. "
+                f"[Config Validation] Field '{field_path}' references non-existent model group '{value}'. "
                 f"Available groups in global config: {list(model_groups.keys())}"
             )
     
