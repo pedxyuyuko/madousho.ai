@@ -1,11 +1,120 @@
 """Run command - Start the madousho service with flow loading."""
+import signal
+import sys
 from pathlib import Path
+from typing import Optional
+
 from madousho.logger import logger
 from madousho.flow.loader import load_plugin
 from madousho.flow.registry import FlowRegistry
 from madousho.config.loader import get_config
 import typer
 
+
+def _start_api_server(config) -> None:
+    """
+    Start the FastAPI server with uvicorn.
+    
+    Handles:
+    - Port conflicts (OSError)
+    - Graceful shutdown on SIGTERM/SIGINT
+    """
+    import socket
+    import uvicorn
+    from madousho.api.app import create_app
+    
+    host = config.api.host
+    port = config.api.port
+    
+    # Check if port is already in use before starting
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 0)
+            s.bind((host, port))
+    except OSError as e:
+        logger.error(f"")
+        logger.error(f"ERROR: Port {port} is already in use.")
+        logger.error(f"Please use a different port or stop the process using it.")
+        logger.error(f"")
+        raise typer.Exit(code=1) from e
+    
+    logger.info(f"Starting API server on {host}:{port}")
+    
+    # Create the FastAPI app
+    app = create_app()
+    
+    def handle_signal(signum: int, frame: object) -> None:
+        """Handle SIGTERM and SIGINT for graceful shutdown."""
+        logger.info(f"Received signal {signum}, shutting down gracefully...")
+        sys.exit(0)
+    
+    # Register signal handlers
+    signal.signal(signal.SIGTERM, handle_signal)
+    signal.signal(signal.SIGINT, handle_signal)
+    
+    try:
+        uvicorn.run(app, host=host, port=port, log_level="info")
+    except OSError as e:
+        if "Address already in use" in str(e) or "address already in use" in str(e).lower():
+            logger.error(f"")
+            logger.error(f"ERROR: Port {port} is already in use.")
+            logger.error(f"Please use a different port or stop the process using it.")
+            logger.error(f"")
+            raise typer.Exit(code=1)
+        raise
+
+
+def _start_api_server(config) -> None:
+    """
+    Start the FastAPI server with uvicorn.
+    
+    Handles:
+    - Port conflicts (OSError)
+    - Graceful shutdown on SIGTERM/SIGINT
+    """
+    import socket
+    import uvicorn
+    from madousho.api.app import create_app
+    
+    host = config.api.host
+    port = config.api.port
+    
+    # Check if port is already in use before starting
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 0)
+            s.bind((host, port))
+    except OSError as e:
+        logger.error(f"")
+        logger.error(f"ERROR: Port {port} is already in use.")
+        logger.error(f"Please use a different port or stop the process using it.")
+        logger.error(f"")
+        raise typer.Exit(code=1) from e
+    
+    logger.info(f"Starting API server on {host}:{port}")
+    
+    # Create the FastAPI app
+    app = create_app()
+    
+    def handle_signal(signum: int, frame: object) -> None:
+        """Handle SIGTERM and SIGINT for graceful shutdown."""
+        logger.info(f"Received signal {signum}, shutting down gracefully...")
+        sys.exit(0)
+    
+    # Register signal handlers
+    signal.signal(signal.SIGTERM, handle_signal)
+    signal.signal(signal.SIGINT, handle_signal)
+    
+    try:
+        uvicorn.run(app, host=host, port=port, log_level="info")
+    except OSError as e:
+        if "Address already in use" in str(e) or "address already in use" in str(e).lower():
+            logger.error(f"")
+            logger.error(f"ERROR: Port {port} is already in use.")
+            logger.error(f"Please use a different port or stop the process using it.")
+            logger.error(f"")
+            raise typer.Exit(code=1)
+        raise
 
 def serve_cmd(ctx: typer.Context):
     """
@@ -37,7 +146,8 @@ def serve_cmd(ctx: typer.Context):
                 
                 if result.success and result.plugin:
                     flow_name = result.plugin.metadata.name
-                    registry.register(flow_name, result.plugin.flow_instance)
+                    if result.plugin.flow_instance:
+                        registry.register(flow_name, result.plugin.flow_instance)
                     logger.info(f"✓ Flow plugin loaded: {flow_name}")
                 
                 # Log warnings (config validation issues)
@@ -64,4 +174,8 @@ def serve_cmd(ctx: typer.Context):
     else:
         logger.info("No flows registered")
     
-    logger.debug("Configuration loaded", extra={"api_host": config.api.host, "api_port": config.api.port, "model_groups": list(config.model_groups.keys())})
+    if verbose:
+        logger.info("Configuration loaded", config_path=str(config_path), api_host=config.api.host, api_port=config.api.port, model_groups=list(config.model_groups.keys()))
+    
+    # Start API server
+    _start_api_server(config)

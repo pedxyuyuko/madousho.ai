@@ -146,7 +146,7 @@ Max Concurrent: 4 (Wave 2)
 
 ## TODOs
 
-- [ ] 1. 添加 FastAPI 依赖到 pyproject.toml
+- [x] 1. 添加 FastAPI 依赖到 pyproject.toml
 
   **What to do**:
   - 在 `pyproject.toml` 的 `dependencies` 中添加 `fastapi>=0.100.0,<1.0.0`
@@ -196,7 +196,7 @@ Max Concurrent: 4 (Wave 2)
 
 ---
 
-- [ ] 2. 创建 API 模块目录结构
+- [x] 2. 创建 API 模块目录结构
 
   **What to do**:
   - 创建 `src/madousho/api/__init__.py` - 导出 FastAPI 应用
@@ -245,7 +245,7 @@ Max Concurrent: 4 (Wave 2)
 
 ---
 
-- [ ] 3. 创建 FastAPI 应用实例
+- [x] 3. 创建 FastAPI 应用实例
 
   **What to do**:
   - 创建 `src/madousho/api/app.py`
@@ -296,7 +296,7 @@ Max Concurrent: 4 (Wave 2)
 
 ---
 
-- [ ] 4. 创建 Token 认证中间件
+- [x] 4. 创建 Token 认证中间件
 
   **What to do**:
   - 创建 `src/madousho/api/middleware/__init__.py`

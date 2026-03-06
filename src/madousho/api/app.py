@@ -1,3 +1,4 @@
+from madousho.api.middleware.auth import TokenAuthMiddleware
 from fastapi import FastAPI
 from fastapi.routing import APIRouter
 from loguru import logger
@@ -29,11 +30,14 @@ def create_app() -> FastAPI:
         version=__version__,
         description="Systematic AI Agent Framework with fixed flow control + AI-executed steps",
     )
+    app.add_middleware(TokenAuthMiddleware, token=None)
     
     # Create API router with v1 prefix
     api_router = APIRouter(prefix="/api/v1")
     
-    # Include API routes here (will be imported in other modules)
+    # Include health check router
+    from madousho.api.routes.health import router as health_router
+    app.include_router(health_router)
     # app.include_router(api_router)  # Commented out as no routes added yet
     
     logger.info(f"FastAPI application initialized with version {__version__}")
