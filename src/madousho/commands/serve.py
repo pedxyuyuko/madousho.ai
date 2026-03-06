@@ -174,8 +174,5 @@ def serve_cmd(ctx: typer.Context):
     else:
         logger.info("No flows registered")
     
-    if verbose:
-        logger.info("Configuration loaded", config_path=str(config_path), api_host=config.api.host, api_port=config.api.port, model_groups=list(config.model_groups.keys()))
-    
     # Start API server
     _start_api_server(config)
