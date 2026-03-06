@@ -13,17 +13,9 @@ from typing import Any, Dict, List, Optional, Tuple
 import yaml
 
 from ..config.typehint_models import TypeHintDefinition, TypeHintValidator
+from ..logger import logger
 from .base import FlowBase
 from .models import FlowPlugin, FlowPluginConfig, FlowPluginMetadata, PluginLoadResult
-
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
-
-import yaml
-
-from ..config.typehint_models import TypeHintDefinition, TypeHintValidator
-from .models import FlowPluginConfig
-
 
 def normalize_keys(obj: Any) -> Any:
     """Recursively convert hyphenated keys to underscores."""
@@ -329,9 +321,24 @@ def load_plugin(
       all_errors.append(str(e))
       return PluginLoadResult.failure_result(all_errors, all_warnings)
   
+  # Create logger with plugin context
+  plugin_logger = logger.bind(plugin=f"[{metadata.name}] ")
+  
   # 3. Import src/main.py
   try:
+      # Construct package name for logging
+      safe_name = metadata.name.replace('-', '_').replace('.', '_')
+      safe_version = metadata.version.replace('-', '_').replace('.', '_')
+      package_name = f"{safe_name}_{safe_version}"
+      
       main_module = import_flow_module(plugin_path, metadata.name, metadata.version)
+      logger.debug(f"Loaded flow '{metadata.name}' as Python package: {package_name}")
+  except FileNotFoundError as e:
+      all_errors.append(str(e))
+      return PluginLoadResult.failure_result(all_errors, all_warnings)
+  except (SyntaxError, ImportError) as e:
+      all_errors.append(str(e))
+      return PluginLoadResult.failure_result(all_errors, all_warnings)
   except FileNotFoundError as e:
       all_errors.append(str(e))
       return PluginLoadResult.failure_result(all_errors, all_warnings)
