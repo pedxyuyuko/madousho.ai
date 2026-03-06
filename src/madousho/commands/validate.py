@@ -1,4 +1,5 @@
 from madousho.logger import logger
+from madousho.config.loader import get_config
 
 """Validate command - Validate the configuration file."""
 
@@ -12,11 +13,8 @@ def validate_cmd(ctx: typer.Context):
     Loads and validates the configuration file against the Pydantic models.
     Outputs success message or detailed error information.
     """
-    config_path = ctx.obj["config_path"]
-    
     try:
-        from madousho.config.loader import load_config
-        load_config(str(config_path))
+        get_config()
         logger.success("Configuration is valid")
     except Exception as e:
         logger.error(f"Configuration error: {e}")

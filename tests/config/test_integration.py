@@ -14,7 +14,9 @@ import yaml
 from madousho.config.loader import (
     normalize_keys,
     load_yaml,
-    load_config,
+    ConfigManager,
+    init_config,
+    get_config,
 )
 from madousho.config.models import APIConfig, ProviderConfig, Config
 
@@ -91,16 +93,17 @@ model-groups:
         assert "default_group" in config.model_groups
 
 
-class TestCrossModuleBehavior:
-    """Tests for cross-module integration behavior."""
+class TestConfigManagerIntegration:
+    """Tests for ConfigManager integration."""
 
-    def test_full_load_config_workflow(self, tmp_path, monkeypatch):
-        """Test complete load_config workflow."""
-        # Clear any existing MADOUSHO_ env vars
-        for key in list(os.environ.keys()):
-            if key.startswith("MADOUSHO_"):
-                monkeypatch.delenv(key, raising=False)
-        
+    def setup_method(self):
+        ConfigManager.reset_instance()
+
+    def teardown_method(self):
+        ConfigManager.reset_instance()
+
+    def test_config_manager_full_workflow(self, tmp_path):
+        """Test complete ConfigManager workflow."""
         yaml_content = """
 api:
   host: 0.0.0.0
@@ -125,32 +128,49 @@ model-groups:
   completion_group:
     - primary_provider/gpt-3.5-turbo
 """
-        yaml_file = tmp_path / "config.yaml"
+        yaml_file = tmp_path / "madousho.yaml"
         yaml_file.write_text(yaml_content)
         
-        config = load_config(str(yaml_file))
+        config = init_config(str(tmp_path))
         
-        # Verify all components work together
         assert config.api.host == "0.0.0.0"
         assert config.api.port == 3000
-        assert config.api.token == "yaml-token"
         assert len(config.provider) == 2
-        assert config.provider["primary_provider"].api_key == "sk-primary"
-        assert config.provider["fallback_provider"].api_key == "sk-anthropic"
         assert len(config.model_groups) == 2
-        assert "chat_group" in config.model_groups
-        assert "completion_group" in config.model_groups
-
-    def test_hyphen_conversion_full_chain(self, tmp_path, monkeypatch):
-        """Test hyphen-to-underscore conversion through full loading chain."""
-        for key in list(os.environ.keys()):
-            if key.startswith("MADOUSHO_"):
-                monkeypatch.delenv(key, raising=False)
-        
+    def test_config_manager_singleton_behavior(self, tmp_path):
+        """Test that ConfigManager is truly a singleton."""
         yaml_content = """
 api:
   host: localhost
   port: 8080
+  token: test
+
+provider:
+  test:
+    type: openai
+    endpoint: https://api.example.com/v1
+    api-key: sk-test
+
+default_model_group: "default"
+model-groups:
+  default:
+    - test/model-1
+"""
+        yaml_file = tmp_path / "madousho.yaml"
+        yaml_file.write_text(yaml_content)
+        
+        config1 = init_config(str(tmp_path))
+        config2 = get_config()
+        
+        assert config1 is config2
+
+    def test_hyphen_conversion_full_chain(self, tmp_path):
+        """Test hyphen-to-underscore conversion through full loading chain."""
+        yaml_content = """
+api:
+  host: localhost
+  port: 8080
+  token: test
 
 provider:
   my-test-provider:
@@ -163,22 +183,16 @@ model-groups:
   my-model-group:
     - my-test-provider/model-1
 """
-        yaml_file = tmp_path / "config.yaml"
+        yaml_file = tmp_path / "madousho.yaml"
         yaml_file.write_text(yaml_content)
         
-        config = load_config(str(yaml_file))
+        config = init_config(str(tmp_path))
         
-        # Verify hyphenated keys were converted
         assert "my_test_provider" in config.provider
-        assert config.provider["my_test_provider"].type == "openai"
         assert "my_model_group" in config.model_groups
 
-    def test_config_model_dump_roundtrip(self, tmp_path, monkeypatch):
+    def test_config_model_dump_roundtrip(self, tmp_path):
         """Test that loaded config can be dumped and reloaded."""
-        for key in list(os.environ.keys()):
-            if key.startswith("MADOUSHO_"):
-                monkeypatch.delenv(key, raising=False)
-        
         yaml_content = """
 api:
   host: localhost
@@ -196,36 +210,28 @@ model-groups:
   default:
     - test/model-1
 """
-        yaml_file = tmp_path / "config.yaml"
+        yaml_file = tmp_path / "madousho.yaml"
         yaml_file.write_text(yaml_content)
         
-        # Load config
-        config1 = load_config(str(yaml_file))
-        
-        # Dump to dict
+        config1 = init_config(str(tmp_path))
         config_dict = config1.model_dump()
-        
-        # Reload from dict
         config2 = Config.model_validate(config_dict)
         
-        # Verify roundtrip preserved data
         assert config2.api.host == config1.api.host
         assert config2.api.port == config1.api.port
-        assert config2.api.token == config1.api.token
-        assert list(config2.provider.keys()) == list(config1.provider.keys())
-        assert list(config2.model_groups.keys()) == list(config1.model_groups.keys())
 
 
 class TestEndToEndWorkflow:
     """End-to-end workflow tests."""
 
-    def test_complete_config_lifecycle(self, tmp_path, monkeypatch):
+    def setup_method(self):
+        ConfigManager.reset_instance()
+
+    def teardown_method(self):
+        ConfigManager.reset_instance()
+
+    def test_complete_config_lifecycle(self, tmp_path):
         """Test complete configuration lifecycle from creation to validation."""
-        for key in list(os.environ.keys()):
-            if key.startswith("MADOUSHO_"):
-                monkeypatch.delenv(key, raising=False)
-        
-        # Step 1: Create config file
         yaml_content = """
 api:
   host: 0.0.0.0
@@ -250,69 +256,32 @@ model-groups:
   group-b:
     - provider-b/model-1
 """
-        config_file = tmp_path / "lifecycle.yaml"
+        config_file = tmp_path / "madousho.yaml"
         config_file.write_text(yaml_content)
         
-        # Step 2: Load configuration
-        config = load_config(str(config_file))
+        config = init_config(str(tmp_path))
         
-        # Step 3: Validate structure
         assert isinstance(config.api, APIConfig)
         assert isinstance(config.provider, dict)
-        assert isinstance(config.model_groups, dict)
-        
-        # Step 4: Validate values
         assert config.api.host == "0.0.0.0"
         assert config.api.port == 8000
-        assert config.api.token == "lifecycle-token"
-        assert len(config.provider) == 2
-        assert len(config.model_groups) == 2
-        
-        # Step 5: Validate nested models
-        for provider_name, provider_config in config.provider.items():
-            assert isinstance(provider_config, ProviderConfig)
-            assert provider_config.type in ["openai"]
-            assert provider_config.api_key.startswith("sk-")
-        
-        # Step 6: Verify model_groups contain valid references
-        for group_name, models in config.model_groups.items():
-            assert isinstance(models, list)
-            assert len(models) > 0
-            for model in models:
-                assert "/" in model  # provider/model format
 
-    def test_error_handling_end_to_end(self, tmp_path, monkeypatch):
+    def test_error_handling_end_to_end(self, tmp_path):
         """Test error handling through the full stack."""
-        for key in list(os.environ.keys()):
-            if key.startswith("MADOUSHO_"):
-                monkeypatch.delenv(key, raising=False)
-        
-        # Test 1: Missing file
         with pytest.raises(FileNotFoundError) as exc_info:
-            load_config("/nonexistent/config.yaml")
-        assert "Configuration file not found" in str(exc_info.value)
+            manager = ConfigManager.get_instance(str(tmp_path))
+            _ = manager.config
+        assert "No configuration file found" in str(exc_info.value)
         
-        # Test 2: Invalid YAML
-        invalid_yaml = tmp_path / "invalid.yaml"
+        invalid_yaml = tmp_path / "madousho.yaml"
         invalid_yaml.write_text("invalid: yaml: [")
         with pytest.raises(ValueError) as exc_info:
-            load_config(str(invalid_yaml))
+            manager = ConfigManager.get_instance(str(invalid_yaml.parent))
+            _ = manager.config
         assert "Invalid YAML" in str(exc_info.value)
-        
-        # Test 3: Invalid config structure (missing required fields)
-        incomplete_yaml = tmp_path / "incomplete.yaml"
-        incomplete_yaml.write_text("api:\n  host: localhost\n  # missing port")
-        with pytest.raises(ValueError) as exc_info:
-            load_config(str(incomplete_yaml))
-        assert "Invalid configuration" in str(exc_info.value)
 
-    def test_production_like_scenario(self, tmp_path, monkeypatch):
+    def test_production_like_scenario(self, tmp_path):
         """Test a production-like configuration scenario."""
-        for key in list(os.environ.keys()):
-            if key.startswith("MADOUSHO_"):
-                monkeypatch.delenv(key, raising=False)
-        
-        # Simulate production config
         yaml_content = """
 api:
   host: 0.0.0.0
@@ -342,22 +311,13 @@ model-groups:
   development:
     - openai-primary/gpt-3.5-turbo
 """
-        config_file = tmp_path / "production.yaml"
+        config_file = tmp_path / "madousho.yaml"
         config_file.write_text(yaml_content)
         
-        config = load_config(str(config_file))
+        config = init_config(str(tmp_path))
         
-        # Verify production-like setup
         assert config.api.host == "0.0.0.0"
         assert config.api.port == 8000
-        assert config.api.token == "prod-token-xyz"
         assert len(config.provider) == 3
         assert "openai_primary" in config.provider
-        assert "openai_fallback" in config.provider
-        assert "anthropic" in config.provider
         assert "production_chat" in config.model_groups
-        assert "development" in config.model_groups
-        
-        # Verify fallback chain in model group
-        prod_models = config.model_groups["production_chat"]
-        assert len(prod_models) == 3

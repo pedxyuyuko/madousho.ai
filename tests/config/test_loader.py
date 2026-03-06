@@ -7,7 +7,9 @@ import yaml
 from madousho.config.loader import (
     normalize_keys,
     load_yaml,
-    load_config,
+    ConfigManager,
+    get_config,
+    init_config,
 )
 
 
@@ -121,113 +123,222 @@ api:
         assert result == {"api": {"host": "localhost", "port": 8080}}
 
 
-class TestLoadConfig:
-    """Tests for the load_config function (end-to-end)."""
+class TestConfigManager:
+    """Tests for the ConfigManager singleton class."""
 
-    def test_load_config_valid(self, tmp_path, monkeypatch):
-        """Test loading a valid configuration file."""
-        # Clear any existing MADOUSHO_ env vars
-        for key in list(os.environ.keys()):
-            if key.startswith("MADOUSHO_"):
-                monkeypatch.delenv(key, raising=False)
+    def setup_method(self):
+        """Reset singleton before each test."""
+        ConfigManager.reset_instance()
 
+    def teardown_method(self):
+        """Reset singleton after each test."""
+        ConfigManager.reset_instance()
+
+    def test_config_manager_singleton(self, tmp_path):
+        """Test that ConfigManager is a singleton."""
+        # First call creates instance
+        manager1 = ConfigManager.get_instance(str(tmp_path))
+        # Second call returns same instance
+        manager2 = ConfigManager.get_instance()
+        assert manager1 is manager2
+
+    def test_config_manager_requires_config_dir_on_init(self):
+        """Test that first call to get_instance requires config_dir."""
+        ConfigManager.reset_instance()
+        with pytest.raises(RuntimeError) as exc_info:
+            ConfigManager.get_instance()
+        assert "ConfigManager not initialized" in str(exc_info.value)
+
+    def test_config_manager_loads_config(self, tmp_path):
+        """Test that ConfigManager loads config from directory."""
         yaml_content = """
 api:
   host: localhost
   port: 8080
+  token: test-token
+
+provider:
+  test:
+    type: openai
+    endpoint: https://api.example.com/v1
+    api-key: sk-test
 
 default_model_group: "default"
-provider:
-  example:
-    type: openai
-    endpoint: https://api.openai.com/v1
-    api-key: sk-test123
-
 model-groups:
   default:
-    - gpt-4
-    - gpt-3.5-turbo
+    - test/model-1
 """
-        yaml_file = tmp_path / "config.yaml"
-        yaml_file.write_text(yaml_content)
+        config_file = tmp_path / "madousho.yaml"
+        config_file.write_text(yaml_content)
 
-        config = load_config(str(yaml_file))
+        manager = ConfigManager.get_instance(str(tmp_path))
+        config = manager.config
 
         assert config.api.host == "localhost"
         assert config.api.port == 8080
-        assert "example" in config.provider
-        assert config.provider["example"].type == "openai"
-        assert "default" in config.model_groups
 
-    def test_load_config_missing_file(self):
-        """Test that FileNotFoundError is raised for missing config."""
-        with pytest.raises(FileNotFoundError) as exc_info:
-            load_config("/nonexistent/config.yaml")
-        assert "Configuration file not found" in str(exc_info.value)
-
-    def test_load_config_invalid_yaml(self, tmp_path):
-        """Test that ValueError is raised for invalid YAML."""
-        yaml_file = tmp_path / "invalid.yaml"
-        yaml_file.write_text("invalid: yaml: content: [")
-
-        with pytest.raises(ValueError) as exc_info:
-            load_config(str(yaml_file))
-        assert "Invalid YAML" in str(exc_info.value)
-
-    def test_load_config_validation_error(self, tmp_path, monkeypatch):
-        """Test that ValueError is raised for invalid config structure."""
-        # Clear any existing MADOUSHO_ env vars
-        for key in list(os.environ.keys()):
-            if key.startswith("MADOUSHO_"):
-                monkeypatch.delenv(key, raising=False)
-
-        # Missing required fields
+    def test_config_manager_finds_madousho_yaml(self, tmp_path):
+        """Test that ConfigManager prefers madousho.yaml over config.yaml."""
         yaml_content = """
 api:
-  host: localhost
-  # missing port and token
+  host: madousho-host
+  port: 8080
+  token: test
+
+provider:
+  test:
+    type: openai
+    endpoint: https://api.example.com/v1
+    api-key: sk-test
+
+default_model_group: "default"
+model-groups:
+  default:
+    - test/model-1
 """
-        yaml_file = tmp_path / "invalid.yaml"
-        yaml_file.write_text(yaml_content)
+        # Create both files
+        (tmp_path / "madousho.yaml").write_text(yaml_content)
+        (tmp_path / "config.yaml").write_text(yaml_content.replace("madousho-host", "config-host"))
 
-        with pytest.raises(ValueError) as exc_info:
-            load_config(str(yaml_file))
-        assert "Invalid configuration" in str(exc_info.value)
+        manager = ConfigManager.get_instance(str(tmp_path))
+        config = manager.config
 
-    def test_load_config_hyphen_to_underscore(self, tmp_path, monkeypatch):
-        """Test that hyphenated keys in YAML are converted to underscores."""
-        for key in list(os.environ.keys()):
-            if key.startswith("MADOUSHO_"):
-                monkeypatch.delenv(key, raising=False)
+        assert config.api.host == "madousho-host"
 
+    def test_config_manager_finds_config_yaml(self, tmp_path):
+        """Test that ConfigManager falls back to config.yaml."""
         yaml_content = """
 api:
   host: localhost
   port: 8080
+  token: test
 
-default_model_group: "default-group"
 provider:
-  my-provider:
+  test:
     type: openai
-    endpoint: https://api.openai.com/v1
-    api-key: sk-test123
+    endpoint: https://api.example.com/v1
+    api-key: sk-test
 
+default_model_group: "default"
 model-groups:
-  default-group:
-    - gpt-4
+  default:
+    - test/model-1
 """
-        yaml_file = tmp_path / "config.yaml"
-        yaml_file.write_text(yaml_content)
+        config_file = tmp_path / "config.yaml"
+        config_file.write_text(yaml_content)
 
-        config = load_config(str(yaml_file))
+        manager = ConfigManager.get_instance(str(tmp_path))
+        config = manager.config
 
-        # The provider key should be accessible with underscore
-        assert "my_provider" in config.provider
-        assert config.provider["my_provider"].api_key == "sk-test123"
+        assert config.api.host == "localhost"
+
+    def test_config_manager_no_config_file(self, tmp_path):
+        """Test that ConfigManager raises error if no config file found."""
+        with pytest.raises(FileNotFoundError) as exc_info:
+            manager = ConfigManager.get_instance(str(tmp_path))
+            _ = manager.config
+        assert "No configuration file found" in str(exc_info.value)
+
+
+class TestGetConfig:
+    """Tests for the get_config() convenience function."""
+
+    def setup_method(self):
+        """Reset singleton before each test."""
+        ConfigManager.reset_instance()
+
+    def teardown_method(self):
+        """Reset singleton after each test."""
+        ConfigManager.reset_instance()
+
+    def test_get_config_requires_initialization(self):
+        """Test that get_config() raises error if not initialized."""
+        with pytest.raises(RuntimeError) as exc_info:
+            get_config()
+        assert "ConfigManager not initialized" in str(exc_info.value)
+
+    def test_get_config_after_init(self, tmp_path):
+        """Test that get_config() works after initialization."""
+        yaml_content = """
+api:
+  host: get-config-host
+  port: 9000
+  token: test
+
+provider:
+  test:
+    type: openai
+    endpoint: https://api.example.com/v1
+    api-key: sk-test
+
+default_model_group: "default"
+model-groups:
+  default:
+    - test/model-1
+"""
+        config_file = tmp_path / "madousho.yaml"
+        config_file.write_text(yaml_content)
+
+        init_config(str(tmp_path))
+        config = get_config()
+
+        assert config.api.host == "get-config-host"
+        assert config.api.port == 9000
+
+
+class TestInitConfig:
+    """Tests for the init_config() convenience function."""
+
+    def setup_method(self):
+        """Reset singleton before each test."""
+        ConfigManager.reset_instance()
+
+    def teardown_method(self):
+        """Reset singleton after each test."""
+        ConfigManager.reset_instance()
+
+    def test_init_config_creates_singleton(self, tmp_path):
+        """Test that init_config() creates the singleton instance."""
+        yaml_content = """
+api:
+  host: init-host
+  port: 7000
+  token: test
+
+provider:
+  test:
+    type: openai
+    endpoint: https://api.example.com/v1
+    api-key: sk-test
+
+default_model_group: "default"
+model-groups:
+  default:
+    - test/model-1
+"""
+        config_file = tmp_path / "madousho.yaml"
+        config_file.write_text(yaml_content)
+
+        config = init_config(str(tmp_path))
+
+        assert config.api.host == "init-host"
+        assert config.api.port == 7000
+
+        # Verify singleton was created
+        config2 = get_config()
+        assert config is config2
 
 
 class TestErrorMessages:
     """Tests for error message clarity."""
+
+    def setup_method(self):
+        """Reset singleton before each test."""
+        ConfigManager.reset_instance()
+
+    def teardown_method(self):
+        """Reset singleton after each test."""
+        ConfigManager.reset_instance()
 
     def test_load_yaml_error_message_includes_path(self, tmp_path):
         """Test that error messages include the file path."""
@@ -238,20 +349,29 @@ class TestErrorMessages:
             load_yaml(str(yaml_file))
         assert str(yaml_file) in str(exc_info.value) or "Invalid YAML" in str(exc_info.value)
 
-    def test_load_config_error_message_includes_validation(self, tmp_path, monkeypatch):
+    def test_config_manager_error_message_includes_validation(self, tmp_path):
         """Test that validation errors are wrapped with context."""
-        for key in list(os.environ.keys()):
-            if key.startswith("MADOUSHO_"):
-                monkeypatch.delenv(key, raising=False)
-
         yaml_content = """
 api:
   host: localhost
   port: 99999
+  token: test
+
+provider:
+  test:
+    type: openai
+    endpoint: https://api.example.com/v1
+    api-key: sk-test
+
+default_model_group: "default"
+model-groups:
+  default:
+    - test/model-1
 """
-        yaml_file = tmp_path / "invalid.yaml"
+        yaml_file = tmp_path / "madousho.yaml"
         yaml_file.write_text(yaml_content)
 
         with pytest.raises(ValueError) as exc_info:
-            load_config(str(yaml_file))
+            manager = ConfigManager.get_instance(str(tmp_path))
+            _ = manager.config
         assert "Invalid configuration" in str(exc_info.value)

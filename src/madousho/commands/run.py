@@ -3,7 +3,7 @@ from pathlib import Path
 from madousho.logger import logger
 from madousho.flow.loader import load_plugin
 from madousho.flow.registry import FlowRegistry
-
+from madousho.config.loader import get_config
 import typer
 
 
@@ -14,11 +14,7 @@ def run_cmd(ctx: typer.Context):
     This command loads configuration, scans plugins/flows/ directory,
     validates and instantiates flow plugins, and registers them.
     """
-    config_path = ctx.obj["config_path"]
-    
-    # Load configuration
-    from madousho.config.loader import load_config
-    config = load_config(str(config_path))
+    config = get_config()
     
     logger.info("Starting madousho service...")
     
@@ -68,4 +64,4 @@ def run_cmd(ctx: typer.Context):
     else:
         logger.info("No flows registered")
     
-    logger.debug("Configuration loaded", extra={"config_path": str(config_path), "api_host": config.api.host, "api_port": config.api.port, "model_groups": list(config.model_groups.keys())})
+    logger.debug("Configuration loaded", extra={"api_host": config.api.host, "api_port": config.api.port, "model_groups": list(config.model_groups.keys())})

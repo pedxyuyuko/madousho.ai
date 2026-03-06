@@ -3,13 +3,17 @@
 This module provides configuration loading and validation functionality.
 
 Usage:
-    from madousho.config import load_config, Config
+    from madousho.config import init_config, get_config, Config
     
-    config = load_config("config.yaml")
+    # Initialize once at startup
+    init_config("/path/to/config/dir")
+    
+    # Get config anywhere
+    config = get_config()
     print(config.api.host)
 """
 
 from .models import APIConfig, ProviderConfig, Config
-from .loader import load_config
+from .loader import ConfigManager, init_config, get_config
 
-__all__ = ["APIConfig", "ProviderConfig", "Config", "load_config"]
+__all__ = ["APIConfig", "ProviderConfig", "Config", "ConfigManager", "init_config", "get_config"]
