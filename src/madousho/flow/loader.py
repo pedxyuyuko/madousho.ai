@@ -212,13 +212,15 @@ def load_pyproject_metadata(plugin_path: Path) -> FlowPluginMetadata:
     )
 
 
-def import_flow_module(plugin_path: Path) -> Any:
+def import_flow_module(plugin_path: Path, plugin_name: str, plugin_version: str) -> Any:
   """
   Import src/main.py from flow plugin.
   
   Args:
       plugin_path: Path to the flow plugin root directory
-      
+      plugin_name: Plugin name from pyproject.toml
+      plugin_version: Plugin version from pyproject.toml
+  
   Returns:
       Imported module
       
@@ -235,8 +237,11 @@ def import_flow_module(plugin_path: Path) -> Any:
   if not main_path.exists():
       raise FileNotFoundError(f"src/main.py not found in {plugin_path}")
   
-  # Create a unique package name for this plugin
-  package_name = f"madousho_flow_{plugin_path.name}_{id(plugin_path)}"
+  # Create a unique package name using pyproject.toml name and version
+  # Format: {name}_{version} as valid Python module name (replace - and . with _)
+  safe_name = plugin_name.replace('-', '_').replace('.', '_')
+  safe_version = plugin_version.replace('-', '_').replace('.', '_')
+  package_name = f"{safe_name}_{safe_version}"
   module_name = f"{package_name}.main"
   
   # Track if we created __init__.py temporarily
@@ -285,7 +290,6 @@ def import_flow_module(plugin_path: Path) -> Any:
           except Exception:
               pass  # Ignore cleanup errors
 
-
 def load_plugin(
     plugin_path: Path,
     global_config: Dict[str, Any]
@@ -327,7 +331,7 @@ def load_plugin(
   
   # 3. Import src/main.py
   try:
-      main_module = import_flow_module(plugin_path)
+      main_module = import_flow_module(plugin_path, metadata.name, metadata.version)
   except FileNotFoundError as e:
       all_errors.append(str(e))
       return PluginLoadResult.failure_result(all_errors, all_warnings)

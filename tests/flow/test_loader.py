@@ -134,7 +134,7 @@ class TestFlow(FlowBase):
 FlowClass = TestFlow
 """)
 
-        module = import_flow_module(tmp_path)
+        module = import_flow_module(tmp_path, "test-flow", "0.0.1")
 
         assert hasattr(module, "FlowClass")
         assert module.FlowClass is not None
@@ -142,14 +142,14 @@ FlowClass = TestFlow
     def test_import_module_missing_main_py(self, tmp_path: Path):
         """Test importing when src/main.py is missing."""
         with pytest.raises(FileNotFoundError) as exc_info:
-            import_flow_module(tmp_path)
+            import_flow_module(tmp_path, "test-flow", "0.0.1")
 
         assert "src/main.py" in str(exc_info.value)
 
     def test_import_module_missing_src_directory(self, tmp_path: Path):
         """Test importing when src directory is missing."""
         with pytest.raises(FileNotFoundError) as exc_info:
-            import_flow_module(tmp_path)
+            import_flow_module(tmp_path, "test-flow", "0.0.1")
 
         assert "src" in str(exc_info.value)
 
@@ -161,7 +161,7 @@ FlowClass = TestFlow
         main_py.write_text("invalid python syntax {{{")
 
         with pytest.raises(SyntaxError) as exc_info:
-            import_flow_module(tmp_path)
+            import_flow_module(tmp_path, "test-flow", "0.0.1")
 
         assert "main.py" in str(exc_info.value) or "invalid syntax" in str(exc_info.value).lower()
 
@@ -177,8 +177,8 @@ class TestFlow(FlowBase):
 FlowClass = TestFlow
 """)
 
-        module1 = import_flow_module(tmp_path)
-        module2 = import_flow_module(tmp_path)
+        module1 = import_flow_module(tmp_path, "test-flow", "0.0.1")
+        module2 = import_flow_module(tmp_path, "test-flow", "0.0.1")
 
         # Should be different module instances
         assert module1 is not module2
