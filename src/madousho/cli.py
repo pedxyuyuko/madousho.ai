@@ -8,7 +8,7 @@ from typer import CallbackParam
 import os
 
 from .commands import run_cmd, validate_cmd
-
+from .logger import configure_logger
 
 app = typer.Typer()
 
@@ -108,12 +108,12 @@ def callback(
         typer.echo(f"Error: {e}", err=True)
         raise typer.Exit(code=1) from None
     
+    # Configure logger with verbose and json settings
+    configure_logger(verbose=verbose, json_output=json)
+    
     # Store global state in context object
     ctx.obj = {
         "config_path": config_path,
-        "verbose": verbose,
-        "json": json,
-    
     }
 
 
