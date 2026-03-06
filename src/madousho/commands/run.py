@@ -43,12 +43,12 @@ def run_cmd(ctx: typer.Context):
                 if result.success and result.plugin:
                     flow_name = result.plugin.metadata.name
                     registry.register(flow_name, result.plugin.flow_instance)
-                    logger.info(f"✓ Flow plugin loaded: {flow_name}")
-                    
-                    # Log warnings if verbose
-                    if verbose and result.warnings:
-                        for warning in result.warnings:
-                            logger.warning(f"  Warning: {warning}")
+                logger.info(f"✓ Flow plugin loaded: {flow_name}")
+                
+                # Log warnings (always show config validation warnings)
+                if result.warnings:
+                    for warning in result.warnings:
+                        logger.warning(f"  Warning: {warning}")
                 else:
                     logger.error(f"✗ Failed to load flow plugin {plugin_path.name}")
                     for error in result.errors:
