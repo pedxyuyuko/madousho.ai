@@ -6,7 +6,7 @@ from pathlib import Path
 import importlib.metadata
 from typer import CallbackParam
 
-from .commands import run_cmd, validate_cmd
+from .commands import serve_cmd, validate_cmd
 from .logger import configure_logger
 from .config.loader import init_config
 app = typer.Typer()
@@ -109,7 +109,7 @@ def callback(
 
 
 # Register subcommands
-app.command("run")(run_cmd)
+app.command("serve")(serve_cmd)
 app.command("validate")(validate_cmd)
 
 

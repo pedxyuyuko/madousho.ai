@@ -7,7 +7,7 @@ from madousho.config.loader import get_config
 import typer
 
 
-def run_cmd(ctx: typer.Context):
+def serve_cmd(ctx: typer.Context):
     """
     Start the madousho service.
     
