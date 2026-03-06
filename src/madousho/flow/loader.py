@@ -229,22 +229,47 @@ def import_flow_module(plugin_path: Path) -> Any:
   import importlib.util
   import sys
   
-  main_path = plugin_path / "src" / "main.py"
+  src_path = plugin_path / "src"
+  main_path = src_path / "main.py"
   
   if not main_path.exists():
       raise FileNotFoundError(f"src/main.py not found in {plugin_path}")
   
-  # Create a unique module name
-  module_name = f"madousho_flow_{plugin_path.name}_{id(plugin_path)}"
+  # Create a unique package name for this plugin
+  package_name = f"madousho_flow_{plugin_path.name}_{id(plugin_path)}"
+  module_name = f"{package_name}.main"
+  
+  # Track if we created __init__.py temporarily
+  created_init = False
+  src_init = src_path / "__init__.py"
+  
+  # If src doesn't have __init__.py, create one temporarily
+  if not src_init.exists():
+      src_init.write_text("")
+      created_init = True
   
   # Load the module
   try:
+      # Load src as a package first
+      src_spec = importlib.util.spec_from_file_location(package_name, src_init)
+      if src_spec is None or src_spec.loader is None:
+          raise ImportError(f"Cannot load package from {src_path}")
+      
+      src_package = importlib.util.module_from_spec(src_spec)
+      sys.modules[package_name] = src_package
+      src_spec.loader.exec_module(src_package)
+      
+      # Load main.py as a submodule of src package
       spec = importlib.util.spec_from_file_location(module_name, main_path)
       if spec is None or spec.loader is None:
           raise ImportError(f"Cannot load module from {main_path}")
       
       module = importlib.util.module_from_spec(spec)
       sys.modules[module_name] = module
+      
+      # Set __package__ to enable relative imports
+      module.__package__ = package_name
+      
       spec.loader.exec_module(module)
       
       return module
@@ -252,6 +277,13 @@ def import_flow_module(plugin_path: Path) -> Any:
       raise SyntaxError(f"Syntax error in main.py: {e}")
   except Exception as e:
       raise ImportError(f"Failed to import main.py: {e}")
+  finally:
+      # Clean up: remove temporary __init__.py if we created it
+      if created_init and src_init.exists():
+          try:
+              src_init.unlink()
+          except Exception:
+              pass  # Ignore cleanup errors
 
 
 def load_plugin(
