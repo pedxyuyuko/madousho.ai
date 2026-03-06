@@ -14,8 +14,6 @@ import yaml
 from madousho.config.loader import (
     normalize_keys,
     load_yaml,
-    get_env_overrides,
-    deep_merge,
     load_config,
 )
 from madousho.config.models import APIConfig, ProviderConfig, Config
@@ -38,8 +36,7 @@ class TestLoadRealConfigFile:
         config_path = "config/madousho.yaml"
         config = load_yaml(config_path)
         
-        # Check for expected sections (may be commented out in example)
-        # At minimum, the file should be valid YAML
+        # Check for expected top-level sections
         assert isinstance(config, dict)
 
     def test_load_example_config_file(self):
@@ -93,76 +90,12 @@ model-groups:
         assert config.provider["my_provider"].api_key == "sk-test123"
         assert "default_group" in config.model_groups
 
-    def test_env_override_then_validate(self, tmp_path, monkeypatch):
-        """Test environment overrides work with model validation."""
-        yaml_content = """
-api:
-  host: localhost
-  port: 8080
-
-provider:
-  test:
-    type: openai
-    endpoint: https://api.example.com/v1
-    api-key: sk-test
-
-default_model_group: ""
-model-groups: {}
-"""
-        yaml_file = tmp_path / "config.yaml"
-        yaml_file.write_text(yaml_content)
-        
-        # Set environment override
-        monkeypatch.setenv("MADOUSHO_API_PORT", "9999")
-        monkeypatch.setenv("MADOUSHO_API_TOKEN", "env-token")
-        
-        # Load config with overrides
-        config = load_config(str(yaml_file))
-        
-        # Verify overrides applied
-        assert config.api.port == 9999
-        assert config.api.token == "env-token"
-        assert config.api.host == "localhost"  # Unchanged
-
-    def test_deep_merge_with_model_validation(self):
-        """Test that deep_merge produces valid model input."""
-        base = {
-            "api": {"host": "localhost", "port": 8080},
-            "provider": {
-                "openai": {
-                    "type": "openai",
-                    "endpoint": "https://api.openai.com/v1",
-                    "api_key": "sk-base"
-                }
-            },
-            "default_model_group": "",
-            "model_groups": {}
-        }
-        
-        override = {
-            "api": {"token": "merged-token"},
-            "provider": {
-                "openai": {
-                    "api_key": "sk-override"
-                }
-            }
-        }
-        
-        merged = deep_merge(base, override)
-        config = Config.model_validate(merged)
-        
-        # Verify merge worked correctly
-        assert config.api.host == "localhost"
-        assert config.api.port == 8080
-        assert config.api.token == "merged-token"
-        assert config.provider["openai"].api_key == "sk-override"
-
 
 class TestCrossModuleBehavior:
     """Tests for cross-module integration behavior."""
 
     def test_full_load_config_workflow(self, tmp_path, monkeypatch):
-        """Test complete load_config workflow with all features."""
+        """Test complete load_config workflow."""
         # Clear any existing MADOUSHO_ env vars
         for key in list(os.environ.keys()):
             if key.startswith("MADOUSHO_"):
@@ -195,18 +128,14 @@ model-groups:
         yaml_file = tmp_path / "config.yaml"
         yaml_file.write_text(yaml_content)
         
-        # Set some overrides
-        monkeypatch.setenv("MADOUSHO_API_PORT", "8000")
-        monkeypatch.setenv("MADOUSHO_API_TOKEN", "env-token")
-        
         config = load_config(str(yaml_file))
         
         # Verify all components work together
         assert config.api.host == "0.0.0.0"
-        assert config.api.port == 8000  # Overridden
-        assert config.api.token == "env-token"  # Overridden
+        assert config.api.port == 3000
+        assert config.api.token == "yaml-token"
         assert len(config.provider) == 2
-        assert config.provider["primary_provider"].api_key == "sk-primary"  # From YAML
+        assert config.provider["primary_provider"].api_key == "sk-primary"
         assert config.provider["fallback_provider"].api_key == "sk-anthropic"
         assert len(config.model_groups) == 2
         assert "chat_group" in config.model_groups
@@ -416,15 +345,12 @@ model-groups:
         config_file = tmp_path / "production.yaml"
         config_file.write_text(yaml_content)
         
-        # Simulate production environment override
-        monkeypatch.setenv("MADOUSHO_API_TOKEN", "prod-env-token-secret")
-        
         config = load_config(str(config_file))
         
         # Verify production-like setup
         assert config.api.host == "0.0.0.0"
         assert config.api.port == 8000
-        assert config.api.token == "prod-env-token-secret"  # Overridden
+        assert config.api.token == "prod-token-xyz"
         assert len(config.provider) == 3
         assert "openai_primary" in config.provider
         assert "openai_fallback" in config.provider

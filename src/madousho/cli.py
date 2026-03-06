@@ -5,7 +5,6 @@ from typing import Optional
 from pathlib import Path
 import importlib.metadata
 from typer import CallbackParam
-import os
 
 from .commands import run_cmd, validate_cmd
 from .logger import configure_logger
@@ -15,13 +14,12 @@ app = typer.Typer()
 
 def find_config_file(custom_path: Optional[str] = None) -> Path:
     """
-    Find configuration file using 4-layer search strategy.
+    Find configuration file using 3-layer search strategy.
     
     Search order:
     1. custom_path (CLI --config parameter)
-    2. Environment variable MADOUSHO_CONFIG
-    3. ./madousho.yaml or ./config/madousho.yaml
-    4. ~/.config/madousho/madousho.yaml
+    2. ./madousho.yaml or ./config/madousho.yaml
+    3. ~/.config/madousho/madousho.yaml
     
     Args:
         custom_path: Optional path provided via CLI --config option
@@ -40,16 +38,7 @@ def find_config_file(custom_path: Optional[str] = None) -> Path:
         else:
             raise FileNotFoundError(f"Configuration file not found: {custom_path}")
     
-    # Layer 2: Environment variable MADOUSHO_CONFIG
-    env_path = os.environ.get("MADOUSHO_CONFIG")
-    if env_path:
-        path = Path(env_path)
-        if path.exists():
-            return path
-        else:
-            raise FileNotFoundError(f"Configuration file from MADOUSHO_CONFIG not found: {env_path}")
-    
-    # Layer 3: Current directory - ./madousho.yaml or ./config/madousho.yaml
+    # Layer 2: Current directory - ./madousho.yaml or ./config/madousho.yaml
     cwd = Path.cwd()
     
     # Try ./madousho.yaml
@@ -62,7 +51,7 @@ def find_config_file(custom_path: Optional[str] = None) -> Path:
     if path.exists():
         return path
     
-    # Layer 4: ~/.config/madousho/madousho.yaml
+    # Layer 3: ~/.config/madousho/madousho.yaml
     home_config = Path.home() / ".config" / "madousho" / "madousho.yaml"
     if home_config.exists():
         return home_config
@@ -71,10 +60,9 @@ def find_config_file(custom_path: Optional[str] = None) -> Path:
     raise FileNotFoundError(
         "No configuration file found. Searched in the following locations:\n"
         f"  1. CLI --config parameter (not provided)\n"
-        f"  2. Environment variable MADOUSHO_CONFIG (not set)\n"
-        f"  3. {cwd / 'madousho.yaml'} (not found)\n"
-        f"  4. {cwd / 'config' / 'madousho.yaml'} (not found)\n"
-        f"  5. {home_config} (not found)\n"
+        f"  2. {cwd / 'madousho.yaml'} (not found)\n"
+        f"  3. {cwd / 'config' / 'madousho.yaml'} (not found)\n"
+        f"  4. {home_config} (not found)\n"
         "\nPlease create a configuration file or specify one using --config option."
     )
 
@@ -101,7 +89,7 @@ def callback(
     Madousho AI - Advanced AI Assistant CLI
     """
     
-    # Find configuration file using 4-layer search strategy
+    # Find configuration file using 3-layer search strategy
     try:
         config_path = find_config_file(str(config) if config else None)
     except FileNotFoundError as e:

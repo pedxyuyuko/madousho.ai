@@ -1,13 +1,11 @@
-"""Configuration loader with YAML parsing and environment variable overrides."""
+"""Configuration loader with YAML parsing."""
 
-import os
 from pathlib import Path
 from typing import Any
 
 import yaml
 
 from .models import Config
-
 
 def normalize_keys(obj: Any) -> Any:
     """Recursively convert hyphenated keys to underscores."""
@@ -44,77 +42,8 @@ def load_yaml(path: str) -> dict:
     except yaml.YAMLError as e:
         raise ValueError(f"Invalid YAML in {path}: {e}")
 
-
-def get_env_overrides(prefix: str = "MADOUSHO_") -> dict:
-    """Scan environment variables and build override dictionary.
-    
-    Args:
-        prefix: Prefix for environment variables (default: MADOUSHO_)
-        
-    Returns:
-        Nested dictionary of overrides from environment variables
-        
-    Example:
-        MADOUSHO_API_PORT=9000 -> {"api": {"port": 9000}}
-        MADOUSHO_PROVIDER_EXAMPLE_API_KEY=xyz -> {"provider": {"example": {"api_key": "xyz"}}}
-    """
-    overrides: dict[str, Any] = {}
-    
-    for key, value in os.environ.items():
-        if not key.startswith(prefix):
-            continue
-        
-        # Remove prefix and split by underscore
-        parts = key[len(prefix):].lower().split('_')
-        
-        # Build nested dict
-        current = overrides
-        for i, part in enumerate(parts[:-1]):
-            if part not in current:
-                current[part] = {}
-            elif not isinstance(current[part], dict):
-                # If existing value is not a dict, replace it
-                current[part] = {}
-            current = current[part]
-        
-        # Set the final value
-        final_key = parts[-1]
-        final_value: Any = value
-        
-        # Try to convert to int if possible
-        try:
-            final_value = int(value)
-        except ValueError:
-            pass
-        
-        current[final_key] = final_value
-    
-    return overrides
-
-
-def deep_merge(base: dict, override: dict) -> dict:
-    """Recursively merge two dictionaries.
-    
-    Args:
-        base: Base dictionary
-        override: Dictionary with values to override
-        
-    Returns:
-        Merged dictionary with override values taking precedence
-    """
-    result = base.copy()
-    
-    for key, value in override.items():
-        if key in result and isinstance(result[key], dict) and isinstance(value, dict):
-            result[key] = deep_merge(result[key], value)
-        else:
-            result[key] = value
-    
-    return result
-
-
 def load_config(config_path: str) -> Config:
-    """Load configuration from YAML file with environment variable overrides.
+    """Load configuration from YAML file.
     
     Args:
         config_path: Path to the YAML configuration file
@@ -132,14 +61,8 @@ def load_config(config_path: str) -> Config:
     # Normalize keys (convert hyphens to underscores)
     yaml_config = normalize_keys(yaml_config)
     
-    # Get environment overrides
-    env_overrides = get_env_overrides()
-    
-    # Merge configs
-    merged = deep_merge(yaml_config, env_overrides)
-    
     # Validate and return Config object
     try:
-        return Config.model_validate(merged)
+        return Config.model_validate(yaml_config)
     except Exception as e:
         raise ValueError(f"Invalid configuration: {e}")
