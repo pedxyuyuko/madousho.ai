@@ -30,7 +30,7 @@ dependencies = [
 ]
 
 # Madousho-AI 的配置项
-[tools.madousho-ai]
+[tool.madousho-ai]
 # 这里写依赖的 tools/mcps
 # 格式是 github 的 "username/repo" 或者 "username/repo@版本"
 dependencies-tools = []
