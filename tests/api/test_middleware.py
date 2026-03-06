@@ -178,24 +178,6 @@ class TestTokenAuthMiddlewareEdgeCases:
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
         assert response.json()["detail"] == "Invalid authorization header format"
         
-        # "Bearer " with only space - regex matches but capture group is empty after strip
-        response = client.get("/test", headers={"authorization": "Bearer "})
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
-        assert response.json()["detail"] == "Invalid token"
-        """Test various malformed Authorization headers are rejected."""
-        app = create_test_app(token="test-token-123")
-        client = TestClient(app, raise_server_exceptions=False)
-        
-        # Empty string is falsy, treated as missing header
-        response = client.get("/test", headers={"authorization": ""})
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
-        assert response.json()["detail"] == "Authorization header is required"
-        
-        # "Bearer" without token is invalid format
-        response = client.get("/test", headers={"authorization": "Bearer"})
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
-        assert response.json()["detail"] == "Invalid authorization header format"
-        
         # "Bearer " with only space - regex doesn't match (requires at least one char after "Bearer ")
         response = client.get("/test", headers={"authorization": "Bearer "})
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
