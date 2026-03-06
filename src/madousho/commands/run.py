@@ -15,7 +15,6 @@ def run_cmd(ctx: typer.Context):
     validates and instantiates flow plugins, and registers them.
     """
     config_path = ctx.obj["config_path"]
-    verbose = ctx.obj["verbose"]
     
     # Load configuration
     from madousho.config.loader import load_config
@@ -43,22 +42,21 @@ def run_cmd(ctx: typer.Context):
                 if result.success and result.plugin:
                     flow_name = result.plugin.metadata.name
                     registry.register(flow_name, result.plugin.flow_instance)
-                logger.info(f"✓ Flow plugin loaded: {flow_name}")
+                    logger.info(f"✓ Flow plugin loaded: {flow_name}")
                 
-                # Log warnings (always show config validation warnings)
+                # Log warnings (config validation issues)
                 if result.warnings:
+                    plugin_logger = logger.bind(plugin=f"[{result.plugin.metadata.name}] ") if result.success and result.plugin else logger
                     for warning in result.warnings:
-                        logger.warning(f"  Warning: {warning}")
+                        plugin_logger.warning(f"Config: {warning}")
                 else:
                     logger.error(f"✗ Failed to load flow plugin {plugin_path.name}")
                     for error in result.errors:
-                        logger.error(f"  Error: {error}")
+                        logger.error(f"Config: {error}")
                         
             except Exception as e:
                 logger.error(f"✗ Error loading flow plugin {plugin_path.name}: {e}")
-                if verbose:
-                    import traceback
-                    logger.debug(traceback.format_exc())
+                logger.debug("Stacktrace:", exc_info=True)
     else:
         logger.info(f"No plugins/flows directory found")
     
@@ -70,5 +68,4 @@ def run_cmd(ctx: typer.Context):
     else:
         logger.info("No flows registered")
     
-    if verbose:
-        logger.info("Configuration loaded", config_path=str(config_path), api_host=config.api.host, api_port=config.api.port, model_groups=list(config.model_groups.keys()))
+    logger.debug("Configuration loaded", extra={"config_path": str(config_path), "api_host": config.api.host, "api_port": config.api.port, "model_groups": list(config.model_groups.keys())})
