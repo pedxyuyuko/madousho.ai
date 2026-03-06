@@ -172,8 +172,8 @@ Max Concurrent: 4 (Wave 2)
   - `pyproject.toml:28-40` - 现有依赖定义格式
 
   **Acceptance Criteria**:
-  - [ ] `pip install -e .` 成功安装 fastapi 和 uvicorn
-  - [ ] `python -c "import fastapi; import uvicorn"` 无错误
+  - [x] `pip install -e .` 成功安装 fastapi 和 uvicorn
+  - [x] `python -c "import fastapi; import uvicorn"` 无错误
 
   **QA Scenarios**:
 
@@ -222,8 +222,8 @@ Max Concurrent: 4 (Wave 2)
   - `src/madousho/flow/__init__.py` - 子包导出模式
 
   **Acceptance Criteria**:
-  - [ ] `src/madousho/api/__init__.py` 存在
-  - [ ] `src/madousho/api/routes/__init__.py` 存在
+  - [x] `src/madousho/api/__init__.py` 存在
+  - [x] `src/madousho/api/routes/__init__.py` 存在
 
   **QA Scenarios**:
 
@@ -272,9 +272,9 @@ Max Concurrent: 4 (Wave 2)
   - `src/madousho/__init__.py` - 版本获取方式
 
   **Acceptance Criteria**:
-  - [ ] `src/madousho/api/app.py` 存在
-  - [ ] FastAPI 应用正确初始化
-  - [ ] 路由前缀配置为 `/api/v1`
+  - [x] `src/madousho/api/app.py` 存在
+  - [x] FastAPI 应用正确初始化
+  - [x] 路由前缀配置为 `/api/v1`
 
   **QA Scenarios**:
 
@@ -326,10 +326,10 @@ Max Concurrent: 4 (Wave 2)
   - FastAPI 中间件文档：https://fastapi.tiangolo.com/tutorial/middleware/
 
   **Acceptance Criteria**:
-  - [ ] 中间件正确提取 Bearer token
-  - [ ] token 匹配时请求通过
-  - [ ] token 不匹配时返回 401
-  - [ ] token 为空时允许无认证
+  - [x] 中间件正确提取 Bearer token
+  - [x] token 匹配时请求通过
+  - [x] token 不匹配时返回 401
+  - [x] token 为空时允许无认证
 
   **QA Scenarios**:
 
@@ -371,7 +371,7 @@ Max Concurrent: 4 (Wave 2)
 
 ---
 
-- [ ] 5. 创建健康检查端点
+- [x] 5. 创建健康检查端点
 
   **What to do**:
   - 创建 `src/madousho/api/routes/health.py`
@@ -398,9 +398,9 @@ Max Concurrent: 4 (Wave 2)
   - `src/madousho/__init__.py` - 版本导出
 
   **Acceptance Criteria**:
-  - [ ] `GET /api/v1/health` 返回 200
-  - [ ] 响应包含 `status: "ok"`
-  - [ ] 响应包含 `version` 字段
+  - [x] `GET /api/v1/health` 返回 200
+  - [x] 响应包含 `status: "ok"`
+  - [x] 响应包含 `version` 字段
 
   **QA Scenarios**:
 
@@ -423,7 +423,7 @@ Max Concurrent: 4 (Wave 2)
 
 ---
 
-- [ ] 6. 集成 API 启动到 run 命令
+- [x] 6. 集成 API 启动到 run 命令
 
   **What to do**:
   - 修改 `src/madousho/commands/run.py`
@@ -453,9 +453,9 @@ Max Concurrent: 4 (Wave 2)
   - `src/madousho/cli.py:16-79` - 配置加载逻辑
 
   **Acceptance Criteria**:
-  - [ ] `madousho run` 启动后 API 服务器运行
-  - [ ] 端口被占用时退出码 1 + 错误信息
-  - [ ] Ctrl+C 优雅关闭
+  - [x] `madousho run` 启动后 API 服务器运行
+  - [x] 端口被占用时退出码 1 + 错误信息
+  - [x] Ctrl+C 优雅关闭
 
   **QA Scenarios**:
 
@@ -491,7 +491,7 @@ Max Concurrent: 4 (Wave 2)
 
 ---
 
-- [ ] 7. API 模块测试
+- [x] 7. API 模块测试
 
   **What to do**:
   - 创建 `tests/api/__init__.py`
@@ -519,9 +519,9 @@ Max Concurrent: 4 (Wave 2)
   - `tests/flow/test_base.py` - 测试结构
 
   **Acceptance Criteria**:
-  - [ ] `tests/api/test_app.py` 存在
-  - [ ] 测试覆盖率 ≥90%
-  - [ ] 所有测试通过
+  - [x] `tests/api/test_app.py` 存在
+  - [x] 测试覆盖率 ≥90%
+  - [x] 所有测试通过
 
   **QA Scenarios**:
 
@@ -543,7 +543,7 @@ Max Concurrent: 4 (Wave 2)
 
 ---
 
-- [ ] 8. 中间件测试
+- [x] 8. 中间件测试
 
   **What to do**:
   - 创建 `tests/api/test_middleware.py`
@@ -570,9 +570,9 @@ Max Concurrent: 4 (Wave 2)
   - `tests/config/test_models.py` - 边缘情况测试模式
 
   **Acceptance Criteria**:
-  - [ ] `tests/api/test_middleware.py` 存在
-  - [ ] 覆盖所有认证场景
-  - [ ] 所有测试通过
+  - [x] `tests/api/test_middleware.py` 存在
+  - [x] 覆盖所有认证场景
+  - [x] 所有测试通过
 
   **QA Scenarios**:
 
@@ -594,7 +594,7 @@ Max Concurrent: 4 (Wave 2)
 
 ---
 
-- [ ] 9. 端点测试
+- [x] 9. 端点测试
 
   **What to do**:
   - 创建 `tests/api/test_routes.py`
@@ -621,9 +621,9 @@ Max Concurrent: 4 (Wave 2)
   - `tests/commands/test_run.py` - 命令测试模式
 
   **Acceptance Criteria**:
-  - [ ] `tests/api/test_routes.py` 存在
-  - [ ] 覆盖所有端点场景
-  - [ ] 所有测试通过
+  - [x] `tests/api/test_routes.py` 存在
+  - [x] 覆盖所有端点场景
+  - [x] 所有测试通过
 
   **QA Scenarios**:
 
@@ -645,7 +645,7 @@ Max Concurrent: 4 (Wave 2)
 
 ---
 
-- [ ] 10. 集成测试
+- [x] 10. 集成测试
 
   **What to do**:
   - 创建 `tests/api/test_integration.py`
@@ -674,9 +674,9 @@ Max Concurrent: 4 (Wave 2)
   - FastAPI TestClient: https://fastapi.tiangolo.com/tutorial/testing/
 
   **Acceptance Criteria**:
-  - [ ] `tests/api/test_integration.py` 存在
-  - [ ] 覆盖完整流程
-  - [ ] 所有测试通过
+  - [x] `tests/api/test_integration.py` 存在
+  - [x] 覆盖完整流程
+  - [x] 所有测试通过
 
   **QA Scenarios**:
 
@@ -700,19 +700,19 @@ Max Concurrent: 4 (Wave 2)
 
 ## Final Verification Wave
 
-- [ ] F1. **Plan Compliance Audit** — `oracle`
+- [x] F1. **Plan Compliance Audit** — `oracle`
   Read the plan end-to-end. For each "Must Have": verify implementation exists. For each "Must NOT Have": search codebase for forbidden patterns. Check evidence files exist in .sisyphus/evidence/. Compare deliverables against plan.
   Output: `Must Have [N/N] | Must NOT Have [N/N] | Tasks [N/N] | VERDICT: APPROVE/REJECT`
 
-- [ ] F2. **Code Quality Review** — `unspecified-high`
+- [x] F2. **Code Quality Review** — `unspecified-high`
   Run `tsc --noEmit` + linter + `pytest`. Review all changed files for: `as any`/`@ts-ignore`, empty catches, console.log in prod, commented-out code, unused imports. Check AI slop: excessive comments, over-abstraction, generic names.
   Output: `Build [PASS/FAIL] | Lint [PASS/FAIL] | Tests [N pass/N fail] | Files [N clean/N issues] | VERDICT`
 
-- [ ] F3. **Real Manual QA** — `unspecified-high`
+- [x] F3. **Real Manual QA** — `unspecified-high`
   Start from clean state. Execute EVERY QA scenario from EVERY task. Test cross-task integration. Test edge cases: empty state, invalid input, rapid actions. Save to `.sisyphus/evidence/final-qa/`.
   Output: `Scenarios [N/N pass] | Integration [N/N] | Edge Cases [N tested] | VERDICT`
 
-- [ ] F4. **Scope Fidelity Check** — `deep`
+- [x] F4. **Scope Fidelity Check** — `deep`
   For each task: read "What to do", read actual diff. Verify 1:1. Check "Must NOT do" compliance. Detect cross-task contamination. Flag unaccounted changes.
   Output: `Tasks [N/N compliant] | Contamination [CLEAN/N issues] | Unaccounted [CLEAN/N files] | VERDICT`
 
@@ -754,9 +754,9 @@ pytest tests/api/ --cov=madousho.api --cov-fail-under=90
 ```
 
 ### Final Checklist
-- [ ] 所有 "Must Have" 实现
-- [ ] 所有 "Must NOT Have" 不存在
-- [ ] 所有测试通过（90%+ 覆盖率）
-- [ ] `madousho run` 启动后 API 可访问
-- [ ] 认证中间件正常工作
-- [ ] 优雅关闭正常工作
+- [x] 所有 "Must Have" 实现
+- [x] 所有 "Must NOT Have" 不存在
+- [x] 所有测试通过（90%+ 覆盖率）
+- [x] `madousho run` 启动后 API 可访问
+- [x] 认证中间件正常工作
+- [x] 优雅关闭正常工作
