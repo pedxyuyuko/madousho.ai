@@ -9,8 +9,10 @@ from madousho.api.app import create_app
 @pytest.fixture
 def client():
     """Create test client for API testing."""
+    from madousho.config import get_config
     app = create_app()
-    with TestClient(app) as test_client:
+    token = get_config().api.token
+    with TestClient(app, headers={"Authorization": f"Bearer {token}"}) as test_client:
         yield test_client
 
 

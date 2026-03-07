@@ -13,6 +13,7 @@ from fastapi.testclient import TestClient
 from madousho.api.app import create_app
 from madousho.api.middleware.auth import TokenAuthMiddleware
 from madousho.config.models import Config
+from madousho.config import get_config
 
 
 class TestHealthEndpoint:
@@ -22,8 +23,12 @@ class TestHealthEndpoint:
         """Test that health check endpoint returns status ok."""
         app = create_app()
         client = TestClient(app)
+        token = get_config().api.token
 
-        response = client.get("/api/v1/health")
+        response = client.get(
+            "/api/v1/health",
+            headers={"Authorization": f"Bearer {token}"}
+        )
 
         assert response.status_code == 200
         data = response.json()
@@ -34,8 +39,12 @@ class TestHealthEndpoint:
         """Test that version field has valid format."""
         app = create_app()
         client = TestClient(app)
+        token = get_config().api.token
 
-        response = client.get("/api/v1/health")
+        response = client.get(
+            "/api/v1/health",
+            headers={"Authorization": f"Bearer {token}"}
+        )
 
         assert response.status_code == 200
         data = response.json()
@@ -47,8 +56,12 @@ class TestHealthEndpoint:
         """Test that health check returns JSON content type."""
         app = create_app()
         client = TestClient(app)
+        token = get_config().api.token
 
-        response = client.get("/api/v1/health")
+        response = client.get(
+            "/api/v1/health",
+            headers={"Authorization": f"Bearer {token}"}
+        )
 
         assert response.status_code == 200
         assert "application/json" in response.headers["content-type"]
@@ -57,24 +70,15 @@ class TestHealthEndpoint:
 class TestAuthenticationMiddleware:
     """Test token authentication middleware."""
 
-    def test_no_token_allows_access(self):
-        """Test that without token configured, all requests are allowed."""
-        app = create_app()
-        client = TestClient(app)
-
-        response = client.get("/api/v1/health")
-
-        assert response.status_code == 200
-
     def test_valid_token_allows_access(self):
         """Test that valid token allows access to endpoints."""
         app = create_app()
-        app.add_middleware(TokenAuthMiddleware, token="test-secret-token")
         client = TestClient(app)
+        token = get_config().api.token
 
         response = client.get(
             "/api/v1/health",
-            headers={"Authorization": "Bearer test-secret-token"}
+            headers={"Authorization": f"Bearer {token}"}
         )
 
         assert response.status_code == 200
@@ -82,7 +86,6 @@ class TestAuthenticationMiddleware:
     def test_missing_auth_header_rejected(self):
         """Test that missing Authorization header is rejected."""
         app = create_app()
-        app.add_middleware(TokenAuthMiddleware, token="test-secret-token")
         # Note: BaseHTTPMiddleware with HTTPException has TestClient limitations
         # In production, Starlette handles this correctly and returns 401
         client = TestClient(app, raise_server_exceptions=False)
@@ -95,7 +98,8 @@ class TestAuthenticationMiddleware:
     def test_invalid_token_format_rejected(self):
         """Test that invalid token format is rejected."""
         app = create_app()
-        app.add_middleware(TokenAuthMiddleware, token="test-secret-token")
+        token = get_config().api.token
+        app.add_middleware(TokenAuthMiddleware, token=token)
         client = TestClient(app, raise_server_exceptions=False)
 
         response = client.get(
@@ -123,43 +127,44 @@ class TestAuthenticationMiddleware:
     def test_bearer_case_insensitive(self):
         """Test that Bearer prefix is case insensitive."""
         app = create_app()
-        app.add_middleware(TokenAuthMiddleware, token="test-token")
+        token = get_config().api.token
+        app.add_middleware(TokenAuthMiddleware, token=token)
         client = TestClient(app)
 
         # Test lowercase bearer
         response = client.get(
             "/api/v1/health",
-            headers={"Authorization": "bearer test-token"}
+            headers={"Authorization": f"bearer {token}"}
         )
         assert response.status_code == 200
 
         # Test uppercase BEARER
         response = client.get(
             "/api/v1/health",
-            headers={"Authorization": "BEARER test-token"}
+            headers={"Authorization": f"BEARER {token}"}
         )
         assert response.status_code == 200
 
         # Test mixed case BeArEr
         response = client.get(
             "/api/v1/health",
-            headers={"Authorization": "BeArEr test-token"}
+            headers={"Authorization": f"BeArEr {token}"}
         )
         assert response.status_code == 200
 
     def test_token_with_extra_whitespace(self):
         """Test that token with extra whitespace is handled correctly."""
         app = create_app()
-        app.add_middleware(TokenAuthMiddleware, token="test-token")
+        token = get_config().api.token
+        app.add_middleware(TokenAuthMiddleware, token=token)
         client = TestClient(app)
 
         response = client.get(
             "/api/v1/health",
-            headers={"Authorization": "Bearer   test-token  "}
+            headers={"Authorization": f"Bearer   {token}  "}
         )
 
         assert response.status_code == 200
-
 
 class TestAppConfiguration:
     """Test application configuration and initialization."""
@@ -198,7 +203,8 @@ class TestServerLifecycle:
     def test_app_with_middleware_chain(self):
         """Test that app works correctly with middleware chain."""
         app = create_app()
-        app.add_middleware(TokenAuthMiddleware, token="test-token")
+        token = get_config().api.token
+        app.add_middleware(TokenAuthMiddleware, token=token)
         client = TestClient(app, raise_server_exceptions=False)
 
         # Without token should fail (401 or 500 due to TestClient limitation)
@@ -208,7 +214,7 @@ class TestServerLifecycle:
         # With token should succeed
         response = client.get(
             "/api/v1/health",
-            headers={"Authorization": "Bearer test-token"}
+            headers={"Authorization": f"Bearer {token}"}
         )
         assert response.status_code == 200
 
@@ -219,7 +225,7 @@ class TestEndToEnd:
     def test_complete_request_flow_with_auth(self):
         """Test complete request flow with authentication."""
         app = create_app()
-        app.add_middleware(TokenAuthMiddleware, token="e2e-test-token")
+        token = get_config().api.token
         client = TestClient(app, raise_server_exceptions=False)
 
         # Step 1: Try without auth - should fail (401 or 500)
@@ -236,7 +242,7 @@ class TestEndToEnd:
         # Step 3: Try with correct token - should succeed
         response = client.get(
             "/api/v1/health",
-            headers={"Authorization": "Bearer e2e-test-token"}
+            headers={"Authorization": f"Bearer {token}"}
         )
         assert response.status_code == 200
         data = response.json()
@@ -246,11 +252,15 @@ class TestEndToEnd:
         """Test handling multiple concurrent requests."""
         app = create_app()
         client = TestClient(app)
+        token = get_config().api.token
 
-        # Simulate concurrent requests
+        # Simulate concurrent requests with auth
         responses = []
         for _ in range(5):
-            response = client.get("/api/v1/health")
+            response = client.get(
+                "/api/v1/health",
+                headers={"Authorization": f"Bearer {token}"}
+            )
             responses.append(response)
 
         # All should succeed
@@ -263,10 +273,14 @@ class TestEndToEnd:
         """Test that repeated requests return consistent results."""
         app = create_app()
         client = TestClient(app)
+        token = get_config().api.token
 
         results = []
         for _ in range(10):
-            response = client.get("/api/v1/health")
+            response = client.get(
+                "/api/v1/health",
+                headers={"Authorization": f"Bearer {token}"}
+            )
             assert response.status_code == 200
             results.append(response.json())
 
@@ -284,9 +298,13 @@ class TestGracefulShutdown:
         """Test that app handles client close gracefully."""
         app = create_app()
         client = TestClient(app)
+        token = get_config().api.token
 
         # Make a request
-        response = client.get("/api/v1/health")
+        response = client.get(
+            "/api/v1/health",
+            headers={"Authorization": f"Bearer {token}"}
+        )
         assert response.status_code == 200
 
         # Close client
@@ -294,21 +312,31 @@ class TestGracefulShutdown:
 
         # Create new client and verify app still works
         client2 = TestClient(app)
-        response2 = client2.get("/api/v1/health")
+        response2 = client2.get(
+            "/api/v1/health",
+            headers={"Authorization": f"Bearer {token}"}
+        )
         assert response2.status_code == 200
 
     def test_app_state_after_multiple_requests(self):
         """Test that app maintains state correctly after multiple requests."""
         app = create_app()
         client = TestClient(app)
+        token = get_config().api.token
 
         # Make multiple requests
         for _ in range(20):
-            response = client.get("/api/v1/health")
+            response = client.get(
+                "/api/v1/health",
+                headers={"Authorization": f"Bearer {token}"}
+            )
             assert response.status_code == 200
 
         # Final request should still work
-        response = client.get("/api/v1/health")
+        response = client.get(
+            "/api/v1/health",
+            headers={"Authorization": f"Bearer {token}"}
+        )
         assert response.status_code == 200
         data = response.json()
         assert data["status"] == "ok"
@@ -321,23 +349,32 @@ class TestErrorHandling:
         """Test that nonexistent endpoints return 404."""
         app = create_app()
         client = TestClient(app)
+        token = get_config().api.token
 
-        response = client.get("/api/v1/nonexistent")
+        response = client.get(
+            "/api/v1/nonexistent",
+            headers={"Authorization": f"Bearer {token}"}
+        )
         assert response.status_code == 404
 
     def test_invalid_method_returns_405(self):
         """Test that invalid HTTP method returns 405."""
         app = create_app()
         client = TestClient(app)
+        token = get_config().api.token
 
         # Health endpoint only supports GET
-        response = client.post("/api/v1/health")
+        response = client.post(
+            "/api/v1/health",
+            headers={"Authorization": f"Bearer {token}"}
+        )
         assert response.status_code == 405
 
     def test_middleware_error_handling(self):
         """Test that middleware errors are handled gracefully."""
         app = create_app()
-        app.add_middleware(TokenAuthMiddleware, token="test-token")
+        token = get_config().api.token
+        app.add_middleware(TokenAuthMiddleware, token=token)
         client = TestClient(app, raise_server_exceptions=False)
 
         # Send request with malformed auth header
@@ -356,8 +393,12 @@ class TestConfigIntegration:
         """Test app creation with default configuration."""
         app = create_app()
         client = TestClient(app)
+        token = get_config().api.token
 
-        response = client.get("/api/v1/health")
+        response = client.get(
+            "/api/v1/health",
+            headers={"Authorization": f"Bearer {token}"}
+        )
         assert response.status_code == 200
 
     def test_api_routes_prefix(self):

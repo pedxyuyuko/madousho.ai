@@ -11,10 +11,10 @@ class TestAPIConfig:
 
     def test_valid_api_config_minimal(self):
         """Test valid APIConfig with required fields only."""
-        config = APIConfig(host="localhost", port=8080)
+        config = APIConfig(host="localhost", port=8080, token="test-token")
         assert config.host == "localhost"
         assert config.port == 8080
-        assert config.token is None
+        assert config.token == "test-token"
 
     def test_valid_api_config_with_token(self):
         """Test valid APIConfig with optional token field."""
@@ -26,35 +26,35 @@ class TestAPIConfig:
     def test_valid_port_boundaries(self):
         """Test valid port values at boundaries."""
         # Minimum valid port
-        config_min = APIConfig(host="localhost", port=1)
+        config_min = APIConfig(host="localhost", port=1, token="token")
         assert config_min.port == 1
 
         # Maximum valid port
-        config_max = APIConfig(host="localhost", port=65535)
+        config_max = APIConfig(host="localhost", port=65535, token="token")
         assert config_max.port == 65535
 
     def test_invalid_port_zero(self):
         """Test that port=0 is rejected."""
         with pytest.raises(ValidationError) as exc_info:
-            APIConfig(host="localhost", port=0)
+            APIConfig(host="localhost", port=0, token="token")
         assert "port must be between 1 and 65535" in str(exc_info.value)
 
     def test_invalid_port_negative(self):
         """Test that negative port is rejected."""
         with pytest.raises(ValidationError) as exc_info:
-            APIConfig(host="localhost", port=-1)
+            APIConfig(host="localhost", port=-1, token="token")
         assert "port must be between 1 and 65535" in str(exc_info.value)
 
     def test_invalid_port_too_large(self):
         """Test that port > 65535 is rejected."""
         with pytest.raises(ValidationError) as exc_info:
-            APIConfig(host="localhost", port=65536)
+            APIConfig(host="localhost", port=65536, token="token")
         assert "port must be between 1 and 65535" in str(exc_info.value)
 
     def test_extra_fields_rejected(self):
         """Test that extra fields are rejected in APIConfig."""
         with pytest.raises(ValidationError) as exc_info:
-            APIConfig(host="localhost", port=8080, timeout=30)
+            APIConfig(host="localhost", port=8080, token="token", timeout=30)
         assert "Extra inputs are not permitted" in str(exc_info.value)
 
 
@@ -116,7 +116,7 @@ class TestConfig:
     def test_valid_config(self):
         """Test valid Config with nested APIConfig and ProviderConfig."""
         config = Config(
-            api=APIConfig(host="localhost", port=8080),
+            api=APIConfig(host="localhost", port=8080, token="test-token"),
             provider={
                 "openai": ProviderConfig(
                     type="openai",
@@ -165,7 +165,7 @@ class TestConfig:
         """Test that extra fields are rejected in Config."""
         with pytest.raises(ValidationError) as exc_info:
             Config(
-                api=APIConfig(host="localhost", port=8080),
+                api=APIConfig(host="localhost", port=8080, token="token"),
                 provider={},
                 default_model_group="",
                 model_groups={},
@@ -177,7 +177,7 @@ class TestConfig:
         """Test that extra fields in nested models are also rejected."""
         with pytest.raises(ValidationError) as exc_info:
             Config(
-                api=APIConfig(host="localhost", port=8080, extra="reject"),
+                api=APIConfig(host="localhost", port=8080, token="token", extra="reject"),
                 provider={},
                 default_model_group="",
                 model_groups={}
@@ -187,7 +187,7 @@ class TestConfig:
     def test_config_empty_provider_dict(self):
         """Test Config with empty provider dictionary."""
         config = Config(
-            api=APIConfig(host="localhost", port=8080),
+            api=APIConfig(host="localhost", port=8080, token="token"),
             provider={},
             default_model_group="",
             model_groups={}
@@ -199,7 +199,7 @@ class TestConfig:
         """Test Config with invalid API port in nested model."""
         with pytest.raises(ValidationError) as exc_info:
             Config(
-                api=APIConfig(host="localhost", port=0),
+                api=APIConfig(host="localhost", port=0, token="token"),
                 provider={},
                 default_model_group="",
                 model_groups={}
@@ -210,7 +210,7 @@ class TestConfig:
         """Test Config with invalid nested provider config (extra field)."""
         with pytest.raises(ValidationError) as exc_info:
             Config(
-                api=APIConfig(host="localhost", port=8080),
+                api=APIConfig(host="localhost", port=8080, token="token"),
                 provider={
                     "bad": ProviderConfig(
                         type="openai",
@@ -247,7 +247,7 @@ class TestModelValidation:
     def test_config_dict_conversion(self):
         """Test Config can be converted to dict."""
         config = Config(
-            api=APIConfig(host="localhost", port=8080),
+            api=APIConfig(host="localhost", port=8080, token="token"),
             provider={"test": ProviderConfig(type="test", endpoint="http://test", api_key="key")},
             default_model_group="group",
             model_groups={"group": ["model1"]}

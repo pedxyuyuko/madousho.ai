@@ -7,7 +7,7 @@ from fastapi import FastAPI, status
 from madousho.api.middleware.auth import TokenAuthMiddleware
 
 
-def create_test_app(token=None):
+def create_test_app(token: str):
     """Helper to create test app with middleware."""
     app = FastAPI()
     app.add_middleware(TokenAuthMiddleware, token=token)
@@ -39,15 +39,6 @@ class TestTokenAuthMiddleware:
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
         assert response.json()["detail"] == "Invalid token"
-
-    def test_empty_token_config_allows_no_auth(self):
-        """Test that None token config allows requests without authentication."""
-        app = create_test_app(token=None)
-        client = TestClient(app, raise_server_exceptions=False)
-        response = client.get("/test")
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.json() == {"status": "ok"}
 
     def test_missing_authorization_header_rejected(self):
         """Test that missing Authorization header is rejected when token is configured."""
@@ -116,22 +107,12 @@ class TestTokenAuthMiddlewareEdgeCases:
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
         assert response.json()["detail"] == "Invalid token"
 
-    def test_empty_string_token(self):
-        """Test empty string token is treated as no authentication (falsy value)."""
-        app = create_test_app(token="")
-        client = TestClient(app, raise_server_exceptions=False)
-
-        response = client.get("/test", headers={"authorization": "Bearer anything"})
-        assert response.status_code == status.HTTP_200_OK
-
     def test_whitespace_in_token(self):
         """Test that tokens are compared exactly as configured.
         
         Note: This test verifies that token matching is exact - the middleware
         does not perform any normalization on the configured token.
         """
-        # In practice, users won't configure tokens with spaces,
-        # but we test exact matching behavior
         app = create_test_app(token="test-token")
         client = TestClient(app, raise_server_exceptions=False)
         
@@ -139,7 +120,7 @@ class TestTokenAuthMiddlewareEdgeCases:
         response = client.get("/test", headers={"authorization": "Bearer test-token"})
         assert response.status_code == status.HTTP_200_OK
         
-        # Whitespace in request doesn't match (middleware strips it)
+        # Whitespace in request is stripped by middleware
         response = client.get("/test", headers={"authorization": "Bearer  test-token  "})
         assert response.status_code == status.HTTP_200_OK
 
@@ -156,12 +137,6 @@ class TestTokenAuthMiddlewareEdgeCases:
         response = client.get("/test", headers={"authorization": "Bearer test-token-different-secret"})
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
         assert response.json()["detail"] == "Invalid token"
-        """Test multiple spaces between Bearer and token are handled."""
-        app = create_test_app(token="test-token-123")
-        client = TestClient(app, raise_server_exceptions=False)
-
-        response = client.get("/test", headers={"authorization": "Bearer    test-token-123"})
-        assert response.status_code == status.HTTP_200_OK
 
     def test_malformed_authorization_headers(self):
         """Test various malformed Authorization headers are rejected."""

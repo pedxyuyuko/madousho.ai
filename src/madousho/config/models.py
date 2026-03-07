@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -10,7 +10,7 @@ class APIConfig(BaseModel):
 
     host: str
     port: int
-    token: Optional[str] = None
+    token: str
 
     @field_validator("port")
     @classmethod
