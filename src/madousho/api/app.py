@@ -1,6 +1,6 @@
-from madousho.api.middleware.auth import TokenAuthMiddleware
+from madousho.api.middleware.auth import TokenAuth
 from madousho.config import get_config
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.routing import APIRouter
 from loguru import logger
 import sys
@@ -33,16 +33,24 @@ def create_app() -> FastAPI:
         description="Systematic AI Agent Framework with fixed flow control + AI-executed steps",
     )
     
-    # Load configuration and initialize auth middleware
+    # Load configuration
     config = get_config()
-    app.add_middleware(TokenAuthMiddleware, token=config.api.token)
     
-    # Create API router with v1 prefix
-    api_router = APIRouter(prefix="/api/v1")
+    # Create public router (no authentication required)
+    public_router = APIRouter()
     
-    # Include health check router
+    # Include health check router (public access)
     from madousho.api.routes.health import router as health_router
-    app.include_router(health_router)
+    public_router.include_router(health_router)
+    
+    # Create API router with v1 prefix (authentication required)
+    api_router = APIRouter(
+        prefix="/api/v1",
+        dependencies=[Depends(TokenAuth(token=config.api.token))]
+    )
+    
+    # Include routers
+    app.include_router(public_router)
     # app.include_router(api_router)  # Commented out as no routes added yet
     
     logger.info(f"FastAPI application initialized with version {__version__}")

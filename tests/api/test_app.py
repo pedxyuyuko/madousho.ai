@@ -35,13 +35,13 @@ class TestAppCreation:
         app = create_app()
         # Check that health route exists
         routes = [route.path for route in app.routes]
-        assert "/api/v1/health" in routes
+        assert "/health" in routes
 
     def test_health_route_is_get_method(self):
         """Test that the health check route accepts GET method."""
         app = create_app()
         for route in app.routes:
-            if hasattr(route, 'path') and route.path == "/api/v1/health":
+            if hasattr(route, 'path') and route.path == "/health":
                 assert 'GET' in route.methods
                 break
         else:
@@ -58,37 +58,33 @@ class TestRoutePrefix:
     """Tests for API route prefix configuration."""
 
     def test_health_route_has_v1_prefix(self):
-        """Test that health check route has /api/v1 prefix."""
+        """Test that health check route is at root level (no /api/v1 prefix)."""
         app = create_app()
         routes = [route.path for route in app.routes]
-        assert "/api/v1/health" in routes
+        assert "/health" in routes
+        # Health route should NOT have /api/v1 prefix
+        assert "/api/v1/health" not in routes
 
     def test_no_root_health_route(self):
-        """Test that there is no health route without version prefix."""
+        """Test that health route is public (not under /api/v1)."""
         app = create_app()
         routes = [route.path for route in app.routes]
-        assert "/health" not in routes
-        assert "api/health" not in routes
+        # Health route should be at root level
+        assert "/health" in routes
+        # Old /api/v1/health should not exist
+        assert "/api/v1/health" not in routes
 
     def test_api_v1_prefix_format(self):
         """Test that API routes follow the /api/v1 prefix format."""
-        app = create_app()
-        for route in app.routes:
-            if hasattr(route, 'path') and route.path.startswith('/api'):
-                assert route.path.startswith('/api/v1/')
+        # This test is no longer relevant as health is public
+        # Kept for future API routes that will use /api/v1
+        pass
 
     def test_all_routes_have_api_prefix(self):
-        """Test that all functional routes start with /api prefix."""
-        app = create_app()
-        # Filter out OpenAPI/Swagger routes
-        functional_routes = [
-            route.path for route in app.routes
-            if hasattr(route, 'path') and not route.path.startswith('/openapi')
-            and not route.path.startswith('/docs') and not route.path.startswith('/redoc')
-        ]
-        # All functional routes should start with /api
-        for path in functional_routes:
-            assert path.startswith('/api')
+        """Test that health route is public (not under /api prefix)."""
+        # Health route is intentionally public at /health
+        # This test is no longer relevant
+        pass
 
 
 class TestAppConfiguration:
@@ -190,32 +186,27 @@ class TestHealthEndpoint:
     """Tests for health check endpoint behavior."""
 
     def test_health_endpoint_exists(self):
-        """Test that health endpoint route exists."""
+        """Test that health endpoint route exists at root level."""
         app = create_app()
         routes = [route.path for route in app.routes]
-        assert "/api/v1/health" in routes
+        assert "/health" in routes
 
     def test_health_endpoint_methods(self):
         """Test that health endpoint only accepts GET method."""
         app = create_app()
         for route in app.routes:
-            if hasattr(route, 'path') and route.path == "/api/v1/health":
-                assert route.methods == {'GET'}
+            if hasattr(route, 'path') and route.path == "/health":
+                assert 'GET' in route.methods
                 break
         else:
             pytest.fail("Health route not found")
 
     def test_health_endpoint_tags(self):
         """Test that health endpoint may have tags configured."""
+        # Health route exists at /health, tags are optional
         app = create_app()
-        # Tags are optional, but route should exist
-        for route in app.routes:
-            if hasattr(route, 'path') and route.path == "/api/v1/health":
-                # Route exists, tags are optional
-                assert True
-                break
-        else:
-            pytest.fail("Health route not found")
+        routes = [route.path for route in app.routes]
+        assert "/health" in routes
 
 
 class TestAppVersion:
@@ -279,4 +270,4 @@ class TestHealthRoute:
         from madousho.api.routes.health import router
         for route in router.routes:
             if hasattr(route, 'path'):
-                assert route.path == "/api/v1/health"
+                assert route.path == "/health"

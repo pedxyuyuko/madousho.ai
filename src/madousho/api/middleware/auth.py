@@ -1,76 +1,77 @@
-"""Token authentication middleware."""
+"""Token authentication for API routes."""
 
-from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.requests import Request
-from starlette.responses import JSONResponse
-from starlette.types import ASGIApp
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import re
 from typing import Optional
 
 
-class TokenAuthMiddleware(BaseHTTPMiddleware):
-    """Token authentication middleware that validates Bearer tokens."""
+security = HTTPBearer(auto_error=False)
 
-    def __init__(self, app: ASGIApp, token: str):
+
+class TokenAuth:
+    """Token authentication dependency for FastAPI routes."""
+    
+    def __init__(self, token: str):
         """
-        Initialize the middleware with the expected token.
-
+        Initialize with the expected token.
+        
         Args:
-            app: The FastAPI app instance (provided by FastAPI)
-            token: The token to validate against (required)
+            token: The token to validate against
         """
-        super().__init__(app)
         self.token = token
-
-    async def dispatch(self, request: Request, call_next):
+    
+    async def __call__(
+        self,
+        credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)
+    ) -> None:
         """
-        Process incoming requests and validate token.
-
+        Validate the token from Authorization header.
+        
         Args:
-            request: The incoming request
-            call_next: The next middleware/function to call
-
-        Returns:
-            Response from the next middleware/function
+            credentials: HTTP Bearer credentials from the request
+            
+        Raises:
+            HTTPException: If authentication fails
         """
-        # Extract token from Authorization header
-        auth_header = request.headers.get("authorization")
-        if not auth_header:
-            return JSONResponse(
-                status_code=401,
-                content={"detail": "Authorization header is required"}
+        if credentials is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Authorization header is required",
+                headers={"WWW-Authenticate": "Bearer"},
             )
-
-        # Extract token from "Bearer <token>" format
-        token_from_header = self._extract_token_from_auth_header(auth_header)
+        
+        # Extract token from "Bearer <token>\" format
+        token_from_header = self._extract_token_from_credentials(credentials)
         if not token_from_header:
-            return JSONResponse(
-                status_code=401,
-                content={"detail": "Invalid authorization header format"}
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid authorization header format",
+                headers={"WWW-Authenticate": "Bearer"},
             )
-
+        
         # Validate token
         if token_from_header != self.token:
-            return JSONResponse(
-                status_code=401,
-                content={"detail": "Invalid token"}
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token",
+                headers={"WWW-Authenticate": "Bearer"},
             )
-
-        # Token is valid, proceed with the request
-        return await call_next(request)
-
-    def _extract_token_from_auth_header(self, auth_header: str) -> Optional[str]:
+    
+    def _extract_token_from_credentials(
+        self,
+        credentials: HTTPAuthorizationCredentials
+    ) -> Optional[str]:
         """
-        Extract token from Authorization header in "Bearer <token>" format.
-
+        Extract token from credentials.
+        
         Args:
-            auth_header: The Authorization header value
-
+            credentials: HTTP Bearer credentials
+            
         Returns:
             The extracted token or None if format is invalid
         """
         # Match "Bearer <token>" format (case insensitive for "Bearer")
-        match = re.match(r"^bearer\s+(.+)$", auth_header, re.IGNORECASE)
-        if match:
-            return match.group(1).strip()
-        return None
+        if re.match(r"^bearer\s+$", credentials.scheme, re.IGNORECASE):
+            return None
+        return credentials.credentials.strip()

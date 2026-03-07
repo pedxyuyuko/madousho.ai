@@ -20,13 +20,13 @@ class TestHealthEndpoint:
     """Tests for health check endpoint."""
 
     def test_health_check_returns_200(self, client):
-        """Test that GET /api/v1/health returns 200 status code."""
-        response = client.get("/api/v1/health")
+        """Test that GET /health returns 200 status code."""
+        response = client.get("/health")
         assert response.status_code == 200
 
     def test_health_check_response_format(self, client):
         """Test that health check response contains required fields."""
-        response = client.get("/api/v1/health")
+        response = client.get("/health")
         data = response.json()
         
         assert "status" in data
@@ -35,7 +35,7 @@ class TestHealthEndpoint:
 
     def test_health_check_version_field(self, client):
         """Test that health check response version is a non-empty string."""
-        response = client.get("/api/v1/health")
+        response = client.get("/health")
         data = response.json()
         
         assert isinstance(data["version"], str)
