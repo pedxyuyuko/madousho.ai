@@ -1,4 +1,5 @@
 from madousho.api.middleware.auth import TokenAuthMiddleware
+from madousho.config import get_config
 from fastapi import FastAPI
 from fastapi.routing import APIRouter
 from loguru import logger
@@ -12,6 +13,7 @@ except ImportError:
         from madousho import __version__
     except ImportError:
         __version__ = "0.1.0"  # fallback version
+
 
 def create_app() -> FastAPI:
     """Create and configure FastAPI application instance."""
@@ -30,7 +32,10 @@ def create_app() -> FastAPI:
         version=__version__,
         description="Systematic AI Agent Framework with fixed flow control + AI-executed steps",
     )
-    app.add_middleware(TokenAuthMiddleware, token=None)
+    
+    # Load configuration and initialize auth middleware
+    config = get_config()
+    app.add_middleware(TokenAuthMiddleware, token=config.api.token)
     
     # Create API router with v1 prefix
     api_router = APIRouter(prefix="/api/v1")
