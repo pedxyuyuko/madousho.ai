@@ -1,115 +1,145 @@
-# src/madousho/flow/ KNOWLEDGE BASE
+# Flow Engine
 
-**Generated:** 2026-03-04
-**Commit:** 3b8ad40
-**Branch:** master
+**Location:** `src/madousho/flow/`
 
 ## OVERVIEW
 
-Flow engine for Madousho.ai - Task-based execution system with fixed flow control. Tasks are atomic execution units managed by FlowBase, with lifecycle tracking and parallel execution support.
+Core flow execution engine: FlowBase ABC, TaskBase ABC, async persistence layer, plugin loader, and thread-safe registry.
 
 ## STRUCTURE
 
 ```
 flow/
-├── base.py         # FlowBase class, task execution methods
-├── loader.py       # FlowLoader (328 lines), definition loading
-├── models.py       # Pydantic v2 flow data models
-├── registry.py     # FlowRegistry for flow discovery
-├── storage.py      # FlowStorage for task persistence
-├── tasks/          # Task system
-│   ├── __init__.py # Package marker
-│   └── base.py     # TaskBase abstract class (96 lines)
-└── __init__.py     # Package marker
+├── base.py              # FlowBase ABC (run_task, run_parallel, retry_until)
+├── storage.py           # FlowStorage, AtomicJsonWriter, FlowIndex (JSONL)
+├── loader.py            # Plugin loading (load_plugin, import_flow_module)
+├── registry.py          # FlowRegistry singleton (thread-safe)
+├── models.py            # FlowPlugin, FlowPluginConfig, PluginLoadResult
+├── tasks/
+│   ├── base.py          # TaskBase ABC (synchronous run() method)
+│   └── __init__.py
+└── __init__.py
 ```
 
 ## WHERE TO LOOK
 
 | Task | Location | Notes |
 |------|----------|-------|
-| Flow execution | `base.py:94-105` | `run()` abstract method |
-| Task registration | `base.py:107-131` | `register_task()` assigns UUID |
-| Single task execution | `base.py:148-187` | `run_task()` register + execute + save |
-| Parallel execution | `base.py:189-240` | `run_parallel()` asyncio.gather |
-| Task retry logic | `base.py:242-289` | `retry_until()` with condition |
-| Task lifecycle | `tasks/base.py:30-96` | `pending` → `running` → `completed` | `failed` |
-| Task definition | `tasks/base.py:10-55` | `TaskBase` abstract class |
-| Flow hooks | `base.py:291-320` | `on_start()`, `on_complete()`, `on_error()` |
-| Atomic writes | `storage.py:14-60` | `AtomicJsonWriter` - tempfile + fsync + os.replace |
-| Flow indexing | `storage.py:62-179` | `FlowIndex` - JSONL lazy loading |
-| Orphan recovery | `storage.py:392-449` | `recover_orphaned_tasks()` - running but no started_at |
-|------|----------|-------|
-| Flow execution | `base.py:94-105` | `run()` abstract method |
-| Task registration | `base.py:107-131` | `register_task()` assigns UUID |
-| Single task execution | `base.py:148-187` | `run_task()` register + execute + save |
-| Parallel execution | `base.py:189-240` | `run_parallel()` asyncio.gather |
-| Task retry logic | `base.py:242-289` | `retry_until()` with condition |
-| Task lifecycle | `tasks/base.py:30-96` | `pending` → `running` → `completed` | `failed` |
-| Task definition | `tasks/base.py:10-55` | `TaskBase` abstract class |
-| Flow hooks | `base.py:291-320` | `on_start()`, `on_complete()`, `on_error()` |
+| Flow execution | `base.py` | FlowBase.run_task(), run_parallel(), retry_until() |
+| Task persistence | `storage.py` | AtomicJsonWriter, FlowIndex (JSONL lazy loading) |
+| Plugin loading | `loader.py` | load_plugin(), import_flow_module(), validate_flow_config() |
+| Flow registry | `registry.py` | FlowRegistry singleton (double-checked locking) |
+| Task ABC | `tasks/base.py` | TaskBase with synchronous run() method |
+| Flow models | `models.py` | FlowPlugin, FlowPluginConfig, PluginLoadResult |
 
 ## CONVENTIONS
 
-- **Task naming**: `{action}Task` (e.g., `SearchTask`, `SummarizeTask`)
-- **Task labels**: Optional grouping via `label` parameter (not unique within Flow)
+- **Task lifecycle**: `pending` → `running` → `completed` | `failed` (managed by FlowBase)
+- **Synchronous tasks**: Task.run() MUST be synchronous (FlowBase runs in executor for parallel)
 - **Single responsibility**: Each task does ONE thing only
-- **Synchronous execution**: `run()` method is synchronous (not async)
-- **Task lifecycle**: `pending` → `running` → `completed` | `failed`
-- **UUID assignment**: On registration via `FlowBase.register_task()`
-- **Pydantic v2**: Use `model_validate()`, `model_dump()` (NOT v1 methods)
-- **Type hints**: Full typing required (Python 3.14+ target)
+- **No task spawning**: Tasks cannot spawn other tasks (only FlowBase can)
+- **UUID requirement**: All tasks registered via FlowBase.register_task() for UUID + persistence
+- **Async storage**: All storage operations are async (AtomicJsonWriter.write, FlowIndex.append_flow)
+- **Atomic writes**: Storage uses tempfile + fsync + os.replace for crash safety
+- **Flow isolation**: Each plugin loaded as unique package (`{name}_{version}.main`)
 
 ## ANTI-PATTERNS (THIS MODULE)
 
-- DO NOT create tasks without inheriting `TaskBase`
-- DO NOT make `run()` method async (must be synchronous)
-- DO NOT spawn tasks from within other tasks (tasks cannot spawn)
-- DO NOT bypass `register_task()` - UUID required for persistence
-- DO NOT modify task state directly (use FlowBase methods)
-- DO NOT use Pydantic v1 methods (`.dict()`, `.parse_obj()`)
-- DO NOT skip type hints - project uses full typing
+- DO NOT make Task.run() async (must be synchronous - FlowBase handles executor)
+- DO NOT bypass FlowBase.register_task() (UUID required for persistence)
+- DO NOT modify task state directly (use FlowBase.run_task() or run_parallel())
+- DO NOT spawn tasks from within Task.run() (tasks cannot spawn)
+- DO NOT skip FlowClass export in plugin main.py (loader requires: `FlowClass = YourFlow`)
+- DO NOT create FlowBase subclass without implementing run() method (abstract)
+- DO NOT use storage directly (use FlowBase methods: run_task, run_parallel, get_tasks)
+- DO NOT catch exceptions in Task.run() silently (let FlowBase handle failures)
 
-## UNIQUE STYLES
+## UNIQUE PATTERNS
 
-- **Task-based execution model**: Flows execute via discrete Task instances
-- **Task-Flow relationship**: Tasks cannot exist independently (require Flow registration)
-- **Parallel execution**: `run_parallel()` uses asyncio for concurrent task execution
-- **Retry mechanism**: `retry_until()` with custom condition function
-- **Lifecycle hooks**: Flow-level `on_start()`, `on_complete()`, `on_error()`
-- **Storage integration**: All task states persisted via FlowStorage
-- **Label grouping**: Tasks can be queried by label via `get_tasks(label)`
-- **Atomic writes**: AtomicJsonWriter ensures crash-safe persistence
-- **JSONL indexing**: Global flows.jsonl for lazy loading without loading all flows
-- **Label grouping**: Tasks can be queried by label via `get_tasks(label)`
+- **Retry until condition**: `retry_until(task_factory, condition, max_retries)` - creates new task instance per retry
+- **Parallel execution**: `run_parallel(*tasks, timeout)` - uses asyncio.gather with run_in_executor
+- **Label-based querying**: `get_tasks(label)` - returns all tasks with matching label (flow-scoped)
+- **JSONL lazy loading**: FlowIndex reads line-by-line with early exit (limit/offset pagination)
+- **Plugin package isolation**: Each plugin version loaded as separate Python package (prevents conflicts)
+- **Orphaned task recovery**: `recover_orphaned_tasks()` marks running tasks without started_at as failed
 
-## CODE MAP
+## KEY CLASSES
 
-| Symbol | Type | Location | Role |
-|--------|------|----------|------|
-| `FlowBase` | class | base.py:11 | Flow execution base class |
-| `TaskBase` | class | tasks/base.py:10 | Task abstract base class |
-| `register_task` | method | base.py:107 | Register task, assign UUID |
-| `run_task` | method | base.py:148 | Execute single task |
-| `run_parallel` | method | base.py:189 | Execute tasks concurrently |
-| `retry_until` | method | base.py:242 | Retry with condition |
-| `get_tasks` | method | base.py:133 | Query tasks by label |
-| `get_flow_class` | fn | base.py:323 | Extract FlowClass from module |
-| `FlowStorage` | class | storage.py | Task persistence layer |
+### FlowBase
 
-## NOTES
+Abstract base class for all flows. Provides:
+- `run_task(task, timeout)` - Register + execute + save result
+- `run_parallel(*tasks, timeout)` - Execute multiple tasks concurrently
+- `retry_until(task_factory, condition, max_retries)` - Retry until condition met
+- `get_tasks(label)` - Query tasks by label
+- `register_task(task, timeout)` - Register task with UUID
 
-- **Task UUID**: Assigned on registration, not on instantiation
-- **Task state**: Stored in `_state` attribute (private, not direct access)
-- **Flow context**: Accessible via `flow.context` property
-- **Storage async**: FlowStorage uses asyncio internally (wrapped by FlowBase)
-- **Task result**: Stored in `_result` after successful execution
-- **Task error**: Stored in `_error` string on failure
-- **Atomic persistence**: tempfile + fsync + os.replace + directory fsync
-- **Orphaned task detection**: Running state but no started_at = crashed process
-- **File structure**: `data/flow/{uuid}/meta.json` + `{task_uuid}.json`
-- **Task state**: Stored in `_state` attribute (private, not direct access)
-- **Flow context**: Accessible via `flow.context` property
-- **Storage async**: FlowStorage uses asyncio internally (wrapped by FlowBase)
-- **Task result**: Stored in `_result` after successful execution
-- **Task error**: Stored in `_error` string on failure
-- **Python version bug**: `pyproject.toml` requires `>=3.14` (should be `>=3.10`)
+### TaskBase
+
+Abstract base class for all tasks:
+- Synchronous `run()` method (required)
+- `label` for grouping (not unique)
+- State: `_state`, `_result`, `_error`, `_uuid`, `_flow`
+- Cannot spawn tasks
+
+### FlowStorage
+
+Async storage layer:
+- `create_flow(uuid, name, description, context)` - Create flow directory
+- `register_task(task_id, label, flow_uuid, timeout)` - Register task in meta.json
+- `update_task_state(flow_uuid, task_id, state, result, error, messages)` - Update task state
+- `get_tasks(label, flow_uuid)` - Get tasks by label
+- `recover_orphaned_tasks()` - Recover crashed tasks
+
+### AtomicJsonWriter
+
+Atomic JSON file writes:
+- Write to tempfile
+- fsync to disk
+- os.replace to target
+- fsync directory (ensure rename persisted)
+
+### FlowIndex
+
+JSONL-based global index:
+- Append-only for new flows
+- Line-by-line reading for lazy loading
+- Supports limit/offset pagination
+- Atomic rewrites for updates
+
+## PLUGIN STRUCTURE
+
+Flow plugins must have:
+
+```
+plugin-root/
+├── pyproject.toml       # name, version, author metadata
+├── config.yaml          # Flow-specific configuration
+├── config.typehint.yaml # (Optional) Typehint definition for validation
+└── src/
+    ├── __init__.py
+    └── main.py          # Must export: FlowClass = YourFlowClass
+```
+
+## FLOW LOADING PROCESS
+
+1. Load `pyproject.toml` for metadata (name, version, author)
+2. Load `config.yaml` and validate against Pydantic models
+3. (Optional) Load `config.typehint.yaml` and validate against global config
+4. Import `src/main.py` as unique package (`{name}_{version}.main`)
+5. Extract `FlowClass` variable from module
+6. Instantiate flow: `FlowClass(flow_config, global_config)`
+7. Register in FlowRegistry
+
+## TESTING
+
+Tests in `tests/flow/`:
+- `test_base.py` - FlowBase ABC tests
+- `test_base_extensions.py` - Extended FlowBase tests (retry_until, run_parallel)
+- `test_tasks.py` - Task system tests
+- `test_storage.py` - FlowStorage, AtomicJsonWriter tests
+- `test_loader.py` - Plugin loading tests
+- `test_registry.py` - FlowRegistry singleton tests
+- `test_models.py` - Flow model tests
+- `test_config_validation.py` - Flow config validation tests
+- `test_integration.py` - End-to-end flow tests

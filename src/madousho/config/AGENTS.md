@@ -1,66 +1,178 @@
-# src/madousho/config/ KNOWLEDGE BASE
+# Configuration System
 
-**Generated:** 2026-03-03
-**Commit:** 3b8ad40
-**Branch:** master
+**Location:** `src/madousho/config/`
 
 ## OVERVIEW
 
-Configuration system with Pydantic v2 models, YAML loading, and environment variable overrides.
+Pydantic v2-based configuration with YAML loading, hyphen-to-underscore normalization, singleton ConfigManager, and optional typehint validation for flow plugins.
 
 ## STRUCTURE
 
 ```
 config/
-├── models.py           # Pydantic models (APIConfig, ProviderConfig, Config)
-├── loader.py           # YAML loader with env var overrides (145 lines)
-├── typehint_models.py  # Type-hinted model variants (169 lines)
-└── __init__.py         # Package exports
+├── models.py            # Pydantic v2 models (Config, APIConfig, ProviderConfig)
+├── loader.py            # ConfigManager singleton, YAML loading, normalization
+├── typehint_models.py   # TypeHintDefinition, TypeHintValidator for flow configs
+└── __init__.py
 ```
 
 ## WHERE TO LOOK
 
 | Task | Location | Notes |
 |------|----------|-------|
-| Config models | `models.py:6-40` | `APIConfig`, `ProviderConfig`, `Config` |
-| Port validation | `models.py:15-20` | `validate_port` validator |
-| YAML loading | `loader.py:22-46` | `load_yaml()` function |
-| Env overrides | `loader.py:48-92` | `get_env_overrides()` with `MADOUSHO_*` prefix |
-| Deep merge | `loader.py:95-113` | `deep_merge()` for nested overrides |
-| Main loader | `loader.py:116-145` | `load_config()` - validate + return Config |
-| Type hints | `typehint_models.py` | Enhanced type-hinted variants |
+| Main config model | `models.py` | Config, APIConfig, ProviderConfig (Pydantic v2) |
+| Config loader | `loader.py` | ConfigManager singleton, load_yaml, normalize_keys |
+| Typehint validation | `typehint_models.py` | TypeHintDefinition, TypeHintValidator, TypeHintType enum |
+| Global config access | `loader.py:get_config()` | Get singleton config instance |
+| Config initialization | `loader.py:init_config()` | Initialize ConfigManager with config_dir |
 
 ## CONVENTIONS
 
-- **Model naming**: `{Scope}Config` (e.g., `APIConfig`, `ProviderConfig`)
-- **Validation**: Use `@field_validator` decorator (Pydantic v2)
-- **Config dict**: Always `ConfigDict(extra="forbid")` for strict validation
-- **Key normalization**: Hyphens in YAML auto-converted to underscores
-- **Pydantic v2**: Use `model_validate()`, `model_dump()` (NOT v1 methods)
+- **Pydantic v2 syntax**: Use `model_validate()`, `model_dump()` (NOT v1 `.dict()`, `.parse_obj()`)
+- **Extra fields forbidden**: All models use `extra="forbid"` (unknown fields rejected)
+- **Hyphen-to-underscore normalization**: YAML keys auto-converted recursively (`default-model-group` → `default_model_group`)
+- **Singleton pattern**: ConfigManager uses class-level `_instance` with get_instance() accessor
+- **Field validators**: Use `@field_validator` decorator (Pydantic v2, NOT `@validator`)
+- **Type hints required**: All functions and methods have full type annotations
+- **Config reset for testing**: `ConfigManager.reset_instance()` for test isolation
 
 ## ANTI-PATTERNS (THIS MODULE)
 
-- DO NOT use Pydantic v1 syntax (`.dict()`, `.parse_obj()`)
-- DO NOT use `model_dump()` before validation completes
-- DO NOT add fields to models without updating loader tests
-- DO NOT bypass `normalize_keys()` - YAML may contain hyphens
-- DO NOT change env var prefix from `MADOUSHO_`
-- DO NOT add extra fields to config models (rejected by validation)
+- DO NOT use Pydantic v1 methods (`.dict()`, `.parse_obj()`, `@validator`)
+- DO NOT add extra fields to config models (rejected by `extra="forbid"`)
+- DO NOT skip type hints on functions or method parameters
+- DO NOT access config directly (use `get_config()` or `ConfigManager.get_instance()`)
+- DO NOT modify singleton pattern (thread safety depends on get_instance logic)
+- DO NOT bypass normalization (hyphenated YAML keys must convert to underscores)
+- DO NOT use `@validator` decorator (Pydantic v2 uses `@field_validator`)
 
-## UNIQUE STYLES
+## UNIQUE PATTERNS
 
-- **Env var nesting**: `MADOUSHO_PROVIDER_OPENAI_API_KEY` → `{"provider": {"openai": {"api_key": "..."}}}`
-- **Int conversion**: Env vars auto-converted to int if numeric (line 85-88)
-- **Deep merge strategy**: Override dict recursively merged into base (not shallow replace)
-- **Hyphen normalization**: YAML keys with hyphens auto-converted to underscores
+- **Recursive key normalization**: `normalize_keys()` converts hyphens to underscores at all nesting levels
+- **Typehint validation**: Optional `config.typehint.yaml` for flow plugins to validate against global config
+- **MODEL_GROUP type**: Special type that validates against global `model_groups` or falls back to `default_model_group`
+- **Field path syntax**: Typehint uses `.path.to.field` format for nested field validation
+- **Config reset for tests**: `reset_instance()` class method for test isolation (singleton pattern)
 
-## NOTES
+## KEY CLASSES
 
-- **Port validation**: Must be 1-65535 (validated in `APIConfig.validate_port`)
-- **Extra fields**: All models reject extra fields - critical for catching typos
-- **Test coverage**: Dedicated test file `tests/config/test_models.py` with 250+ lines
-- **4-layer search**: CLI param → env var → cwd → ~/.config (enforced by cli.py)
-- **Auto-int conversion**: Numeric env vars auto-converted to int (loader.py:85-88)
-- **Extra fields**: All models reject extra fields - critical for catching typos
-- **Test coverage**: Dedicated test file `tests/config/test_models.py` with 250+ lines
-- **4-layer search**: CLI param → env var → cwd → ~/.config (enforced by cli.py)
+### Config (models.py)
+
+Main application configuration:
+```python
+class Config(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    
+    api: APIConfig
+    provider: Dict[str, ProviderConfig]
+    default_model_group: str
+    model_groups: Dict[str, List[str]]
+```
+
+### APIConfig (models.py)
+
+API server configuration:
+```python
+class APIConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    
+    host: str
+    port: int  # Validated: 1-65535
+    token: Optional[str] = None
+```
+
+### ProviderConfig (models.py)
+
+LLM provider configuration:
+```python
+class ProviderConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    
+    type: str
+    endpoint: str
+    api_key: str
+```
+
+### ConfigManager (loader.py)
+
+Singleton configuration manager:
+- `get_instance(config_dir)` - Get or create singleton instance
+- `reset_instance()` - Reset singleton (for testing)
+- `config` property - Lazy load config on first access
+- `_find_config_file()` - Search for madousho.yaml or config.yaml
+
+### TypeHintDefinition (typehint_models.py)
+
+Typehint definition for flow configs:
+```python
+class TypeHintDefinition(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    
+    field_typehint: Dict[str, str]  # field_path -> type mapping
+```
+
+Supported types: `MODEL_GROUP`, `STRING`, `INTEGER`, `BOOLEAN`, `LIST`, `DICT`
+
+### TypeHintValidator (typehint_models.py)
+
+Validates flow config against typehint definition:
+- `validate()` - Run validation, returns bool
+- `get_errors()` - Get list of error messages
+- `get_warnings()` - Get list of warning messages
+- Supports global config references (for MODEL_GROUP validation)
+
+## CONFIG FILE FORMAT
+
+Example `madousho.yaml`:
+```yaml
+api:
+  token: ""  # Empty = auto-generate
+  host: "0.0.0.0"
+  port: 8000
+
+provider:
+  my_provider:
+    type: "openai-compatible"
+    endpoint: "https://api.example.com/v1"
+    api-key: "sk-xxxxyourapi"  # Hyphenated keys auto-converted
+
+default_model_group: "default"
+model_groups:
+  default:
+    - "my_provider/gpt-4"
+    - "my_provider/fallback1"
+  fast:
+    - "my_provider/haiku"
+```
+
+## FLOW PLUGIN CONFIG
+
+Flow plugins have their own `config.yaml`:
+```yaml
+name: "my_flow"
+model_group: "default"  # Validated against global model_groups
+max_retries: 3
+timeout: 30.0
+```
+
+Optional `config.typehint.yaml` for validation:
+```yaml
+field_typehint:
+  .model_group: "MODEL_GROUP"  # Validates against global config
+  .max_retries: "INTEGER"
+  .timeout: "INTEGER"
+  .name: "STRING"
+```
+
+## TESTING
+
+Tests in `tests/config/`:
+- `test_models.py` - Pydantic model validation tests (valid/invalid configs)
+- `test_loader.py` - ConfigManager singleton, YAML loading, normalization tests
+- `test_typehint_models.py` - TypeHintDefinition and TypeHintValidator tests
+- `test_integration.py` - End-to-end config loading tests
+
+Test patterns:
+- `pytest.raises(ValidationError)` for negative tests
+- Direct model instantiation for validation tests
+- `ConfigManager.reset_instance()` for test isolation
