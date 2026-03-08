@@ -54,11 +54,11 @@ Implement centralized, globally accessible loguru logging with optional named su
 - `src/madousho/__init__.py` - Initialize logger on package import
 
 ### Definition of Done
-- [ ] `from madousho.logging import get_logger` works anywhere
-- [ ] `get_logger()` returns main logger
-- [ ] `get_logger("auth")` returns logger bound with name="auth"
-- [ ] Logs written to console + file (`logs/madousho.log`)
-- [ ] `bun test` (pytest) passes with logging enabled
+- [x] `from madousho.logging import get_logger` works anywhere
+- [x] `get_logger()` returns main logger
+- [x] `get_logger("auth")` returns logger bound with name="auth"
+- [x] Logs written to console + file (`logs/madousho.log`)
+- [x] `bun test` (pytest) passes with logging enabled
 
 ### Must Have
 - One-time initialization (idempotent - safe to call multiple times)
@@ -541,7 +541,7 @@ python -m madousho
 
 ## TODOs
 
-- [ ] 1. Add loguru dependency and create config module
+- [x] 1. Add loguru dependency and create config module
 
   **What to do**:
   - Add `loguru>=0.7.3` to pyproject.toml `[project.dependencies]`
@@ -576,11 +576,11 @@ python -m madousho
   - Loguru rotation: https://loguru.readthedocs.io/en/stable/resources/troubleshooting.html#rotate-and-retention - Rotation/retention patterns
 
   **Acceptance Criteria**:
-  - [ ] `loguru>=0.7.3` added to pyproject.toml dependencies
-  - [ ] `src/madousho/logging/config.py` exists with configure_logging()
-  - [ ] Running `python -c "from madousho.logging.config import configure_logging; configure_logging()"` creates logs/ directory
-  - [ ] Console output shows colored logs
-  - [ ] File `logs/madousho.log` created after logging
+  - [x] `loguru>=0.7.3` added to pyproject.toml dependencies
+  - [x] `src/madousho/logging/config.py` exists with configure_logging()
+  - [x] Running `python -c "from madousho.logging.config import configure_logging; configure_logging()"` creates logs/ directory
+  - [x] Console output shows colored logs
+  - [x] File `logs/madousho.log` created after logging
 
   **QA Scenarios**:
 
@@ -616,7 +616,7 @@ python -m madousho
 
 ---
 
-- [ ] 2. Create logging module with get_logger() function
+- [x] 2. Create logging module with get_logger() function
 
   **What to do**:
   - Create `src/madousho/logging/__init__.py` with:
@@ -652,12 +652,12 @@ python -m madousho
   - `src/madousho/__init__.py` - Add logging import
 
   **Acceptance Criteria**:
-  - [ ] `src/madousho/logging/__init__.py` exists with get_logger()
-  - [ ] `from madousho.logging import get_logger, configure_logging` works
-  - [ ] `get_logger()` returns logger without binding
-  - [ ] `get_logger("auth")` returns logger bound with name="auth"
-  - [ ] **Does NOT** auto-initialize on import (requires explicit configure_logging() call)
-  - [ ] After configure_logging(), logging works correctly
+  - [x] `src/madousho/logging/__init__.py` exists with get_logger()
+  - [x] `from madousho.logging import get_logger, configure_logging` works
+  - [x] `get_logger()` returns logger without binding
+  - [x] `get_logger("auth")` returns logger bound with name="auth"
+  - [x] **Does NOT** auto-initialize on import (requires explicit configure_logging() call)
+  - [x] After configure_logging(), logging works correctly
 
   **QA Scenarios**:
 
@@ -704,7 +704,7 @@ python -m madousho
 
 ---
 
-- [ ] 3. Add tests and verify integration
+- [x] 3. Add tests and verify integration
 
   **What to do**:
   - Create `tests/test_logging.py` with:
@@ -737,10 +737,10 @@ python -m madousho
   - Existing test patterns in `tests/` (if any exist)
 
   **Acceptance Criteria**:
-  - [ ] `tests/test_logging.py` exists
-  - [ ] `pytest tests/test_logging.py -v` passes (all tests green)
-  - [ ] Tests cover: get_logger(), get_logger(name), file output, level override
-  - [ ] No pytest warnings or errors
+  - [x] `tests/test_logging.py` exists
+  - [x] `pytest tests/test_logging.py -v` passes (all tests green)
+  - [x] Tests cover: get_logger(), get_logger(name), file output, level override
+  - [x] No pytest warnings or errors
 
   **QA Scenarios**:
 
@@ -777,19 +777,19 @@ python -m madousho
 
 ## Final Verification Wave
 
-- [ ] F1. **Plan Compliance Audit** — `oracle`
+- [x] F1. **Plan Compliance Audit** — `oracle`
   Verify: loguru in pyproject.toml, src/madousho/logging/ exists, get_logger() works, logs/ created.
   Output: `Must Have [3/3] | Must NOT Have [5/5] | Tasks [3/3] | VERDICT`
 
-- [ ] F2. **Code Quality Review** — `unspecified-high`
+- [x] F2. **Code Quality Review** — `unspecified-high`
   Run `tsc --noEmit` (N/A, Python) + `pytest tests/`. Check for: unused imports, bare excepts, hardcoded paths.
   Output: `Build [N/A] | Tests [N pass/0 fail] | Files [N clean] | VERDICT`
 
-- [ ] F3. **Real Manual QA** — `unspecified-high`
+- [x] F3. **Real Manual QA** — `unspecified-high`
   Execute all QA scenarios from all tasks. Verify file output, console output, named logger binding.
   Output: `Scenarios [N/N pass] | Integration [3/3] | VERDICT`
 
-- [ ] F4. **Scope Fidelity Check** — `deep`
+- [x] F4. **Scope Fidelity Check** — `deep`
   Verify no extra files created, no config files (YAML/JSON), no external service integration.
   Output: `Tasks [3/3 compliant] | Contamination [CLEAN] | VERDICT`
 
@@ -821,7 +821,7 @@ pytest tests/test_logging.py -v  # Expected: all pass
 ```
 
 ### Final Checklist
-- [ ] All "Must Have" present (one-time init, console + file, env override, thread-safe)
-- [ ] All "Must NOT Have" absent (no src/logging/, no YAML config, no external services)
-- [ ] All tests pass (pytest tests/test_logging.py)
-- [ ] Evidence files exist in .sisyphus/evidence/
+- [x] All "Must Have" present (one-time init, console + file, env override, thread-safe)
+- [x] All "Must NOT Have" absent (no src/logging/, no YAML config, no external services)
+- [x] All tests pass (pytest tests/test_logging.py)
+- [x] Evidence files exist in .sisyphus/evidence/
