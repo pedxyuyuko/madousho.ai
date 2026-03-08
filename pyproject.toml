@@ -45,7 +45,9 @@ classifiers = [
 
 ]
 
-dependencies = []
+dependencies = [
+    "typer>=0.9.0",
+]
 
 [project.optional-dependencies]
 dev = [
