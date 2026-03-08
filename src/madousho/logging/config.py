@@ -3,8 +3,9 @@ from loguru import logger
 import sys
 import os
 
-# 项目根目录
-PROJECT_ROOT = Path(__file__).parent.parent.parent
+# 项目根目录（向上三级：config.py -> logging/ -> madousho/ -> src/ -> 项目根目录）
+# 使用绝对路径确保正确
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent
 LOGS_DIR = PROJECT_ROOT / "logs"
 
 # 标准格式（彩色友好）
