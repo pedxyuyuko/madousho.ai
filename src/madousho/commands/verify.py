@@ -1,9 +1,9 @@
 """Verify command for Madousho.ai configuration validation."""
 
 import os
-from pathlib import Path
 from typing import Optional
 
+import typer
 from loguru import logger
 from pydantic import ValidationError
 import yaml
@@ -11,8 +11,37 @@ import yaml
 from madousho.config.models import Config
 from madousho.config.loader import get_config_file
 
+app = typer.Typer()
 
-def verify_config(filepath: Optional[str] = None) -> bool:
+
+@app.command()
+def verify(ctx: typer.Context):
+    """Verify configuration file format and structure."""
+    verbose = ctx.obj.get("verbose", False)
+    json_output = ctx.obj.get("json_output", False)
+    config_path = os.environ.get("MADOUSHO_CONFIG_PATH")
+
+    # Set MADOUSHO_CONFIG_PATH environment variable if config_path is provided
+    if config_path is not None:
+        os.environ["MADOUSHO_CONFIG_PATH"] = config_path
+
+    # Initialize logging with global options
+    from madousho.logging.config import configure_logging
+
+    configure_logging(level="DEBUG" if verbose else None, is_json=json_output)
+
+    # Verify configuration
+    is_valid = _verify_config(None)
+
+    # Exit with appropriate code
+    if is_valid:
+        logger.info("✓ Configuration verification passed")
+    else:
+        logger.error("✗ Configuration verification failed")
+        raise typer.Exit(code=1)
+
+
+def _verify_config(filepath: Optional[str] = None) -> bool:
     """Verify configuration file format and structure.
 
     Args:
@@ -62,27 +91,3 @@ def verify_config(filepath: Optional[str] = None) -> bool:
     except Exception as e:
         logger.error(f"Unexpected error: {e}")
         return False
-
-
-def verify(
-    verbose: bool = False, json_output: bool = False, config_path: Optional[str] = None
-):
-    """Verify configuration file format and structure."""
-    # Set MADOUSHO_CONFIG_PATH environment variable if config_path is provided
-    if config_path is not None:
-        os.environ["MADOUSHO_CONFIG_PATH"] = config_path
-
-    from madousho.logging.config import configure_logging
-
-    # Initialize logging with global options
-    configure_logging(level="DEBUG" if verbose else None, is_json=json_output)
-
-    # Verify configuration
-    is_valid = verify_config(None)
-
-    # Exit with appropriate code
-    if is_valid:
-        logger.info("✓ Configuration verification passed")
-    else:
-        logger.error("✗ Configuration verification failed")
-        exit(1)
