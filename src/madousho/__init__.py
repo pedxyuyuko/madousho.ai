@@ -3,6 +3,6 @@
 from ._version import __version__
 
 # 导出 logging 相关函数（不自动初始化）
-from .logging import get_logger, configure_logging
+from .logging import get_logger
 
-__all__ = ["__version__", "get_logger", "configure_logging"]
+__all__ = ["__version__", "get_logger"]
