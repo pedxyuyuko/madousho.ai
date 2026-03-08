@@ -52,23 +52,23 @@
 - `tests/test_serve_command.py` - 测试用例
 
 ### Definition of Done
-- [ ] `madousho serve --help` 显示帮助信息
-- [ ] `madousho serve` 成功执行，无报错
-- [ ] 配置文件正确加载
-- [ ] 日志系统正确初始化
-- [ ] 测试通过
+- [x] `madousho serve --help` 显示帮助信息
+- [x] `madousho serve` 成功执行，无报错
+- [x] 配置文件正确加载
+- [x] 日志系统正确初始化
+- [x] 测试通过
 
 ### Must Have
-- [ ] 使用 Typer 框架实现
-- [ ] 调用 `config.loader.init_config()` 加载配置
-- [ ] 调用 `logging.config.configure_logging()` 初始化日志
-- [ ] 添加成功启动的日志输出
+- [x] 使用 Typer 框架实现
+- [x] 调用 `config.loader.init_config()` 加载配置
+- [x] 调用 `logging.config.configure_logging()` 初始化日志
+- [x] 添加成功启动的日志输出
 
 ### Must NOT Have (Guardrails)
-- [ ] **不要**实现 API 服务器逻辑（未来任务）
-- [ ] **不要**添加额外的命令行参数（当前不需要）
-- [ ] **不要**修改现有配置加载器或日志配置模块
-- [ ] **不要**在模块导入时自动初始化配置或日志
+- [x] **不要**实现 API 服务器逻辑（未来任务）
+- [x] **不要**添加额外的命令行参数（当前不需要）
+- [x] **不要**修改现有配置加载器或日志配置模块
+- [x] **不要**在模块导入时自动初始化配置或日志
 
 ---
 
@@ -103,7 +103,7 @@ Wave 1:
 
 ## TODOs
 
-- [ ] 1. 实现 madousho serve 命令
+- [x] 1. 实现 madousho serve 命令
 
   **What to do**:
   1. 创建 `src/madousho/commands/` 目录（如不存在）
@@ -227,16 +227,16 @@ Wave 1:
 
 ## Final Verification Wave
 
-- [ ] F1. **Plan Compliance Audit** — `oracle`
+- [x] F1. **Plan Compliance Audit** — `oracle`
   验证 `serve` 命令存在、配置加载调用、日志初始化调用、测试文件存在。
 
-- [ ] F2. **Code Quality Review** — `unspecified-high`
+- [x] F2. **Code Quality Review** — `unspecified-high`
   运行 `pytest` 验证测试通过，检查代码风格。
 
-- [ ] F3. **Real Manual QA** — `unspecified-high`
+- [x] F3. **Real Manual QA** — `unspecified-high`
   执行所有 QA 场景，验证输出和退出码。
 
-- [ ] F4. **Scope Fidelity Check** — `deep`
+- [x] F4. **Scope Fidelity Check** — `deep`
   验证没有实现 API 服务器逻辑，没有添加额外参数。
 
 ---
@@ -259,8 +259,8 @@ pytest tests/test_serve_command.py -v  # Expected: 2 测试全部通过
 ```
 
 ### Final Checklist
-- [ ] `serve` 命令可执行
-- [ ] 配置正确加载
-- [ ] 日志正确初始化
-- [ ] 测试通过
-- [ ] 没有实现 API 服务器逻辑（符合当前范围）
+- [x] `serve` 命令可执行
+- [x] 配置正确加载
+- [x] 日志正确初始化
+- [x] 测试通过
+- [x] 没有实现 API 服务器逻辑（符合当前范围）
