@@ -97,6 +97,7 @@ omit = [
     "src/madousho/cli.py",
     "src/madousho/logger.py",
     "src/madousho/commands/*",
+    "src/madousho/_version.py",
 ]
 
 [tool.coverage.report]
