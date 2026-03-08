@@ -2,6 +2,7 @@
 
 import typer
 
+from madousho.commands.serve import serve
 try:
     from madousho._version import version as __version__
 except (ImportError, ModuleNotFoundError):
@@ -23,6 +24,9 @@ def version():
     """Show version and exit."""
     typer.echo(__version__)
 
+@app.command(name="serve", help=serve.__doc__)
+def serve_cmd():
+    return serve()
 
 if __name__ == "__main__":
     app()
