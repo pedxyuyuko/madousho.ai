@@ -9,14 +9,14 @@ try:
 except (ImportError, ModuleNotFoundError):
     __version__ = "0.0.0.dev0"
 
-app = typer.Typer()
+app = typer.Typer(no_args_is_help=True)
 
 # Register command modules at top level (no nesting)
 app.add_typer(serve.app)
 app.add_typer(verify.app)
 
 
-@app.callback(invoke_without_command=True)
+@app.callback()
 def main(
     ctx: typer.Context,
     verbose: bool = typer.Option(
