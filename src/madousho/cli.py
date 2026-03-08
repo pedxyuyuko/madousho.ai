@@ -6,6 +6,7 @@ from typing import Optional
 import typer
 
 from madousho.commands.serve import serve
+from madousho.commands.verify import verify
 
 try:
     from madousho._version import version as __version__
@@ -45,6 +46,14 @@ def version():
 @app.command(name="serve", help=serve.__doc__)
 def serve_cmd(ctx: typer.Context):
     return serve(
+        verbose=ctx.obj.get("verbose", False),
+        json_output=ctx.obj.get("json_output", False),
+        config_path=os.environ.get("MADOUSHO_CONFIG_PATH")
+    )
+
+@app.command(name="verify", help=verify.__doc__)
+def verify_cmd(ctx: typer.Context):
+    return verify(
         verbose=ctx.obj.get("verbose", False),
         json_output=ctx.obj.get("json_output", False),
         config_path=os.environ.get("MADOUSHO_CONFIG_PATH")
