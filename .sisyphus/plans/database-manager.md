@@ -56,10 +56,10 @@
 - `alembic/` - 迁移脚本目录
 
 ### Definition of Done
-- [ ] `Database.get_instance()` 返回同一实例（Python 验证）
-- [ ] `bun run pytest tests/test_database.py` 通过（5+ 测试）
-- [ ] 自动创建表结构（运行后检查 SQLite 文件）
-- [ ] 支持上下文管理器 `with db.session() as session`
+- [x] `Database.get_instance()` 返回同一实例（Python 验证）
+- [x] `bun run pytest tests/test_database.py` 通过（5+ 测试）
+- [x] 自动创建表结构（运行后检查 SQLite 文件）
+- [x] 支持上下文管理器 `with db.session() as session`
 
 ### Must Have
 - 单例模式实现
@@ -140,7 +140,7 @@ Max Concurrent: 1
 
 ## TODOs
 
-- [ ] 1. 创建数据库目录结构和模块导出
+- [x] 1. 创建数据库目录结构和模块导出
 
   **What to do**:
   - 创建 `src/madousho/database/` 目录
@@ -167,9 +167,9 @@ Max Concurrent: 1
   - `src/madousho/` - 参考项目目录结构
 
   **Acceptance Criteria**:
-  - [ ] `src/madousho/database/` 目录存在
-  - [ ] `src/madousho/database/__init__.py` 存在
-  - [ ] `alembic/` 目录存在
+  - [x] `src/madousho/database/` 目录存在
+  - [x] `src/madousho/database/__init__.py` 存在
+  - [x] `alembic/` 目录存在
 
   **QA Scenarios**:
 
@@ -192,7 +192,7 @@ Max Concurrent: 1
 
 ---
 
-- [ ] 2. 实现 Database 单例类
+- [x] 2. 实现 Database 单例类
 
   **What to do**:
   - 实现 `Database` 类，使用类属性 `_instance` 实现单例
@@ -245,17 +245,17 @@ Max Concurrent: 1
   - Python 单例模式：https://refactoring.guru/design-patterns/singleton/python/example
 
   **Acceptance Criteria**:
-  - [ ] `Database.get_instance()` 返回同一实例
-  - [ ] `db.init("sqlite:///./test.db")` 成功初始化
-  - [ ] `with db.session() as session:` 支持上下文管理
-  - [ ] `create_all_tables()` 成功创建表
-  - [ ] `db.is_initialized()` 返回 True（初始化后）
-  - [ ] `db.dispose()` 成功关闭连接
-  - [ ] `Database.get_instance()` 返回同一实例
-  - [ ] `db.init("sqlite:///./test.db")` 成功初始化
-  - [ ] `with db.get_session() as session:` 支持上下文管理
-  - [ ] CRUD 方法可用：add, get, update, delete, list
-  - [ ] `create_all_tables()` 成功创建表
+  - [x] `Database.get_instance()` 返回同一实例
+  - [x] `db.init("sqlite:///./test.db")` 成功初始化
+  - [x] `with db.session() as session:` 支持上下文管理
+  - [x] `create_all_tables()` 成功创建表
+  - [x] `db.is_initialized()` 返回 True（初始化后）
+  - [x] `db.dispose()` 成功关闭连接
+  - [x] `Database.get_instance()` 返回同一实例
+  - [x] `db.init("sqlite:///./test.db")` 成功初始化
+  - [x] `with db.get_session() as session:` 支持上下文管理
+  - [x] CRUD 方法可用：add, get, update, delete, list
+  - [x] `create_all_tables()` 成功创建表
 
   ```
   Scenario: 验证单例模式
@@ -324,8 +324,8 @@ Max Concurrent: 1
   ```
 
   **Evidence to Capture**:
-  - [ ] Python 脚本输出
-  - [ ] 测试日志
+  - [x] Python 脚本输出
+  - [x] 测试日志
 
   **Commit**: YES (groups with 1, 3)
   - Message: `feat(database): implement Database singleton class`
@@ -334,7 +334,7 @@ Max Concurrent: 1
 
 ---
 
-- [ ] 3. 定义基础模型类
+- [x] 3. 定义基础模型类
 
   **What to do**:
   - 创建 `src/madousho/database/base_model.py`
@@ -367,10 +367,10 @@ Max Concurrent: 1
   - `src/madousho/config/models.py` - 参考 Pydantic 模型定义风格
 
   **Acceptance Criteria**:
-  - [ ] `Base` 类可导出
-  - [ ] `BaseModel` 是抽象基类（`__abstract__ = True`）
-  - [ ] 可以选择性继承 id/created_at/updated_at 字段
-  - [ ] 可以继承 `BaseModel` 创建新模型（不强制用 id）
+  - [x] `Base` 类可导出
+  - [x] `BaseModel` 是抽象基类（`__abstract__ = True`）
+  - [x] 可以选择性继承 id/created_at/updated_at 字段
+  - [x] 可以继承 `BaseModel` 创建新模型（不强制用 id）
 
   ```
   Scenario: 验证模型继承
@@ -421,7 +421,7 @@ Max Concurrent: 1
   ```
 
   **Evidence to Capture**:
-  - [ ] Python 脚本输出
+  - [x] Python 脚本输出
 
   **Commit**: YES (groups with 1, 2)
   - Message: `feat(database): add base model definitions`
@@ -430,7 +430,7 @@ Max Concurrent: 1
 
 ---
 
-- [ ] 4. 配置 Alembic 自动迁移
+- [x] 4. 配置 Alembic 自动迁移
 
   **What to do**:
   - 创建 `alembic.ini` 配置文件
@@ -459,10 +459,10 @@ Max Concurrent: 1
   - `pyproject.toml` - 检查已安装的 Alembic 版本
 
   **Acceptance Criteria**:
-  - [ ] `alembic.ini` 存在且配置正确
-  - [ ] `alembic/env.py` 存在
-  - [ ] `alembic/versions/` 目录存在
-  - [ ] `db.create_all_tables()` 成功创建表
+  - [x] `alembic.ini` 存在且配置正确
+  - [x] `alembic/env.py` 存在
+  - [x] `alembic/versions/` 目录存在
+  - [x] `db.create_all_tables()` 成功创建表
 
   **QA Scenarios**:
 
@@ -486,8 +486,8 @@ Max Concurrent: 1
   ```
 
   **Evidence to Capture**:
-  - [ ] Python 脚本输出
-  - [ ] SQLite 文件存在性检查
+  - [x] Python 脚本输出
+  - [x] SQLite 文件存在性检查
 
   **Commit**: YES (单独提交)
   - Message: `feat(database): configure Alembic migrations`
@@ -496,7 +496,7 @@ Max Concurrent: 1
 
 ---
 
-- [ ] 5. 编写测试文件
+- [x] 5. 编写测试文件
 
   **What to do**:
   - 创建 `tests/test_database.py`
@@ -525,9 +525,9 @@ Max Concurrent: 1
   - pytest 官方文档：https://docs.pytest.org/en/latest/getting-started.html
 
   **Acceptance Criteria**:
-  - [ ] `tests/test_database.py` 存在
-  - [ ] 包含至少 5 个测试函数
-  - [ ] 所有测试通过
+  - [x] `tests/test_database.py` 存在
+  - [x] 包含至少 5 个测试函数
+  - [x] 所有测试通过
 
   **QA Scenarios**:
 
@@ -544,7 +544,7 @@ Max Concurrent: 1
   ```
 
   **Evidence to Capture**:
-  - [ ] pytest 输出
+  - [x] pytest 输出
 
   **Commit**: YES (单独提交)
   - Message: `test(database): add database unit tests`
@@ -553,7 +553,7 @@ Max Concurrent: 1
 
 ---
 
-- [ ] 6. 运行测试验证
+- [x] 6. 运行测试验证
 
   **What to do**:
   - 安装 pytest（如果未安装）
@@ -579,9 +579,9 @@ Max Concurrent: 1
   - `pyproject.toml` - 检查测试命令配置
 
   **Acceptance Criteria**:
-  - [ ] `pytest tests/test_database.py -v` 通过
-  - [ ] 无测试失败
-  - [ ] 测试文件清理完成
+  - [x] `pytest tests/test_database.py -v` 通过
+  - [x] 无测试失败
+  - [x] 测试文件清理完成
 
   **QA Scenarios**:
 
@@ -599,8 +599,8 @@ Max Concurrent: 1
   ```
 
   **Evidence to Capture**:
-  - [ ] pytest 完整输出
-  - [ ] 清理命令输出
+  - [x] pytest 完整输出
+  - [x] 清理命令输出
 
   **Commit**: NO (验证任务)
 
@@ -610,19 +610,19 @@ Max Concurrent: 1
 
 > 4 review agents run in PARALLEL. ALL must APPROVE. Rejection → fix → re-run.
 
-- [ ] F1. **Plan Compliance Audit** — `oracle`
+- [x] F1. **Plan Compliance Audit** — `oracle`
   Read the plan end-to-end. For each "Must Have": verify implementation exists (read file, curl endpoint, run command). For each "Must NOT Have": search codebase for forbidden patterns — reject with file:line if found. Check evidence files exist in .sisyphus/evidence/. Compare deliverables against plan.
   Output: `Must Have [N/N] | Must NOT Have [N/N] | Tasks [N/N] | VERDICT: APPROVE/REJECT`
 
-- [ ] F2. **Code Quality Review** — `unspecified-high`
+- [x] F2. **Code Quality Review** — `unspecified-high`
   Run `tsc --noEmit` + linter + `bun test`. Review all changed files for: `as any`/`@ts-ignore`, empty catches, console.log in prod, commented-out code, unused imports. Check AI slop: excessive comments, over-abstraction, generic names (data/result/item/temp).
   Output: `Build [PASS/FAIL] | Lint [PASS/FAIL] | Tests [N pass/N fail] | Files [N clean/N issues] | VERDICT`
 
-- [ ] F3. **Real Manual QA** — `unspecified-high` (+ `playwright` skill if UI)
+- [x] F3. **Real Manual QA** — `unspecified-high`
   Start from clean state. Execute EVERY QA scenario from EVERY task — follow exact steps, capture evidence. Test cross-task integration (features working together, not isolation). Test edge cases: empty state, invalid input, rapid actions. Save to `.sisyphus/evidence/final-qa/`.
   Output: `Scenarios [N/N pass] | Integration [N/N] | Edge Cases [N tested] | VERDICT`
 
-- [ ] F4. **Scope Fidelity Check** — `deep`
+- [x] F4. **Scope Fidelity Check** — `deep`
   For each task: read "What to do", read actual diff (git log/diff). Verify 1:1 — everything in spec was built (no missing), nothing beyond spec was built (no creep). Check "Must NOT do" compliance. Detect cross-task contamination: Task N touching Task M's files. Flag unaccounted changes.
   Output: `Tasks [N/N compliant] | Contamination [CLEAN/N issues] | Unaccounted [CLEAN/N files] | VERDICT`
 
@@ -651,8 +651,8 @@ python -c "from src.madousho.database import Database, Base; db = Database.get_i
 ```
 
 ### Final Checklist
-- [ ] 所有 "Must Have" 实现完成
-- [ ] 所有 "Must NOT Have" 未实现
-- [ ] 所有测试通过
-- [ ] 证据文件完整
-- [ ] 代码无 AI slop
+- [x] 所有 "Must Have" 实现完成
+- [x] 所有 "Must NOT Have" 未实现
+- [x] 所有测试通过
+- [x] 证据文件完整
+- [x] 代码无 AI slop

@@ -1,6 +1,7 @@
 # symlink
 plugins/flows/example_flows
 
+*.db
 data/
 
 .sisyphus/boulder.json
