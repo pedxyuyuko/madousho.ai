@@ -20,3 +20,33 @@ model_groups:
     - "example_provider/gpt-5.2"
     - "example_provider/fallback1"
     - "example_provider/fallback2"
+
+
+# Database configuration
+database:
+  # Database connection URL (SQLite, PostgreSQL, MySQL, etc.)
+  url: "sqlite:///./data/madousho.db"
+  # SQLite-specific configuration
+  sqlite:
+    # Enable Write-Ahead Logging mode for better write performance
+    wal_enabled: true
+    # Synchronization mode: OFF, NORMAL, FULL, or EXTRA
+    synchronous: "NORMAL"
+    # Page cache size in KB (negative value)
+    cache_size: -64000
+    # Temporary storage location: DEFAULT, FILE, or MEMORY
+    temp_store: "MEMORY"
+    # Memory-mapped I/O size in bytes (256MB)
+    mmap_size: 268435456
+    # WAL file size limit in bytes (64MB)
+    journal_size_limit: 67108864
+    # Connection pool size
+    pool_size: 50
+    # Connection pool timeout in seconds
+    pool_timeout: 30
+    # Connection pool recycle time in seconds
+    pool_recycle: 3600
+    # SQLite busy timeout in milliseconds
+    busy_timeout: 30000
+    # Enable foreign key constraints
+    foreign_keys: true

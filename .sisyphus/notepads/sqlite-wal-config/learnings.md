@@ -32,3 +32,55 @@ python -c "from src.madousho.config.models import SqliteConfig; c = SqliteConfig
 - Followed existing Pydantic model patterns with Field defaults and descriptions
 - No new linting errors introduced (pre-existing warnings about deprecated typing.Dict/List)
 - Models use default_factory for nested configurations to avoid mutable default arguments
+# SQLite WAL Configuration Pattern
+
+## Configuration Added (2026-03-12)
+Location: config/madousho.yaml
+
+### Settings Applied:
+- WAL mode enabled for better concurrency
+- Synchronous=NORMAL for balance of safety/performance
+- Cache size: -64000 (64MB negative = KB pages)
+- Memory-mapped I/O: 256MB
+- Connection pool: 50 connections, 30s timeout
+- Busy timeout: 30s for high contention scenarios
+- Foreign keys enforced
+
+### Verification:
+```bash
+python -c "from src.madousho.config.loader import init_config; c = init_config(); print(c.database.url)"
+# Output: sqlite:///./data/madousho.db
+```
+
+
+
+## Example Configuration File Entry (2026-03-12)
+
+Location: `config/madousho.example.yaml`
+
+Added complete database configuration section with all WAL settings documented:
+
+```yaml
+# Database configuration
+database:
+  url: "sqlite:///./data/madousho.db"
+  sqlite:
+    wal_enabled: true
+    synchronous: "NORMAL"
+    cache_size: -64000
+    temp_store: "MEMORY"
+    mmap_size: 268435456
+    journal_size_limit: 67108864
+    pool_size: 50
+    pool_timeout: 30
+    pool_recycle: 3600
+    busy_timeout: 30000
+    foreign_keys: true
+```
+
+### Verification Command
+```bash
+python -c "import yaml; yaml.safe_load(open('config/madousho.example.yaml'))"
+```
+
+All settings validated successfully with PyYAML safe_load.
