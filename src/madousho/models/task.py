@@ -1,12 +1,12 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
-from sqlalchemy import String, JSON, ForeignKey, Index
+from sqlalchemy import String, JSON, ForeignKey, Index, DateTime
 from sqlalchemy.orm import Mapped, mapped_column
-from src.madousho.database.base_model import BaseModel
+from src.madousho.database.base_model import Base
 
 
-class Task(BaseModel):
+class Task(Base):
     """Task model for storing individual task execution data."""
 
     __tablename__: str = "tasks"
@@ -29,6 +29,9 @@ class Task(BaseModel):
     error: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
     started_at: Mapped[datetime | None] = mapped_column(nullable=True)
     completed_at: Mapped[datetime | None] = mapped_column(nullable=True)
+    created_at: Mapped[datetime | None] = mapped_column(
+        DateTime, default=lambda: datetime.now(timezone.utc), nullable=True
+    )
 
     __table_args__: tuple[Index, ...] = (
         Index("idx_task_flow_uuid", "flow_uuid"),

@@ -1,10 +1,11 @@
 import uuid
-from sqlalchemy import String, Text, JSON
+from datetime import datetime, timezone
+from sqlalchemy import String, Text, JSON, DateTime
 from sqlalchemy.orm import Mapped, mapped_column
-from src.madousho.database.base_model import BaseModel
+from src.madousho.database.base_model import Base
 
 
-class Flow(BaseModel):
+class Flow(Base):
     """Flow model for storing AI agent workflow definitions."""
 
     __tablename__: str = "flows"
@@ -17,4 +18,7 @@ class Flow(BaseModel):
     plugin: Mapped[str] = mapped_column(String(255), nullable=False)
     tasks: Mapped[list[str] | None] = mapped_column(
         JSON, nullable=True, comment="List of task UUIDs"
+    )
+    created_at: Mapped[datetime | None] = mapped_column(
+        DateTime, default=lambda: datetime.now(timezone.utc), nullable=True
     )
