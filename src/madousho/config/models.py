@@ -1,8 +1,10 @@
 """Pydantic models for Madousho configuration."""
 
+import secrets
 from typing import Dict, List
 
-from pydantic import BaseModel, Field, field_validator
+from loguru import logger
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 class ApiConfig(BaseModel):
@@ -11,6 +13,24 @@ class ApiConfig(BaseModel):
     token: str = Field(default="", description="API authentication token")
     host: str = Field(default="0.0.0.0", description="Server host address")
     port: int = Field(default=8000, description="Server port number")
+    _token_generated: bool = False
+
+    @model_validator(mode="after")
+    def generate_token_if_empty(self) -> "ApiConfig":
+        """Generate a random 32-bit token if not provided and warn user."""
+        if not self.token:
+            # Generate a 32-character hex token (128 bits of entropy)
+            self.token = secrets.token_hex(16)
+            self._token_generated = True
+            logger.warning(
+                f"API token was empty, generated random token: {self.token}. "
+                "Token will be saved to config file automatically."
+            )
+        return self
+
+    def token_was_generated(self) -> bool:
+        """Check if the token was auto-generated."""
+        return self._token_generated
 
 
 class ProviderConfig(BaseModel):
