@@ -19,6 +19,7 @@ def verify(ctx: typer.Context):
     """Verify configuration file format and structure."""
     verbose = ctx.obj.get("verbose", False)
     json_output = ctx.obj.get("json_output", False)
+    no_color = ctx.obj.get("no_color", False)
     config_path = os.environ.get("MADOUSHO_CONFIG_PATH")
 
     # Set MADOUSHO_CONFIG_PATH environment variable if config_path is provided
@@ -28,7 +29,9 @@ def verify(ctx: typer.Context):
     # Initialize logging with global options
     from madousho.logging.config import configure_logging
 
-    configure_logging(level="DEBUG" if verbose else None, is_json=json_output)
+    configure_logging(
+        level="DEBUG" if verbose else None, is_json=json_output, colorize=not no_color
+    )
 
     # Verify configuration
     is_valid = _verify_config(None)

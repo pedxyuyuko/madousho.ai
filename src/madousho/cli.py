@@ -9,7 +9,7 @@ try:
 except (ImportError, ModuleNotFoundError):
     __version__ = "0.0.0.dev0"
 
-app = typer.Typer(no_args_is_help=True)
+app = typer.Typer(no_args_is_help=True, add_completion=False)
 
 # Register command modules at top level (no nesting)
 app.add_typer(serve.app)
@@ -25,6 +25,7 @@ def main(
     json_output: bool = typer.Option(
         False, "--json", help="Output logs in JSON format"
     ),
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colored output"),
     config_path: str = typer.Option(
         "config",
         "--config-path",
@@ -36,12 +37,14 @@ def main(
     """Madousho.ai CLI."""
     # Set MADOUSHO_CONFIG_PATH environment variable
     import os
+
     os.environ["MADOUSHO_CONFIG_PATH"] = config_path
 
     # Store options in context for subcommands
     ctx.ensure_object(dict)
     ctx.obj["verbose"] = verbose
     ctx.obj["json_output"] = json_output
+    ctx.obj["no_color"] = no_color
 
 
 @app.command()

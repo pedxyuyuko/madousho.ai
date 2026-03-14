@@ -82,10 +82,13 @@ def serve(ctx: typer.Context):
     """Madousho.ai API server."""
     verbose = ctx.obj.get("verbose", False)
     json_output = ctx.obj.get("json_output", False)
+    no_color = ctx.obj.get("no_color", False)
     config_path = os.environ.get("MADOUSHO_CONFIG_PATH")
 
     # Initialize logging with global options
-    configure_logging(level="DEBUG" if verbose else None, is_json=json_output)
+    configure_logging(
+        level="DEBUG" if verbose else None, is_json=json_output, colorize=not no_color
+    )
 
     # Set MADOUSHO_CONFIG_PATH environment variable if config_path is provided
     if config_path is not None:
