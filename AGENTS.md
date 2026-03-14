@@ -31,6 +31,7 @@ Madousho.ai (魔导书) - Systematic AI Agent Framework. Python package with Typ
 | Logging | `src/madousho/logging/` | Loguru configuration |
 | API server | `src/madousho/api/` | FastAPI app, routes, dependency injection |
 | Tests | `tests/` | pytest, 90% coverage enforced |
+| Enums | `src/madousho/models/enums.py` | FlowStatus (CREATED, PROCESSING, FINISHED) |
 | Migrations | `alembic/versions/` | Alembic migration scripts |
 
 ## CODE MAP
@@ -41,7 +42,8 @@ Madousho.ai (魔导书) - Systematic AI Agent Framework. Python package with Typ
 | `app` | FastAPI | `api/main.py:10` | API server application |
 | `Database` | Singleton | `database/connection.py:15` | DB connection manager |
 | `Config` | Pydantic | `config/models.py:49` | Root config model |
-| `Flow`, `Task` | SQLAlchemy | `models/` | ORM models |
+| `Flow`, `Task` | SQLAlchemy | `models/` | ORM models (Flow has status, flow_template) |
+| `FlowStatus` | Enum | `models/enums.py:12` | Flow lifecycle states |
 | `configure_logging` | Function | `logging/config.py:23` | Loguru setup |
 | `get_config` | Function | `config/loader.py:105` | Lazy config loader with caching |
 | `get_db` | Dependency | `api/deps.py:8` | Database session DI for API |
@@ -55,6 +57,7 @@ Madousho.ai (魔导书) - Systematic AI Agent Framework. Python package with Typ
 - **JSON columns**: Store structured data (task lists, messages, results) as `JSON` type
 - **SQLite optimization**: WAL mode, connection pooling, PRAGMA settings via event listeners
 - **Loguru sinks**: Console + file (100MB rotation, 7-day retention, zip compression)
+- **Enum pattern**: Use `str, PythonEnum` base, store as VARCHAR, values are lowercase
 
 ## ANTI-PATTERNS (THIS PROJECT)
 
@@ -64,6 +67,7 @@ Madousho.ai (魔导书) - Systematic AI Agent Framework. Python package with Typ
 - **DO NOT** initialize logging multiple times - `configure_logging()` is one-time setup
 - **DO NOT** commit/rollback manually - use `db.session()` context manager
 - **DO NOT** hardcode config paths - use `get_config_file()` with env var support
+- **DO NOT** import `Base` from different paths in models vs tests — `src.madousho.database.base_model.Base` and `madousho.database.Base` are DIFFERENT Python objects
 
 ## UNIQUE STYLES
 
@@ -99,6 +103,8 @@ python -m build            # Build distribution packages
 
 - **Python 3.10+** required (type hints with `|` union syntax)
 - **Logs directory**: `./logs/` - auto-created by logging config
-- **Default database**: `sqlite:///./madousho.db` (configurable via YAML)
+- **Default database**: `sqlite:///./data/madousho.db` (configurable via YAML)
 - **CI/CD**: GitHub Actions - test on push to master, publish on release
 - **Package name**: `madousho-ai` on PyPI, import as `madousho`
+- **SQLite migrations**: Adding NOT NULL columns requires `server_default` parameter
+- **Alembic config**: `alembic.ini` must match project config DB URL
