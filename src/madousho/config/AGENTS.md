@@ -30,6 +30,8 @@ config/
 - **Config path resolution**: `.yaml` tried first, then `.yml`, then error
 - **Environment override**: `MADOUSHO_CONFIG_PATH` env var sets config root directory
 - **Lazy init**: `get_config()` calls `init_config()` if `_cached_config is None`
+- **Auto token generation**: `ApiConfig.token` auto-generates 32-char hex token (128-bit) if empty, with WARNING log. Token is automatically saved to config file on `madousho serve` startup.
+- **Config persistence**: Use `save_config()` to persist runtime changes (e.g., auto-generated token) to YAML file. Only modified fields are updated, preserving original formatting.
 
 ## CONFIGURATION EXAMPLE
 
