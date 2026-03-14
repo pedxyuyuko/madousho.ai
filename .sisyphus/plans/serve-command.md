@@ -164,13 +164,13 @@ Wave 1:
   **Acceptance Criteria**:
 
   **测试文件创建**:
-  - [ ] `tests/test_serve_command.py` 创建
-  - [ ] `src/madousho/commands/__init__.py` 创建
-  - [ ] `src/madousho/commands/serve.py` 创建
+  - [x] `tests/test_serve_command.py` 创建
+  - [x] `src/madousho/commands/__init__.py` 创建
+  - [x] `src/madousho/commands/serve.py` 创建
 
   **测试通过**:
-  - [ ] `pytest tests/test_serve_command.py -v` → PASS (2 测试，0 失败)
-  - [ ] `pytest tests/ -v` → PASS (包含现有测试)
+  - [x] `pytest tests/test_serve_command.py -v` → PASS (2 测试，0 失败)
+  - [x] `pytest tests/ -v` → PASS (包含现有测试)
 
   **QA Scenarios**:
 
@@ -214,9 +214,9 @@ Wave 1:
   ```
 
   **Evidence to Capture**:
-  - [ ] `.sisyphus/evidence/task-1-serve-help.txt` - help 输出
-  - [ ] `.sisyphus/evidence/task-1-serve-execution.txt` - 执行输出
-  - [ ] `.sisyphus/evidence/task-1-serve-missing-config.txt` - 错误输出
+  - [x] `.sisyphus/evidence/task-1-serve-help.txt` - help 输出
+  - [x] `.sisyphus/evidence/task-1-serve-execution.txt` - 执行输出
+  - [x] `.sisyphus/evidence/task-1-serve-missing-config.txt` - 错误输出
 
   **Commit**: YES
   - Message: `feat(cli): add serve command as API server entry point`
