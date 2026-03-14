@@ -84,6 +84,9 @@ def serve(ctx: typer.Context):
     json_output = ctx.obj.get("json_output", False)
     config_path = os.environ.get("MADOUSHO_CONFIG_PATH")
 
+    # Initialize logging with global options
+    configure_logging(level="DEBUG" if verbose else None, is_json=json_output)
+
     # Set MADOUSHO_CONFIG_PATH environment variable if config_path is provided
     if config_path is not None:
         os.environ["MADOUSHO_CONFIG_PATH"] = config_path
@@ -94,11 +97,8 @@ def serve(ctx: typer.Context):
     # Load configuration
     _ = init_config()
 
-    # Initialize logging with global options
-    configure_logging(level="DEBUG" if verbose else None, is_json=json_output)
+    # Output startup information
+    logger.info(f"Configuration loaded from: {resolved_config_path}")
 
     # Initialize database
     init_database()
-
-    # Output startup information
-    logger.info(f"Configuration loaded from: {resolved_config_path}")
