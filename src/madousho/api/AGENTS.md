@@ -11,6 +11,8 @@ api/
 ├── __init__.py         # Empty (module marker)
 ├── main.py             # FastAPI app, static file mounting, router registration
 ├── deps.py             # Dependency injection (get_db for database sessions)
+├── auth.py             # Token verification middleware
+├── errors.py           # Custom exception handlers (Chinese docstrings)
 └── routes/
     └── __init__.py     # APIRouter with endpoints (/health)
 ```
@@ -21,6 +23,8 @@ api/
 |-----------|------|---------|
 | FastAPI app | `main.py` | `app` instance, version, contact, license, static file mounting |
 | Dependencies | `deps.py` | `get_db()` - yields database session for dependency injection |
+| Auth | `auth.py` | `verify_token()` - Bearer + X-API-Token header validation |
+| Errors | `errors.py` | Custom exception classes with unified error format |
 | Routes | `routes/__init__.py` | `api_router` - APIRouter with endpoint definitions |
 | Static files | `main.py:18-20` | SPA static file serving from `public/` directory |
 

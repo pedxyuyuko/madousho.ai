@@ -14,7 +14,11 @@ tests/
 ├── test_database.py        # Database singleton, session management
 ├── test_global_options.py  # CLI global options (--verbose, --json)
 ├── test_serve_command.py   # serve command tests
-└── test_verify_command.py  # verify command tests
+├── test_verify_command.py  # verify command tests
+└── api/                    # API authentication tests
+    ├── __init__.py
+    ├── test_auth.py        # Bearer, X-API-Token, auth bypass
+    └── test_health.py      # Health endpoint, static files
 ```
 
 ## TEST FRAMEWORK
@@ -72,6 +76,8 @@ assert result.exit_code == 0
 | `test_serve_command.py` | serve command | Command invocation with config |
 | `test_verify_command.py` | verify command | Config validation, error cases |
 | `test_global_options.py` | Global flags | --verbose, --json options across commands |
+| `api/test_auth.py` | Auth middleware | Bearer token, X-API-Token, header priority, OPTIONS bypass |
+| `api/test_health.py` | Health endpoint | `/api/v1/health`, static file mounting |
 
 ## COVERAGE EXCLUSIONS
 
