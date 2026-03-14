@@ -59,9 +59,10 @@ class Database:
         if database_url.startswith("sqlite"):
             connect_args["check_same_thread"] = False
 
-        # 从配置中提取池设置 (仅用于非 SQLite 数据库)
-        if database_url.startswith("sqlite"):
-            # SQLite 使用 SingletonThreadPool,不支持池参数
+        # 从配置中提取池设置
+        # 内存 SQLite (:memory:) 使用 SingletonThreadPool,不支持池参数
+        # 文件 SQLite 使用 QueuePool,支持池参数
+        if database_url == "sqlite:///:memory:":
             engine_kwargs = {}
         else:
             pool_size = sqlite_config.get("pool_size", 5) if sqlite_config else 5
