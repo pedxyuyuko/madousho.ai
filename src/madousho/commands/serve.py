@@ -11,9 +11,8 @@ from alembic.config import Config as AlembicConfig
 from alembic import command as alembic_command
 from pydantic import ValidationError
 
-from madousho.config.loader import init_config, get_config_file
+from madousho.config.loader import init_config, get_config_file, get_config, save_config
 from madousho.database.connection import Database
-from madousho.config.loader import get_config
 from madousho.logging.config import configure_logging
 from loguru import logger
 
@@ -116,10 +115,15 @@ def serve(
     resolved_config_path = get_config_file(None)
 
     # Load configuration
-    _ = init_config()
+    config = init_config()
 
     # Output startup information
     logger.info(f"Configuration loaded from: {resolved_config_path}")
+
+    # Auto-save config if token was generated (persists the random token)
+    if config.api.token_was_generated():
+        save_config()
+        logger.info("Auto-generated API token saved to config file")
 
     # Initialize database
     init_database()
