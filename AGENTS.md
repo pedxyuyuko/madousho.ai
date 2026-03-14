@@ -43,7 +43,7 @@ Madousho.ai (魔导书) - Systematic AI Agent Framework. Python package with Typ
 | `Config` | Pydantic | `config/models.py:49` | Root config model |
 | `Flow`, `Task` | SQLAlchemy | `models/` | ORM models |
 | `configure_logging` | Function | `logging/config.py:23` | Loguru setup |
-| `get_config` | Function | `config/loader.py:101` | Config singleton access |
+| `get_config` | Function | `config/loader.py:105` | Lazy config loader with caching |
 | `get_db` | Dependency | `api/deps.py:8` | Database session DI for API |
 
 ## CONVENTIONS
@@ -60,7 +60,7 @@ Madousho.ai (魔导书) - Systematic AI Agent Framework. Python package with Typ
 
 - **DO NOT** use autoincrement IDs - UUID required for all models
 - **DO NOT** call `Database()` directly - use `Database.get_instance()`
-- **DO NOT** access config dict directly - use `get_config()` or `config` singleton
+- **DO NOT** access config dict directly - use `get_config()`
 - **DO NOT** initialize logging multiple times - `configure_logging()` is one-time setup
 - **DO NOT** commit/rollback manually - use `db.session()` context manager
 - **DO NOT** hardcode config paths - use `get_config_file()` with env var support
