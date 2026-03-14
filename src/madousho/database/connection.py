@@ -37,7 +37,9 @@ class Database:
         """检查是否已初始化"""
         return self._engine is not None
 
-    def init(self, database_url: str, sqlite_config: Optional[Dict[str, Any]] = None) -> None:
+    def init(
+        self, database_url: str, sqlite_config: Optional[Dict[str, Any]] = None
+    ) -> None:
         """
         初始化数据库连接
 
@@ -57,34 +59,62 @@ class Database:
         if database_url.startswith("sqlite"):
             connect_args["check_same_thread"] = False
 
-        # 从配置中提取池设置
-        pool_size = sqlite_config.get("pool_size", 5) if sqlite_config else 5
-        pool_timeout = sqlite_config.get("pool_timeout", 30) if sqlite_config else 30
-        pool_recycle = sqlite_config.get("pool_recycle", 3600) if sqlite_config else 3600
+        # 从配置中提取池设置 (仅用于非 SQLite 数据库)
+        if database_url.startswith("sqlite"):
+            # SQLite 使用 SingletonThreadPool,不支持池参数
+            engine_kwargs = {}
+        else:
+            pool_size = sqlite_config.get("pool_size", 5) if sqlite_config else 5
+            pool_timeout = (
+                sqlite_config.get("pool_timeout", 30) if sqlite_config else 30
+            )
+            pool_recycle = (
+                sqlite_config.get("pool_recycle", 3600) if sqlite_config else 3600
+            )
+            engine_kwargs = {
+                "pool_size": pool_size,
+                "pool_timeout": pool_timeout,
+                "pool_recycle": pool_recycle,
+            }
 
         self._engine = create_engine(
             database_url,
             connect_args=connect_args,
             echo=False,  # 开发时可设为 True 记录 SQL
-            pool_size=pool_size,
-            pool_timeout=pool_timeout,
-            pool_recycle=pool_recycle,
+            **engine_kwargs,
         )
 
         # 为 SQLite 注册 WAL 配置事件监听器
         if database_url.startswith("sqlite"):
+
             @event.listens_for(self._engine, "connect")
             def set_sqlite_pragma(dbapi_connection, connection_record):
                 """Configure SQLite WAL mode and performance settings on connection."""
                 cursor = dbapi_connection.cursor()
                 cursor.execute("PRAGMA journal_mode=WAL")
-                cursor.execute(f"PRAGMA synchronous={self._sqlite_config.get('synchronous', 'NORMAL') if self._sqlite_config else 'NORMAL'}")
-                cursor.execute(f"PRAGMA cache_size={self._sqlite_config.get('cache_size', -64000) if self._sqlite_config else -64000}")
-                cursor.execute(f"PRAGMA temp_store={self._sqlite_config.get('temp_store', 'MEMORY') if self._sqlite_config else 'MEMORY'}")
-                cursor.execute(f"PRAGMA mmap_size={self._sqlite_config.get('mmap_size', 268435456) if self._sqlite_config else 268435456}")
-                cursor.execute(f"PRAGMA journal_size_limit={self._sqlite_config.get('journal_size_limit', 67108864) if self._sqlite_config else 67108864}")
-                cursor.execute(f"PRAGMA busy_timeout={self._sqlite_config.get('busy_timeout', 30000) if self._sqlite_config else 30000}")
-                if self._sqlite_config.get('foreign_keys', True) if self._sqlite_config else True:
+                cursor.execute(
+                    f"PRAGMA synchronous={self._sqlite_config.get('synchronous', 'NORMAL') if self._sqlite_config else 'NORMAL'}"
+                )
+                cursor.execute(
+                    f"PRAGMA cache_size={self._sqlite_config.get('cache_size', -64000) if self._sqlite_config else -64000}"
+                )
+                cursor.execute(
+                    f"PRAGMA temp_store={self._sqlite_config.get('temp_store', 'MEMORY') if self._sqlite_config else 'MEMORY'}"
+                )
+                cursor.execute(
+                    f"PRAGMA mmap_size={self._sqlite_config.get('mmap_size', 268435456) if self._sqlite_config else 268435456}"
+                )
+                cursor.execute(
+                    f"PRAGMA journal_size_limit={self._sqlite_config.get('journal_size_limit', 67108864) if self._sqlite_config else 67108864}"
+                )
+                cursor.execute(
+                    f"PRAGMA busy_timeout={self._sqlite_config.get('busy_timeout', 30000) if self._sqlite_config else 30000}"
+                )
+                if (
+                    self._sqlite_config.get("foreign_keys", True)
+                    if self._sqlite_config
+                    else True
+                ):
                     cursor.execute("PRAGMA foreign_keys=ON")
                 cursor.close()
                 logger.info("SQLite WAL mode enabled")
