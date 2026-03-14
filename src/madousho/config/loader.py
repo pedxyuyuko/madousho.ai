@@ -115,10 +115,6 @@ def get_config() -> Config:
     return _cached_config
 
 
-# Global singleton instance - lazily initialized on first access
-config: Config = get_config()
-
-
 def save_config() -> None:
     """Save the cached configuration back to the YAML file.
 

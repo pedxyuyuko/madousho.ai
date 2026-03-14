@@ -114,10 +114,7 @@ def serve(
     # Get the actual config file path that will be used
     resolved_config_path = get_config_file(None)
 
-    # Load configuration
     config = init_config()
-
-    # Output startup information
     logger.info(f"Configuration loaded from: {resolved_config_path}")
 
     # Auto-save config if token was generated (persists the random token)
