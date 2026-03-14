@@ -22,7 +22,7 @@ jobs:
       - name: Create mock config file
         run: cp config/madousho.mock.yml config/madousho.yaml
       - name: Run pytest
-        run: python -m pytest --cov --cov-fail-under=90
+        run: python -m pytest --cov --cov-fail-under=90 --color=no
 
   deploy:
     name: Deploy to TestPyPI
