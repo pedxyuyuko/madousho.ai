@@ -78,6 +78,20 @@ def init_database() -> None:
     logger.info("Database initialization completed successfully")
 
 
+def start_http_server(host: str, port: int, reload: bool = False) -> None:
+    """Start the HTTP server using uvicorn.
+
+    This function is extracted for testability - it can be mocked in tests.
+    """
+    logger.info(f"Starting HTTP server on http://{host}:{port}")
+    uvicorn.run(
+        "madousho.api.main:app",
+        host=host,
+        port=port,
+        reload=reload,
+    )
+
+
 @app.command()
 def serve(
     ctx: typer.Context,
@@ -112,10 +126,4 @@ def serve(
 
     # Get configuration and start HTTP server
     config = get_config()
-    logger.info(f"Starting HTTP server on http://{config.api.host}:{config.api.port}")
-    uvicorn.run(
-        "madousho.api.main:app",
-        host=config.api.host,
-        port=config.api.port,
-        reload=reload,
-    )
+    start_http_server(host=config.api.host, port=config.api.port, reload=reload)
