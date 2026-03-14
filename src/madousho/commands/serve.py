@@ -4,6 +4,7 @@ import os
 import sys
 
 import typer
+import uvicorn
 from sqlalchemy import text
 from sqlalchemy.exc import OperationalError, SQLAlchemyError
 from alembic.config import Config as AlembicConfig
@@ -78,7 +79,10 @@ def init_database() -> None:
 
 
 @app.command()
-def serve(ctx: typer.Context):
+def serve(
+    ctx: typer.Context,
+    reload: bool = typer.Option(False, "--reload", help="Enable auto-reload mode"),
+):
     """Madousho.ai API server."""
     verbose = ctx.obj.get("verbose", False)
     json_output = ctx.obj.get("json_output", False)
@@ -105,3 +109,13 @@ def serve(ctx: typer.Context):
 
     # Initialize database
     init_database()
+
+    # Get configuration and start HTTP server
+    config = get_config()
+    logger.info(f"Starting HTTP server on http://{config.api.host}:{config.api.port}")
+    uvicorn.run(
+        "madousho.api.main:app",
+        host=config.api.host,
+        port=config.api.port,
+        reload=reload,
+    )
