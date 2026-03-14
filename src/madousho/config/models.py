@@ -73,7 +73,7 @@ class DatabaseConfig(BaseModel):
     """Database configuration."""
 
     url: str = Field(
-        default="sqlite://./madousho.db", description="Database connection URL"
+        default="sqlite:///./madousho.db", description="Database connection URL"
     )
     sqlite: SqliteConfig = Field(
         default_factory=SqliteConfig, description="SQLite-specific configuration"

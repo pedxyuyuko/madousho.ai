@@ -18,3 +18,15 @@ model_groups:
     - "example_provider/gpt-5.2"
     - "example_provider/fallback1"
     - "example_provider/fallback2"
+
+database:
+  url: "sqlite:///./data/madousho.db"
+  sqlite:
+    wal_enabled: true
+    synchronous: "NORMAL"
+    cache_size: -64000
+    temp_store: "MEMORY"
+    mmap_size: 268435456
+    journal_size_limit: 67108864
+    busy_timeout: 30000
+    foreign_keys: true
