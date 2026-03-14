@@ -22,7 +22,8 @@ class TestApiConfig:
     def test_default_values(self):
         """Test ApiConfig default field values."""
         config = ApiConfig()
-        assert config.token == ""
+        # Token is auto-generated if empty
+        assert len(config.token) == 32  # 32 hex characters (128 bits)
         assert config.host == "0.0.0.0"
         assert config.port == 8000
 
@@ -64,7 +65,7 @@ class TestProviderConfig:
         config = ProviderConfig(
             type="custom-type",
             endpoint="https://api.example.com/v1",
-            **{"api-key": "sk-test123"}
+            **{"api-key": "sk-test123"},
         )
         assert config.type == "custom-type"
         assert config.endpoint == "https://api.example.com/v1"
@@ -96,7 +97,8 @@ class TestConfig:
         config = Config(
             api=ApiConfig(), provider={}, default_model_group="default", model_groups={}
         )
-        assert config.api.token == ""
+        # Token is auto-generated if empty
+        assert len(config.api.token) == 32
         assert config.default_model_group == "default"
         assert config.provider == {}
         assert config.model_groups == {}
@@ -318,17 +320,18 @@ class TestGetConfig:
                 "default_model_group": "default",
                 "model_groups": {},
             }
-            
+
             with open(config_file, "w") as f:
                 yaml.dump(config_data, f)
-            
+
             # Set env var to point to temp dir (will use default "madousho" filename)
             os.environ["MADOUSHO_CONFIG_PATH"] = tmpdir
-            
+
             # Reset cache
             import madousho.config.loader as loader
+
             loader._cached_config = None
-            
+
             try:
                 config = get_config()
                 assert isinstance(config, Config)
