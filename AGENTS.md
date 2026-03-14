@@ -11,7 +11,7 @@ Madousho.ai (魔导书) - Systematic AI Agent Framework. Python package with Typ
 
 ```
 ./
-├── src/madousho/        # Main package (CLI, commands, models, database, config, logging)
+├── src/madousho/        # Main package (CLI, commands, models, database, config, logging, api)
 ├── tests/               # pytest test suite (90% coverage required)
 ├── config/              # YAML configuration files (app-level, not source)
 ├── alembic/             # Database migrations
@@ -29,6 +29,7 @@ Madousho.ai (魔导书) - Systematic AI Agent Framework. Python package with Typ
 | DB connection | `src/madousho/database/` | Singleton `Database` class |
 | Config loading | `src/madousho/config/` | YAML loader + Pydantic models |
 | Logging | `src/madousho/logging/` | Loguru configuration |
+| API server | `src/madousho/api/` | FastAPI app, routes, dependency injection |
 | Tests | `tests/` | pytest, 90% coverage enforced |
 | Migrations | `alembic/versions/` | Alembic migration scripts |
 
@@ -37,11 +38,13 @@ Madousho.ai (魔导书) - Systematic AI Agent Framework. Python package with Typ
 | Symbol | Type | Location | Role |
 |--------|------|----------|------|
 | `app` | Typer | `cli.py:12` | Main CLI application |
+| `app` | FastAPI | `api/main.py:10` | API server application |
 | `Database` | Singleton | `database/connection.py:15` | DB connection manager |
 | `Config` | Pydantic | `config/models.py:49` | Root config model |
 | `Flow`, `Task` | SQLAlchemy | `models/` | ORM models |
 | `configure_logging` | Function | `logging/config.py:23` | Loguru setup |
 | `get_config` | Function | `config/loader.py:101` | Config singleton access |
+| `get_db` | Dependency | `api/deps.py:8` | Database session DI for API |
 
 ## CONVENTIONS
 
