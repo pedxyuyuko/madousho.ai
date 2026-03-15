@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends
 from fastapi.security import HTTPBearer
 
 from madousho.api.auth import verify_token
+from madousho.api.routes.flow import router as flow_router
 
 bearer_scheme = HTTPBearer(description="API Token", auto_error=False)
 
@@ -24,3 +25,6 @@ def health_check():
 def protected_endpoint():
     """受保护端点示例（验证鉴权功能）"""
     return {"message": "authenticated"}
+
+
+protected_router.include_router(flow_router, prefix="/flows", tags=["flows"])
