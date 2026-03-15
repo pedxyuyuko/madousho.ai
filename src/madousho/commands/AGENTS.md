@@ -20,6 +20,23 @@ commands/
 | `madousho serve` | `serve.py` | `serve(ctx)` | Load config, init logging, start API server |
 | `madousho verify` | `verify.py` | `verify(ctx)` | Validate YAML config against Pydantic models |
 
+### Serve Command Internal Functions
+
+| Function | Purpose |
+|----------|---------|
+| `ensure_database_directory()` | Create SQLite db directory if missing |
+| `run_alembic_migrations()` | Run Alembic upgrade to latest |
+| `init_database()` | Full DB init: config → directory → connection → migrations → test |
+| `start_http_server()` | Start uvicorn (extracted for testability) |
+
+### Serve Command Flow
+
+1. `configure_logging()` with global options (verbose, json, color)
+2. `init_config()` → load and validate YAML config
+3. Auto-save config if token was generated (`save_config()`)
+4. `init_database()` → ensure dir → connect → migrate → test
+5. `start_http_server()` → uvicorn with configured host/port
+
 ## CONVENTIONS
 
 - **Typer app pattern**: Each command file has `app = typer.Typer()` + `@app.command()` decorated function

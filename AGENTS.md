@@ -1,7 +1,9 @@
 # Madousho.ai - Project Knowledge Base
 
-**Generated:** 2026-03-14
-**Stack:** Python 3.10+ | SQLAlchemy 2.0 | Pydantic v2 | Typer CLI | Alembic | Loguru
+**Generated:** 2026-03-15
+**Commit:** 73c900f
+**Branch:** fastapi
+**Stack:** Python 3.10+ | SQLAlchemy 2.0 | Pydantic v2 | Typer CLI | FastAPI | Alembic | Loguru
 
 ## OVERVIEW
 
@@ -41,12 +43,12 @@ Madousho.ai (魔导书) - Systematic AI Agent Framework. Python package with Typ
 | `app` | Typer | `cli.py:12` | Main CLI application |
 | `app` | FastAPI | `api/main.py:10` | API server application |
 | `Database` | Singleton | `database/connection.py:15` | DB connection manager |
-| `Config` | Pydantic | `config/models.py:49` | Root config model |
+| `Config` | Pydantic | `config/models.py:113` | Root config model |
 | `Flow`, `Task` | SQLAlchemy | `models/` | ORM models (Flow has status, flow_template) |
-| `FlowStatus` | Enum | `models/enums.py:12` | Flow lifecycle states |
+| `FlowStatus` | Enum | `models/enums.py:6` | Flow lifecycle states |
 | `configure_logging` | Function | `logging/config.py:23` | Loguru setup |
 | `get_config` | Function | `config/loader.py:105` | Lazy config loader with caching |
-| `get_db` | Dependency | `api/deps.py:8` | Database session DI for API |
+| `get_db` | Dependency | `api/deps.py:10` | Database session DI for API |
 
 ## CONVENTIONS
 

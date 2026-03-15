@@ -4,12 +4,23 @@
 
 SQLAlchemy ORM models for database-backed flows and tasks. UUID-based primary keys, JSON fields for flexible data storage.
 
+## STRUCTURE
+
+```
+models/
+├── __init__.py         # Exports: Flow, Task
+├── enums.py            # FlowStatus enum (created, processing, finished)
+├── flow.py             # Flow model (workflow container)
+└── task.py             # Task model (execution unit)
+```
+
 ## WHERE TO LOOK
 
 | Model | File | Purpose |
 |-------|------|---------|
-| Flow | `flow.py` | AI workflow definitions |
-| Task | `task.py` | Individual task execution data |
+| Flow | `flow.py` | AI workflow definitions (name, description, plugin, tasks) |
+| Task | `task.py` | Individual task execution data (state machine, messages, results) |
+| FlowStatus | `enums.py` | Flow lifecycle states: `created`, `processing`, `finished` |
 | Exports | `__init__.py` | `Flow`, `Task` |
 
 ## CONVENTIONS

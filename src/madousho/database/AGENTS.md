@@ -44,23 +44,32 @@ database/
 
 ## SQLITE OPTIMIZATIONS
 
-Configured via `sqlite_config` dict (from `config/madousho.yaml`):
+Configured via `sqlite_config` dict (from `SqliteConfig` in `config/models.py`):
 
 ```python
 {
     "wal_enabled": True,
-    "synchronous": "NORMAL",
-    "cache_size": -64000,      # 64MB
+    "synchronous": "NORMAL",           # OFF, NORMAL, FULL, EXTRA
+    "cache_size": -64000,              # 64MB (negative = KB)
     "temp_store": "MEMORY",
-    "mmap_size": 268435456,    # 256MB
-    "journal_size_limit": 67108864,  # 64MB
-    "busy_timeout": 30000,     # 30 seconds
+    "mmap_size": 268435456,            # 256MB
+    "journal_size_limit": 67108864,    # 64MB
+    "busy_timeout": 5000,              # 5 seconds (milliseconds)
+    "wal_autocheckpoint": 1000,        # Page count threshold
+    "locking_mode": "NORMAL",          # NORMAL or EXCLUSIVE
     "foreign_keys": True,
-    "pool_size": 50,
-    "pool_timeout": 30,
-    "pool_recycle": 3600,
+    "ignore_check_constraints": False,
 }
 ```
+
+**Connection pool settings** (separate from SQLite PRAGMAs, in `connection.py`):
+```python
+pool_size = sqlite_config.get("pool_size", 5)
+pool_timeout = sqlite_config.get("pool_timeout", 30)
+pool_recycle = sqlite_config.get("pool_recycle", 3600)
+```
+
+**Note**: Memory SQLite (`:memory:`) uses `SingletonThreadPool` - pool params ignored.
 
 ## ANTI-PATTERNS
 

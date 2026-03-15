@@ -20,6 +20,7 @@ config/
 | Pydantic models | `models.py` | `Config`, `ApiConfig`, `ProviderConfig`, `SqliteConfig`, `DatabaseConfig` |
 | File resolution | `loader.py` | `get_config_file()` - resolves `.yaml`/`.yml` extensions |
 | Caching | `loader.py` | `_cached_config` global, `init_config()`, `get_config()` |
+| Persistence | `loader.py` | `save_config()`, `get_config_path()` - persist runtime changes |
 | Exports | `__init__.py` | `get_config`, `init_config` (no module-level singleton) |
 
 ## CONVENTIONS

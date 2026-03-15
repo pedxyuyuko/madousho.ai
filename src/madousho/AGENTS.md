@@ -23,11 +23,12 @@ src/madousho/
 | Module | Files | Purpose |
 |--------|-------|---------|
 | CLI | `cli.py` | Typer app, global options, command registration |
-| Commands | `commands/` | `serve` (API server), `verify` (config validation) |
-| Config | `config/` | `models.py` (Pydantic), `loader.py` (YAML + caching) |
+| Commands | `commands/` | `serve` (API server + DB init), `verify` (config validation) |
+| Config | `config/` | `models.py` (Pydantic), `loader.py` (YAML + caching + save) |
 | Database | `database/` | `connection.py` (singleton), `base_model.py` (Base classes) |
-| Models | `models/` | `flow.py`, `task.py` (UUID-based ORM) |
+| Models | `models/` | `flow.py`, `task.py`, `enums.py` (UUID-based ORM) |
 | Logging | `logging/` | `config.py` (Loguru sinks setup) |
+| API | `api/` | FastAPI app, routers (public/protected), schemas, CRUD endpoints |
 
 ## CONVENTIONS
 
