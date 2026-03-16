@@ -1,6 +1,8 @@
 # symlink
 plugins/flows/example_flows
 
+public/
+
 *.db
 data/
 
