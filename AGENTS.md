@@ -1,8 +1,8 @@
 # Madousho.ai - Project Knowledge Base
 
 **Generated:** 2026-03-15
-**Commit:** 73c900f
-**Branch:** fastapi
+**Commit:** d55a51d
+**Branch:** frontend
 **Stack:** Python 3.10+ | SQLAlchemy 2.0 | Pydantic v2 | Typer CLI | FastAPI | Alembic | Loguru
 
 ## OVERVIEW
@@ -14,9 +14,11 @@ Madousho.ai (魔导书) - Systematic AI Agent Framework. Python package with Typ
 ```
 ./
 ├── src/madousho/        # Main package (CLI, commands, models, database, config, logging, api)
+├── frontend/            # Vue 3 SPA (Vite, Pinia, Naive UI, MSW mocks)
 ├── tests/               # pytest test suite (90% coverage required)
 ├── config/              # YAML configuration files (app-level, not source)
 ├── alembic/             # Database migrations
+├── public/              # Built frontend assets (served by FastAPI)
 ├── pyproject.toml       # Build config, dependencies, entry points
 └── pytest.ini           # Test configuration
 ```
@@ -35,6 +37,7 @@ Madousho.ai (魔导书) - Systematic AI Agent Framework. Python package with Typ
 | Tests | `tests/` | pytest, 90% coverage enforced |
 | Enums | `src/madousho/models/enums.py` | FlowStatus (CREATED, PROCESSING, FINISHED) |
 | Migrations | `alembic/versions/` | Alembic migration scripts |
+| Frontend | `frontend/` | Vue 3 SPA - see `frontend/AGENTS.md` |
 
 ## CODE MAP
 
