@@ -13,8 +13,8 @@
   --login-gradient-start: #0d0d1a;
   --login-gradient-mid: #2d1b4e;
   --login-gradient-end: #0d0d1a;
-  --login-glass-bg: rgba(15, 15, 24, 0.7);
-  --login-glass-border: rgba(255, 255, 255, 0.06);
+  --login-glass-bg: rgba(20, 18, 35, 0.85);
+  --login-glass-border: rgba(124, 58, 237, 0.2);
   --login-text-primary: #e8e0f0;
   --login-text-secondary: rgba(232, 224, 240, 0.6);
   --login-text-muted: rgba(232, 224, 240, 0.45);
@@ -32,6 +32,12 @@
   --login-focus-glow: rgba(124, 58, 237, 0.3);
   --login-loading-overlay: rgba(15, 15, 24, 0.5);
   --login-brand-shadow: 0 0 60px rgba(124, 58, 237, 0.4);
+  --login-panel-bg: linear-gradient(
+    180deg,
+    rgba(20, 18, 35, 0.6) 0%,
+    rgba(15, 13, 28, 0.8) 50%,
+    rgba(20, 18, 35, 0.6) 100%
+  );
 }
 
 [data-theme="parchment"] {
@@ -63,6 +69,7 @@
   --login-focus-glow: rgba(139, 69, 19, 0.3);
   --login-loading-overlay: rgba(237, 224, 204, 0.5);
   --login-brand-shadow: 0 0 60px rgba(212, 165, 116, 0.4);
+  --login-panel-bg: transparent;
 }
 
 /* ============================================
@@ -82,6 +89,16 @@
 
 [data-theme="starry-night"] .n-card {
   box-shadow: 0 4px 20px rgba(124, 58, 237, 0.15);
+}
+
+/* Form container enhancement for dark mode */
+[data-theme="starry-night"] .form-container {
+  border: 1px solid rgba(124, 58, 237, 0.25);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(124, 58, 237, 0.12),
+    0 0 40px rgba(124, 58, 237, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 [data-theme="starry-night"] input:focus,
