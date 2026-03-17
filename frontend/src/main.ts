@@ -9,7 +9,9 @@ import router from './router'
 import { useThemeStore } from '@/stores/theme.store'
 
 async function bootstrap() {
-  if (import.meta.env.DEV) {
+  const useMocks = import.meta.env.VITE_USE_MOCKS !== 'false'
+  
+  if (import.meta.env.DEV && useMocks) {
     const { worker } = await import('./mocks/browser')
     await worker.start({ onUnhandledRequest: 'bypass' })
   }
