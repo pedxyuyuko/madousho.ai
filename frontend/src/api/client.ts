@@ -1,52 +1,60 @@
 import axios from 'axios'
 import type { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
 
-// Create axios instance with base configuration
+// Lazy import avoids circular dependency with Pinia auth store
+async function getAuthStore() {
+  const { useAuthStore } = await import('@/stores/auth.store')
+  return useAuthStore()
+}
+
 const apiClient: AxiosInstance = axios.create({
-  baseURL: '/api/v1',
+  baseURL: '',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
   },
-});
+})
 
-// Request interceptor to add Bearer token
 apiClient.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    // Get token from localStorage (placeholder implementation)
-    const token = localStorage.getItem('authToken');
-    
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+  async (config: InternalAxiosRequestConfig) => {
+    const authStore = await getAuthStore()
+
+    const baseUrl = authStore.currentBaseUrl ?? ''
+    if (baseUrl && config.url) {
+      config.url = `${baseUrl}/api/v1${config.url}`
+    } else if (config.url && !config.url.startsWith('http')) {
+      config.url = `/api/v1${config.url}`
     }
-    
-    return config;
+
+    const token = authStore.currentToken
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+
+    return config
   },
   (error: AxiosError) => {
-    return Promise.reject(error);
+    return Promise.reject(error)
   }
-);
+)
 
-// Response interceptor for error handling
 apiClient.interceptors.response.use(
   (response: AxiosResponse) => {
-    // Return successful responses as-is
-    return response;
+    return response
   },
-  (error: AxiosError) => {
-    // Handle specific error cases
+  async (error: AxiosError) => {
     if (error.response?.status === 401) {
-      // Token might be expired, redirect to login
-      console.error('Unauthorized access - token may be expired');
-      // In Phase 2, this could trigger a logout action
+      const authStore = await getAuthStore()
+      authStore.logout()
+      window.location.href = '/login'
     } else if (error.response?.status === 403) {
-      console.error('Forbidden access');
+      console.error('Forbidden access')
     } else if (error.response?.status === 500) {
-      console.error('Internal server error');
+      console.error('Internal server error')
     }
-    
-    return Promise.reject(error);
-  }
-);
 
-export default apiClient;
+    return Promise.reject(error)
+  }
+)
+
+export default apiClient
