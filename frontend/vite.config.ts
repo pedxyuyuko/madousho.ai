@@ -17,6 +17,7 @@ export default defineConfig({
   },
   // Proxy API requests to FastAPI backend
   server: {
+    host: '0.0.0.0',  // Bind to all interfaces (IPv4 + IPv6)
     proxy: {
       '/api/v1': {
         target: 'http://localhost:8000',
