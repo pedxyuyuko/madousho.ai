@@ -15,11 +15,11 @@ app = FastAPI(
     swagger_ui_parameters={"persistAuthorization": True},
 )
 
+# 挂载 API 路由
+app.include_router(public_router, prefix="/api/v1")
+app.include_router(protected_router, prefix="/api/v1")
+
 # 挂载 SPA 静态文件
 public_dir = "public/"
 if os.path.exists(public_dir):
     app.mount("/", StaticFiles(directory=public_dir, html=True), name="static")
-
-# 挂载 API 路由
-app.include_router(public_router, prefix="/api/v1")
-app.include_router(protected_router, prefix="/api/v1")
