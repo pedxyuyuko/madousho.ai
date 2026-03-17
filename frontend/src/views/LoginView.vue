@@ -63,6 +63,13 @@ async function handleLogin() {
         </n-alert>
 
         <form @submit.prevent="handleLogin" class="form-fields">
+          <!-- Loading shimmer overlay -->
+          <div v-if="isLoading" class="loading-overlay">
+            <div class="shimmer-bar"></div>
+            <div class="shimmer-bar shimmer-bar--delayed"></div>
+            <div class="shimmer-bar shimmer-bar--short"></div>
+          </div>
+
           <div class="field-group">
             <label class="field-label" for="base-url">Base URL</label>
             <n-input
@@ -218,20 +225,49 @@ async function handleLogin() {
   letter-spacing: 0.15em;
 }
 
-// Right form panel
+// Right form panel - Enhancement 2: Glowing gradient divider
 .login-form-panel {
   flex: 0 0 30%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #0f0f18;
-  border-left: 1px solid rgba(255, 255, 255, 0.04);
+  background: transparent;
+  position: relative;
   padding: $spacing-xl;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 10%;
+    height: 80%;
+    width: 1px;
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      rgba(124, 58, 237, 0.15) 20%,
+      rgba(124, 58, 237, 0.5) 50%,
+      rgba(79, 70, 229, 0.5) 70%,
+      rgba(124, 58, 237, 0.15) 80%,
+      transparent
+    );
+    box-shadow:
+      0 0 8px rgba(124, 58, 237, 0.3),
+      0 0 24px rgba(124, 58, 237, 0.1);
+  }
 }
 
+// Enhancement 4: Glass-morphism on form container
 .form-container {
   width: 100%;
   max-width: 360px;
+  background: rgba(15, 15, 24, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  padding: $spacing-xl;
+  position: relative;
 }
 
 .form-title {
@@ -286,6 +322,67 @@ async function handleLogin() {
   line-height: 1.5;
 }
 
+// Enhancement 1: Input Focus Glow Effect
+.field-input {
+  width: 100%;
+  transition: box-shadow 0.2s ease;
+
+  &:focus-within {
+    box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.3);
+  }
+}
+
+// Enhancement 3: Loading Skeleton Shimmer
+.form-fields {
+  position: relative;
+}
+
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background: rgba(15, 15, 24, 0.5);
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 0 16px;
+  justify-content: center;
+}
+
+.shimmer-bar {
+  height: 48px;
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.02) 0%,
+    rgba(255, 255, 255, 0.06) 40%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.8s ease-in-out infinite;
+
+  &--delayed {
+    animation-delay: 0.2s;
+  }
+
+  &--short {
+    height: 48px;
+    width: 100%;
+    animation-delay: 0.4s;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
 // Responsive: stack vertically on mobile
 @media (max-width: $breakpoint-md) {
   .login-page {
@@ -299,8 +396,16 @@ async function handleLogin() {
 
   .login-form-panel {
     flex: 1;
-    border-left: none;
-    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    padding: $spacing-lg;
+
+    &::before {
+      display: none;
+    }
+  }
+
+  .form-container {
+    border-radius: 12px;
+    padding: $spacing-lg;
   }
 
   .brand-title {
