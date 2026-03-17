@@ -65,7 +65,7 @@ function handleSelect(key: string | number) {
 }
 
 .backend-switcher:hover {
-  background: rgba(0, 0, 0, 0.05);
+  background: var(--theme-hover, rgba(0, 0, 0, 0.05));
   border-color: var(--n-primary-color, #18a058);
 }
 

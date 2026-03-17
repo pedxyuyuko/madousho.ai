@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth.store'
+import ThemeSwitcher from '@/components/ThemeSwitcher.vue'
 
 const authStore = useAuthStore()
 </script>
@@ -11,6 +12,7 @@ const authStore = useAuthStore()
       <span class="status-text">已连接</span>
     </div>
     <p class="backend-url">{{ authStore.currentBaseUrl ?? '—' }}</p>
+    <ThemeSwitcher />
   </main>
 </template>
 
@@ -30,26 +32,26 @@ const authStore = useAuthStore()
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
   border-radius: 999px;
-  background: rgba(34, 197, 94, 0.1);
-  border: 1px solid rgba(34, 197, 94, 0.3);
+  background: var(--theme-success-bg);
+  border: 1px solid var(--theme-success-border);
 }
 
 .status-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #22c55e;
+  background: var(--theme-success);
 }
 
 .status-text {
   font-size: 1rem;
   font-weight: 500;
-  color: #22c55e;
+  color: var(--theme-success);
 }
 
 .backend-url {
   font-size: 0.875rem;
-  color: #94a3b8;
+  color: var(--theme-text-muted);
   margin: 0;
 }
 </style>

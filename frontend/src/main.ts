@@ -6,6 +6,7 @@ import naive from 'naive-ui'
 
 import App from './App.vue'
 import router from './router'
+import { useThemeStore } from '@/stores/theme.store'
 
 async function bootstrap() {
   if (import.meta.env.DEV) {
@@ -16,6 +17,11 @@ async function bootstrap() {
   const app = createApp(App)
 
   app.use(createPinia())
+  
+  const themeStore = useThemeStore()
+  themeStore.loadFromStorage()
+  themeStore.initSystemListener()
+  
   app.use(router)
   app.use(naive)
 
