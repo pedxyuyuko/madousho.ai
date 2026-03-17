@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store'
+import ThemeSwitcher from '@/components/ThemeSwitcher.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -49,6 +50,9 @@ async function handleLogin() {
     <!-- Right form panel -->
     <div class="login-form-panel">
       <div class="form-container">
+        <div class="theme-switcher-wrapper">
+          <ThemeSwitcher />
+        </div>
         <h2 class="form-title">Connect</h2>
         <p class="form-description">Enter your backend credentials to get started.</p>
 
@@ -121,7 +125,7 @@ async function handleLogin() {
   display: flex;
   min-height: 100vh;
   width: 100%;
-  background: #0a0a0f;
+  background: var(--login-bg);
 }
 
 // Left gradient panel
@@ -131,11 +135,11 @@ async function handleLogin() {
   overflow: hidden;
   background: linear-gradient(
     135deg,
-    #0d0d1a 0%,
-    #1a1035 25%,
-    #2d1b4e 50%,
-    #1a1035 75%,
-    #0d0d1a 100%
+    var(--login-gradient-start) 0%,
+    var(--login-gradient-start) 25%,
+    var(--login-gradient-mid) 50%,
+    var(--login-gradient-start) 75%,
+    var(--login-gradient-end) 100%
   );
   display: flex;
   align-items: center;
@@ -159,7 +163,7 @@ async function handleLogin() {
 .glow-orb--primary {
   width: 400px;
   height: 400px;
-  background: radial-gradient(circle, #7c3aed 0%, transparent 70%);
+  background: radial-gradient(circle, var(--login-glow-primary) 0%, transparent 70%);
   top: 20%;
   left: 30%;
   animation: pulse-slow 8s ease-in-out infinite;
@@ -168,7 +172,7 @@ async function handleLogin() {
 .glow-orb--secondary {
   width: 300px;
   height: 300px;
-  background: radial-gradient(circle, #2563eb 0%, transparent 70%);
+  background: radial-gradient(circle, var(--login-glow-secondary) 0%, transparent 70%);
   bottom: 20%;
   right: 20%;
   animation: pulse-slow 10s ease-in-out infinite reverse;
@@ -177,7 +181,7 @@ async function handleLogin() {
 .glow-orb--tertiary {
   width: 200px;
   height: 200px;
-  background: radial-gradient(circle, #4f46e5 0%, transparent 70%);
+  background: radial-gradient(circle, var(--login-glow-tertiary) 0%, transparent 70%);
   top: 60%;
   left: 15%;
   animation: pulse-slow 6s ease-in-out infinite;
@@ -203,16 +207,16 @@ async function handleLogin() {
 .brand-title {
   font-size: 5rem;
   font-weight: 300;
-  color: #e8e0f0;
+  color: var(--login-text-primary);
   letter-spacing: 0.2em;
   margin-bottom: $spacing-sm;
-  text-shadow: 0 0 60px rgba(124, 58, 237, 0.4);
+  text-shadow: var(--login-brand-shadow);
   font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', serif;
 }
 
 .brand-subtitle {
   font-size: 1.25rem;
-  color: rgba(232, 224, 240, 0.6);
+  color: var(--login-text-secondary);
   letter-spacing: 0.35em;
   text-transform: uppercase;
   font-family: 'JetBrains Mono', monospace;
@@ -221,7 +225,7 @@ async function handleLogin() {
 .brand-tagline {
   margin-top: $spacing-lg;
   font-size: 0.875rem;
-  color: rgba(232, 224, 240, 0.35);
+  color: var(--login-text-faint);
   letter-spacing: 0.15em;
 }
 
@@ -245,15 +249,15 @@ async function handleLogin() {
     background: linear-gradient(
       to bottom,
       transparent,
-      rgba(124, 58, 237, 0.15) 20%,
-      rgba(124, 58, 237, 0.5) 50%,
-      rgba(79, 70, 229, 0.5) 70%,
-      rgba(124, 58, 237, 0.15) 80%,
+      var(--login-divider-mid) 20%,
+      var(--login-divider-mid) 50%,
+      var(--login-divider-mid) 70%,
+      var(--login-divider-mid) 80%,
       transparent
     );
     box-shadow:
-      0 0 8px rgba(124, 58, 237, 0.3),
-      0 0 24px rgba(124, 58, 237, 0.1);
+      0 0 8px var(--login-divider-glow),
+      0 0 24px var(--login-divider-glow-faint);
   }
 }
 
@@ -261,25 +265,32 @@ async function handleLogin() {
 .form-container {
   width: 100%;
   max-width: 360px;
-  background: rgba(15, 15, 24, 0.7);
+  background: var(--login-glass-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--login-glass-border);
   border-radius: 16px;
   padding: $spacing-xl;
   position: relative;
 }
 
+.theme-switcher-wrapper {
+  position: absolute;
+  top: $spacing-md;
+  right: $spacing-md;
+  z-index: 5;
+}
+
 .form-title {
   font-size: 1.75rem;
   font-weight: 600;
-  color: #e8e0f0;
+  color: var(--login-text-primary);
   margin-bottom: $spacing-sm;
 }
 
 .form-description {
   font-size: 0.875rem;
-  color: rgba(232, 224, 240, 0.45);
+  color: var(--login-text-muted);
   margin-bottom: $spacing-xl;
   line-height: 1.5;
 }
@@ -296,7 +307,7 @@ async function handleLogin() {
   display: block;
   font-size: 0.75rem;
   font-weight: 500;
-  color: rgba(232, 224, 240, 0.55);
+  color: var(--login-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: $spacing-sm;
@@ -317,7 +328,7 @@ async function handleLogin() {
 .form-footer {
   margin-top: $spacing-xl;
   font-size: 0.75rem;
-  color: rgba(232, 224, 240, 0.25);
+  color: var(--login-text-faint);
   text-align: center;
   line-height: 1.5;
 }
@@ -328,7 +339,7 @@ async function handleLogin() {
   transition: box-shadow 0.2s ease;
 
   &:focus-within {
-    box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.3);
+    box-shadow: 0 0 0 2px var(--login-focus-glow);
   }
 }
 
@@ -341,7 +352,7 @@ async function handleLogin() {
   position: absolute;
   inset: 0;
   z-index: 10;
-  background: rgba(15, 15, 24, 0.5);
+  background: var(--login-loading-overlay);
   border-radius: 8px;
   overflow: hidden;
   display: flex;
@@ -356,9 +367,9 @@ async function handleLogin() {
   border-radius: 6px;
   background: linear-gradient(
     90deg,
-    rgba(255, 255, 255, 0.02) 0%,
-    rgba(255, 255, 255, 0.06) 40%,
-    rgba(255, 255, 255, 0.02) 100%
+    var(--login-shimmer-base) 0%,
+    var(--login-shimmer-highlight) 40%,
+    var(--login-shimmer-base) 100%
   );
   background-size: 200% 100%;
   animation: shimmer 1.8s ease-in-out infinite;
