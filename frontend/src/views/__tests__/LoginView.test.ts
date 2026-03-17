@@ -87,7 +87,7 @@ describe('LoginView', () => {
 
     expect(wrapper.find('.login-gradient').exists()).toBe(true)
     expect(wrapper.find('.login-form-panel').exists()).toBe(true)
-    expect(wrapper.find('.brand-title').text()).toBe('魔導書')
+    expect(wrapper.find('.brand-title').text()).toBe('Madousho.ai')
   })
 
   it('shows validation — button disabled when fields are empty', async () => {
