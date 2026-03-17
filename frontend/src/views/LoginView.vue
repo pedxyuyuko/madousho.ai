@@ -235,7 +235,7 @@ async function handleLogin() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: transparent;
+  background: var(--login-panel-bg);
   position: relative;
   padding: $spacing-xl;
 
