@@ -31,6 +31,10 @@ async function handleLogin() {
 }
 </script>
 
+<style>
+@import '../assets/css/login.css';
+</style>
+
 <template>
   <div class="login-page">
     <!-- Left gradient panel -->

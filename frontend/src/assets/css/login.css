@@ -1,0 +1,61 @@
+/* Login Page CSS Variables - Starry Night & Parchment Themes */
+/* Extracted from themes.css for separation of concerns */
+
+[data-theme="starry-night"] {
+  --login-bg: #0a0a0f;
+  --login-gradient-start: #0d0d1a;
+  --login-gradient-mid: #2d1b4e;
+  --login-gradient-end: #0d0d1a;
+  --login-glass-bg: rgba(20, 18, 35, 0.85);
+  --login-glass-border: rgba(124, 58, 237, 0.2);
+  --login-text-primary: #e8e0f0;
+  --login-text-secondary: rgba(232, 224, 240, 0.6);
+  --login-text-muted: rgba(232, 224, 240, 0.45);
+  --login-text-faint: rgba(232, 224, 240, 0.35);
+  --login-glow-primary: #7c3aed;
+  --login-glow-secondary: #2563eb;
+  --login-glow-tertiary: #4f46e5;
+  --login-divider-start: transparent;
+  --login-divider-mid: rgba(124, 58, 237, 0.5);
+  --login-divider-end: transparent;
+  --login-divider-glow: rgba(124, 58, 237, 0.3);
+  --login-divider-glow-faint: rgba(124, 58, 237, 0.1);
+  --login-shimmer-base: rgba(255, 255, 255, 0.02);
+  --login-shimmer-highlight: rgba(255, 255, 255, 0.06);
+  --login-focus-glow: rgba(124, 58, 237, 0.3);
+  --login-loading-overlay: rgba(15, 15, 24, 0.5);
+  --login-brand-shadow: 0 0 60px rgba(124, 58, 237, 0.4);
+  --login-panel-bg: linear-gradient(
+    180deg,
+    rgba(20, 18, 35, 0.6) 0%,
+    rgba(15, 13, 28, 0.8) 50%,
+    rgba(20, 18, 35, 0.6) 100%
+  );
+}
+
+[data-theme="parchment"] {
+  --login-bg: #F5E6C8;
+  --login-gradient-start: #F5E6C8;
+  --login-gradient-mid: #D4A574;
+  --login-gradient-end: #F5E6C8;
+  --login-glass-bg: rgba(237, 224, 204, 0.8);
+  --login-glass-border: rgba(139, 69, 19, 0.12);
+  --login-text-primary: #3D2B1F;
+  --login-text-secondary: rgba(61, 43, 31, 0.7);
+  --login-text-muted: rgba(61, 43, 31, 0.55);
+  --login-text-faint: rgba(61, 43, 31, 0.35);
+  --login-glow-primary: #D4A574;
+  --login-glow-secondary: #A0522D;
+  --login-glow-tertiary: #CD853F;
+  --login-divider-start: transparent;
+  --login-divider-mid: rgba(139, 69, 19, 0.5);
+  --login-divider-end: transparent;
+  --login-divider-glow: rgba(139, 69, 19, 0.3);
+  --login-divider-glow-faint: rgba(139, 69, 19, 0.1);
+  --login-shimmer-base: rgba(139, 69, 19, 0.02);
+  --login-shimmer-highlight: rgba(139, 69, 19, 0.06);
+  --login-focus-glow: rgba(139, 69, 19, 0.3);
+  --login-loading-overlay: rgba(237, 224, 204, 0.5);
+  --login-brand-shadow: 0 0 60px rgba(212, 165, 116, 0.4);
+  --login-panel-bg: transparent;
+}
