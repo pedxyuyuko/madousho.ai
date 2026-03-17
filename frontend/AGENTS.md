@@ -14,11 +14,11 @@ frontend/
 │   ├── api/
 │   │   └── client.ts      # Axios instance with Bearer token interceptor
 │   ├── assets/            # CSS, SCSS (global variables auto-injected)
-│   ├── components/        # Reusable Vue components
+│   ├── components/        # Reusable Vue components (BackendSwitcher, HelloWorld)
 │   ├── mocks/             # MSW handlers for dev (browser.ts, handlers.ts, node.ts)
-│   ├── router/            # Vue Router (currently empty routes)
-│   ├── stores/            # Pinia stores (index.ts re-exports all stores)
-│   └── views/             # Page-level components (HomeView, AboutView)
+│   ├── router/            # Vue Router with auth guards (/login, /)
+│   ├── stores/            # Pinia stores (auth.store.ts, counter.ts, index.ts)
+│   └── views/             # Page-level components (HomeView, LoginView, AboutView)
 ├── vite.config.ts         # Vite config (proxy, SCSS, build output)
 ├── vitest.config.ts       # Vitest config (jsdom environment)
 ├── eslint.config.ts       # ESLint + Oxlint + Vue + TypeScript
@@ -31,9 +31,11 @@ frontend/
 |-----------|------|---------|
 | Bootstrap | `src/main.ts` | App init, MSW in dev, plugin registration |
 | API client | `src/api/client.ts` | Axios with Bearer token + error interceptors |
-| Router | `src/router/index.ts` | Vue Router (routes currently empty) |
-| Stores | `src/stores/` | Pinia state management |
+| Router | `src/router/index.ts` | Vue Router with auth guards (login/home routes) |
+| Auth store | `src/stores/auth.store.ts` | Multi-backend auth state (login, logout, backend switching) |
+| Stores | `src/stores/` | Pinia state management (centralized re-exports) |
 | Mocks | `src/mocks/` | MSW for API mocking in dev |
+| Backend switcher | `src/components/BackendSwitcher.vue` | UI for switching between API backends |
 | Vite config | `vite.config.ts` | Proxy, SCSS globals, build output |
 | Tests | `src/components/__tests__/` | Vitest + Vue Test Utils |
 
@@ -47,6 +49,24 @@ frontend/
 - **Store pattern**: Centralized re-exports in `src/stores/index.ts`
 - **Linting**: Oxlint (fast) + ESLint (Vue/TS) via `run-s lint:*`
 - **Component library**: Naive UI — imported globally in `main.ts`
+
+## AUTH FLOW
+
+Multi-backend authentication with auth store and router guards:
+
+```typescript
+// Router guard (router/index.ts)
+router.beforeEach(async (to) => {
+  const authStore = useAuthStore()
+  if (to.path === '/login' && authStore.isAuthenticated) return { path: '/' }
+  if (to.path !== '/login' && !authStore.isAuthenticated) return { path: '/login' }
+  return true
+})
+```
+
+**Auth store** (`src/stores/auth.store.ts`): Handles login/logout, backend switching, token storage.
+**API client** (`src/api/client.ts`): Attaches Bearer token via interceptor.
+**Backend switcher** (`src/components/BackendSwitcher.vue`): UI for switching between configured backends.
 
 ## ANTI-PATTERNS
 
@@ -77,7 +97,7 @@ npm run test:unit        # Vitest unit tests
 
 - **Node requirement**: `^20.19.0 || >=22.12.0` (enforced in package.json engines)
 - **Naive UI**: Component library loaded globally — no per-component imports needed
-- **Vue Router**: Currently empty routes — add route definitions to `router/index.ts`
+- **Vue Router**: Routes defined in `router/index.ts` with auth guards (login redirect pattern)
 - **SCSS**: Use `scss/` directory for organized stylesheets, `assets/` for static CSS
 
 ## RELATED
