@@ -1,0 +1,15 @@
+{
+  "title": "连接",
+  "description": "输入后端凭据以开始使用。",
+  "form": {
+    "baseUrl": "基础 URL",
+    "apiToken": "API 令牌",
+    "tokenPlaceholder": "输入你的 API 令牌",
+    "submitting": "连接中...",
+    "submit": "连接"
+  },
+  "error": {
+    "connectionFailed": "连接失败，请检查你的凭据"
+  },
+  "footer": "你的凭据仅存储在本地，不会被共享。"
+}
