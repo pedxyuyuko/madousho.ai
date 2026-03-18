@@ -58,17 +58,17 @@ function handleSelect(key: string | number) {
   gap: 6px;
   padding: 6px 12px;
   background: transparent;
-  border: 1px solid var(--n-border-color, #e0e0e6);
+  border: 1px solid var(--color-border);
   border-radius: 6px;
   cursor: pointer;
   font-size: 13px;
   color: inherit;
-  transition: background 0.2s, border-color 0.2s;
+  transition: background 0.35s ease, border-color 0.35s ease;
 }
 
 .backend-switcher:hover {
-  background: var(--theme-hover, rgba(0, 0, 0, 0.05));
-  border-color: var(--n-primary-color, #18a058);
+  background: var(--theme-hover);
+  border-color: var(--color-border-hover);
 }
 
 .backend-switcher__label {
@@ -80,6 +80,6 @@ function handleSelect(key: string | number) {
 
 .backend-switcher__chevron {
   font-size: 10px;
-  opacity: 0.6;
+  color: var(--theme-text-muted);
 }
 </style>
