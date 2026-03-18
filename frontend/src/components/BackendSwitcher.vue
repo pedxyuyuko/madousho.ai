@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth.store'
 
 const authStore = useAuthStore()
 const router = useRouter()
+const { t } = useI18n()
 
 const displayLabel = computed(() => {
   const backend = authStore.currentBackend
-  return backend?.name || backend?.baseUrl || 'No backend'
+  return backend?.name || backend?.baseUrl || t('backend.noBackend')
 })
 
 interface DropdownOption {
@@ -22,7 +24,7 @@ const dropdownOptions = computed<DropdownOption[]>(() => {
     key: opt.value,
   }))
   items.push({
-    label: '+ Add new',
+    label: t('backend.addNew'),
     key: 'add-new',
   })
   return items

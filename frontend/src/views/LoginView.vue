@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth.store'
 import ThemeSwitcher from '@/components/ThemeSwitcher.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const { t } = useI18n()
 
 const baseUrl = ref(window.location.origin)
 const token = ref('')
@@ -24,7 +26,7 @@ async function handleLogin() {
     await authStore.login(baseUrl.value.trim(), token.value.trim())
     router.push('/')
   } catch (err: any) {
-    error.value = err?.message || 'Connection failed. Check your credentials.'
+    error.value = err?.message || t('login.error.connectionFailed')
   } finally {
     isLoading.value = false
   }
@@ -45,7 +47,7 @@ async function handleLogin() {
         <div class="glow-orb glow-orb--tertiary"></div>
         <div class="brand">
           <h1 class="brand-title">Madousho.ai</h1>
-          <p class="brand-subtitle">Systematic AI Agent Framework</p>
+          <p class="brand-subtitle">{{ t('common.brand.subtitle') }}</p>
           <p class="brand-tagline">-</p>
         </div>
       </div>
@@ -57,8 +59,8 @@ async function handleLogin() {
         <div class="theme-switcher-wrapper">
           <ThemeSwitcher />
         </div>
-        <h2 class="form-title">Connect</h2>
-        <p class="form-description">Enter your backend credentials to get started.</p>
+        <h2 class="form-title">{{ t('login.title') }}</h2>
+        <p class="form-description">{{ t('login.description') }}</p>
 
         <n-alert
           v-if="error"
@@ -79,7 +81,7 @@ async function handleLogin() {
           </div>
 
           <div class="field-group">
-            <label class="field-label" for="base-url">Base URL</label>
+            <label class="field-label" for="base-url">{{ t('login.form.baseUrl') }}</label>
             <n-input
               id="base-url"
               v-model:value="baseUrl"
@@ -90,13 +92,13 @@ async function handleLogin() {
           </div>
 
           <div class="field-group">
-            <label class="field-label" for="token">API Token</label>
+            <label class="field-label" for="token">{{ t('login.form.apiToken') }}</label>
             <n-input
               id="token"
               v-model:value="token"
               type="password"
               show-password-on="click"
-              placeholder="Enter your API token"
+              :placeholder="t('login.form.tokenPlaceholder')"
               :disabled="isLoading"
               size="large"
               class="field-input"
@@ -112,12 +114,12 @@ async function handleLogin() {
             @click="handleLogin"
             class="submit-btn"
           >
-            {{ isLoading ? 'Connecting...' : 'Connect' }}
+            {{ isLoading ? t('login.form.submitting') : t('login.form.submit') }}
           </n-button>
         </form>
 
         <p class="form-footer">
-          Your credentials are stored locally and never shared.
+          {{ t('login.footer') }}
         </p>
       </div>
     </div>

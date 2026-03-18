@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth.store'
+import { useI18n } from 'vue-i18n'
 import ThemeSwitcher from '@/components/ThemeSwitcher.vue'
 
 const authStore = useAuthStore()
+const { t } = useI18n()
 </script>
 
 <template>
   <main class="home">
     <div class="status-card">
       <span class="status-dot" />
-      <span class="status-text">已连接</span>
+      <span class="status-text">{{ t('home.status.connected') }}</span>
     </div>
     <p class="backend-url">{{ authStore.currentBaseUrl ?? '—' }}</p>
     <ThemeSwitcher />

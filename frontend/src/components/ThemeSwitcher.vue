@@ -2,8 +2,10 @@
 import { computed } from 'vue'
 import { NButton } from 'naive-ui';
 import { useThemeStore } from '@/stores/theme.store';
+import { useI18n } from 'vue-i18n'
 
 const themeStore = useThemeStore();
+const { t } = useI18n()
 const isDark = computed(() => themeStore.isDark);
 
 const handleToggle = () => {
@@ -13,7 +15,7 @@ const handleToggle = () => {
 
 <template>
   <NButton
-    :aria-label="isDark ? 'Switch to light theme' : 'Switch to dark theme'"
+    :aria-label="isDark ? t('theme.switchToLight') : t('theme.switchToDark')"
     @click="handleToggle"
     quaternary
     circle

@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { RouterView } from 'vue-router'
 import { NConfigProvider, NGlobalStyle } from 'naive-ui'
+import { zhCN, dateZhCN } from 'naive-ui/es/locales'
 import BackendSwitcher from './components/BackendSwitcher.vue'
 import { useAuthStore } from '@/stores/auth.store'
 import { useThemeStore } from '@/stores/theme.store'
@@ -18,7 +19,7 @@ const themeOverrides = computed(() =>
 </script>
 
 <template>
-  <n-config-provider :theme="naiveTheme" :theme-overrides="themeOverrides">
+  <n-config-provider :theme="naiveTheme" :theme-overrides="themeOverrides" :locale="zhCN" :date-locale="dateZhCN">
     <n-global-style />
     <div class="app-layout" :data-theme="themeStore.resolvedTheme">
       <div

@@ -7,6 +7,7 @@ import naive from 'naive-ui'
 import App from './App.vue'
 import router from './router'
 import { useThemeStore } from '@/stores/theme.store'
+import { i18n } from './i18n'
 
 async function bootstrap() {
   const useMocks = import.meta.env.VITE_USE_MOCKS !== 'false'
@@ -24,6 +25,7 @@ async function bootstrap() {
   themeStore.loadFromStorage()
   themeStore.initSystemListener()
   
+  app.use(i18n)
   app.use(router)
   app.use(naive)
 
