@@ -30,11 +30,20 @@ class TestHealthEndpoint:
 class TestStaticFiles:
     """Tests for static file serving."""
 
-    def test_static_files_mounted(self, client: TestClient) -> None:
-        """Test that static files are mounted at root."""
-        # The static files should be mounted, but public/ directory may not exist
-        # This test verifies the mount point exists
+    def test_root_returns_index_html(self, client: TestClient) -> None:
+        """Test that root path returns index.html for SPA."""
         response = client.get("/")
-        # If public/ doesn't exist, should return 404
-        # If it exists, should return HTML
-        assert response.status_code in [200, 404]
+        if response.status_code == 200:
+            assert "text/html" in response.headers["content-type"]
+
+    def test_spa_fallback_returns_index_html(self, client: TestClient) -> None:
+        """Test that any non-API path returns index.html for SPA routing."""
+        response = client.get("/login")
+        if response.status_code == 200:
+            assert "text/html" in response.headers["content-type"]
+
+    def test_api_routes_not_affected(self, client: TestClient) -> None:
+        """Test that API routes still work after SPA fallback."""
+        response = client.get("/api/v1/health")
+        assert response.status_code == 200
+        assert response.json() == {"status": "ok"}

@@ -1,6 +1,7 @@
 """FastAPI application entry point for Madousho.ai API."""
 
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 import os
 
@@ -19,7 +20,21 @@ app = FastAPI(
 app.include_router(public_router, prefix="/api/v1")
 app.include_router(protected_router, prefix="/api/v1")
 
-# 挂载 SPA 静态文件
 public_dir = "public/"
+index_html = os.path.join(public_dir, "index.html")
+
 if os.path.exists(public_dir):
-    app.mount("/", StaticFiles(directory=public_dir, html=True), name="static")
+    assets_dir = os.path.join(public_dir, "assets")
+    if os.path.exists(assets_dir):
+        app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
+
+    @app.get("/favicon.ico")
+    async def favicon():
+        favicon_path = os.path.join(public_dir, "favicon.ico")
+        if os.path.exists(favicon_path):
+            return FileResponse(favicon_path)
+        return FileResponse(index_html)
+
+    @app.get("/{full_path:path}")
+    async def serve_spa(full_path: str):
+        return FileResponse(index_html, media_type="text/html")
