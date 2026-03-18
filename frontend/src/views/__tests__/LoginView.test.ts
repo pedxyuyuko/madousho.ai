@@ -26,24 +26,44 @@ vi.mock('vue-router', () => ({
 }))
 
 const NInputStub = {
-  props: ['value', 'disabled', 'type'],
+  props: {
+    value: { type: String, default: '' },
+    disabled: Boolean,
+    type: { type: String, default: 'text' },
+  },
   emits: ['update:value'],
   template: `<input
     :value="value"
     :disabled="disabled"
     :type="type || 'text'"
-    v-bind="$attrs"
+    :id="$attrs.id"
+    :placeholder="$attrs.placeholder"
+    :class="$attrs.class"
     @input="$emit('update:value', $event.target.value)"
   />`,
 }
 
 const NButtonStub = {
-  props: ['disabled', 'loading'],
-  template: `<button :disabled="disabled || loading" v-bind="$attrs"><slot /></button>`,
+  props: {
+    disabled: Boolean,
+    loading: Boolean,
+  },
+  emits: ['click'],
+  template: `<button
+    type="button"
+    :disabled="disabled || loading"
+    :class="$attrs.class"
+    @click="$emit('click', $event)"
+  ><slot /></button>`,
 }
 
 const NAlertStub = {
-  template: `<div v-bind="$attrs"><slot /></div>`,
+  props: { type: String },
+  template: `<div :class="$attrs.class"><slot /></div>`,
+}
+
+const ThemeSwitcherStub = {
+  template: '<div class="theme-switcher-stub" />',
 }
 
 const i18n = createI18n({
@@ -63,6 +83,7 @@ function mountLoginView() {
         'n-input': NInputStub,
         'n-button': NButtonStub,
         'n-alert': NAlertStub,
+        'ThemeSwitcher': ThemeSwitcherStub,
       },
     },
   })
@@ -91,7 +112,7 @@ describe('LoginView', () => {
     expect(inputs[0]!.attributes('id')).toBe('base-url')
     expect(inputs[1]!.attributes('id')).toBe('token')
 
-    expect(wrapper.find('button').exists()).toBe(true)
+    expect(wrapper.find('.submit-btn').exists()).toBe(true)
     expect(wrapper.text()).toContain('连接')
   })
 
@@ -106,7 +127,7 @@ describe('LoginView', () => {
   it('shows validation — button disabled when fields are empty', async () => {
     const wrapper = mountLoginView()
 
-    const button = wrapper.find('button')
+    const button = wrapper.find('.submit-btn')
     expect(button.attributes('disabled')).toBeDefined()
 
     await setFields(wrapper, 'http://localhost:8000', '')
@@ -120,7 +141,7 @@ describe('LoginView', () => {
     const wrapper = mountLoginView()
     await setFields(wrapper, 'http://localhost:8000', 'test-token')
 
-    const button = wrapper.find('button')
+    const button = wrapper.find('.submit-btn')
     expect(button.attributes('disabled')).toBeUndefined()
   })
 
@@ -129,7 +150,7 @@ describe('LoginView', () => {
     const wrapper = mountLoginView()
     await setFields(wrapper, 'http://localhost:8000', 'test-token')
 
-    await wrapper.find('button').trigger('click')
+    await wrapper.find('.submit-btn').trigger('click')
     await flushPromises()
 
     expect(mockLogin).toHaveBeenCalledWith('http://localhost:8000', 'test-token')
@@ -142,7 +163,7 @@ describe('LoginView', () => {
     const wrapper = mountLoginView()
     await setFields(wrapper, 'http://localhost:8000', 'test-token')
 
-    await wrapper.find('button').trigger('click')
+    await wrapper.find('.submit-btn').trigger('click')
     await flushPromises()
 
     expect(wrapper.text()).toContain('连接中...')
@@ -159,7 +180,7 @@ describe('LoginView', () => {
     const wrapper = mountLoginView()
     await setFields(wrapper, 'http://localhost:8000', 'bad-token')
 
-    await wrapper.find('button').trigger('click')
+    await wrapper.find('.submit-btn').trigger('click')
     await flushPromises()
 
     expect(wrapper.find('.form-error').exists()).toBe(true)
@@ -171,7 +192,7 @@ describe('LoginView', () => {
     const wrapper = mountLoginView()
     await setFields(wrapper, 'http://localhost:8000', 'bad-token')
 
-    await wrapper.find('button').trigger('click')
+    await wrapper.find('.submit-btn').trigger('click')
     await flushPromises()
 
     expect(wrapper.text()).toContain('连接失败，请检查你的凭据')
@@ -182,7 +203,7 @@ describe('LoginView', () => {
     const wrapper = mountLoginView()
     await setFields(wrapper, 'http://localhost:8000', 'test-token')
 
-    await wrapper.find('button').trigger('click')
+    await wrapper.find('.submit-btn').trigger('click')
     await flushPromises()
 
     expect(mockPush).toHaveBeenCalledWith('/')
@@ -193,7 +214,7 @@ describe('LoginView', () => {
     const wrapper = mountLoginView()
     await setFields(wrapper, '  http://localhost:8000  ', '  test-token  ')
 
-    await wrapper.find('button').trigger('click')
+    await wrapper.find('.submit-btn').trigger('click')
     await flushPromises()
 
     expect(mockLogin).toHaveBeenCalledWith('http://localhost:8000', 'test-token')
