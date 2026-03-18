@@ -175,7 +175,7 @@ export const starryNightOverrides: GlobalThemeOverrides = {
     borderColor: 'rgba(124, 58, 237, 0.15)',
     boxShadow: '0 4px 24px 0 rgba(0, 0, 0, 0.4)',
     titleTextColor: '#e2dff0',
-    textColor: 'rgba(226, 223, 240, 0.65)',
+    textColor: 'rgba(226, 223, 240, 0.9)',
   },
 
   // ── Component: Menu (sidebar navigation) ────────────────────────

@@ -169,7 +169,7 @@ export const parchmentOverrides: GlobalThemeOverrides = {
     boxShadow: '0 1px 2px -2px rgba(61, 43, 31, 0.08), 0 3px 6px 0 rgba(61, 43, 31, 0.06)',
     titleTextColor: '#3D2B1F',
     titleFontWeight: '600',
-    textColor: 'rgba(61, 43, 31, 0.7)'
+    textColor: 'rgba(61, 43, 31, 0.9)'
   },
 
   Select: {
