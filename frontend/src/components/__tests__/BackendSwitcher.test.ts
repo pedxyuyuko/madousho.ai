@@ -1,6 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
+import { createI18n } from 'vue-i18n'
 import BackendSwitcher from '../BackendSwitcher.vue'
+import common from '@/locales/zh-CN/common.json'
+import login from '@/locales/zh-CN/login.json'
+import home from '@/locales/zh-CN/home.json'
+import backend from '@/locales/zh-CN/backend.json'
+import theme from '@/locales/zh-CN/theme.json'
 
 const mockSwitchBackend = vi.fn()
 const mockPush = vi.fn()
@@ -24,6 +30,12 @@ vi.mock('vue-router', () => ({
   }),
 }))
 
+const i18n = createI18n({
+  legacy: false,
+  locale: 'zh-CN',
+  fallbackLocale: 'zh-CN',
+  messages: { 'zh-CN': { common, login, home, backend, theme } },
+})
 
 const NDropdownStub = {
   props: ['options', 'trigger'],
@@ -53,6 +65,7 @@ const NDropdownStub = {
 function mountBackendSwitcher() {
   return mount(BackendSwitcher, {
     global: {
+      plugins: [i18n],
       stubs: {
         'n-dropdown': NDropdownStub,
       },
@@ -96,7 +109,7 @@ describe('BackendSwitcher', () => {
 
       const wrapper = mountBackendSwitcher()
 
-      expect(wrapper.find('.backend-switcher__label').text()).toBe('No backend')
+      expect(wrapper.find('.backend-switcher__label').text()).toBe('未连接后端')
     })
 
     it('renders chevron indicator', () => {
@@ -125,7 +138,7 @@ describe('BackendSwitcher', () => {
       expect(options).toHaveLength(3)
       expect(options[0]!.text()).toBe('✓ Backend A')
       expect(options[1]!.text()).toBe('Backend B')
-      expect(options[2]!.text()).toBe('+ Add new')
+      expect(options[2]!.text()).toBe('添加新后端')
     })
 
     it('shows ✓ prefix on current backend option', async () => {
@@ -156,7 +169,7 @@ describe('BackendSwitcher', () => {
 
       const options = wrapper.findAll('.n-dropdown-option')
       expect(options).toHaveLength(2)
-      expect(options[1]!.text()).toBe('+ Add new')
+      expect(options[1]!.text()).toBe('添加新后端')
     })
   })
 
@@ -207,7 +220,7 @@ describe('BackendSwitcher', () => {
 
       const options = wrapper.findAll('.n-dropdown-option')
       const addOption = options[options.length - 1]
-      expect(addOption?.text()).toBe('+ Add new')
+      expect(addOption?.text()).toBe('添加新后端')
     })
 
     it('calls router.push("/login") when "Add new" is selected', async () => {

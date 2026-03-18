@@ -1,6 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
+import { createI18n } from 'vue-i18n'
+import common from '@/locales/zh-CN/common.json'
+import login from '@/locales/zh-CN/login.json'
+import home from '@/locales/zh-CN/home.json'
+import backend from '@/locales/zh-CN/backend.json'
+import theme from '@/locales/zh-CN/theme.json'
 import LoginView from '../LoginView.vue'
 
 const mockLogin = vi.fn()
@@ -40,12 +46,19 @@ const NAlertStub = {
   template: `<div v-bind="$attrs"><slot /></div>`,
 }
 
+const i18n = createI18n({
+  legacy: false,
+  locale: 'zh-CN',
+  fallbackLocale: 'zh-CN',
+  messages: { 'zh-CN': { common, login, home, backend, theme } },
+})
+
 function mountLoginView() {
   const pinia = createPinia()
   setActivePinia(pinia)
   return mount(LoginView, {
     global: {
-      plugins: [pinia],
+      plugins: [pinia, i18n],
       stubs: {
         'n-input': NInputStub,
         'n-button': NButtonStub,
@@ -79,7 +92,7 @@ describe('LoginView', () => {
     expect(inputs[1]!.attributes('id')).toBe('token')
 
     expect(wrapper.find('button').exists()).toBe(true)
-    expect(wrapper.text()).toContain('Connect')
+    expect(wrapper.text()).toContain('连接')
   })
 
   it('has left panel (gradient) and right panel (form) structure', () => {
@@ -132,13 +145,13 @@ describe('LoginView', () => {
     await wrapper.find('button').trigger('click')
     await flushPromises()
 
-    expect(wrapper.text()).toContain('Connecting...')
+    expect(wrapper.text()).toContain('连接中...')
 
     resolveLogin()
     await flushPromises()
 
-    expect(wrapper.text()).toContain('Connect')
-    expect(wrapper.text()).not.toContain('Connecting...')
+    expect(wrapper.text()).toContain('连接')
+    expect(wrapper.text()).not.toContain('连接中...')
   })
 
   it('shows error alert on login failure', async () => {
@@ -161,7 +174,7 @@ describe('LoginView', () => {
     await wrapper.find('button').trigger('click')
     await flushPromises()
 
-    expect(wrapper.text()).toContain('Connection failed. Check your credentials.')
+    expect(wrapper.text()).toContain('连接失败，请检查你的凭据')
   })
 
   it('redirects to / on successful login', async () => {
