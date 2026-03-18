@@ -24,7 +24,7 @@ const { t } = useI18n()
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 80vh;
+  min-height: calc(100vh - 60px); /* Account for header height */
   gap: 1rem;
 }
 

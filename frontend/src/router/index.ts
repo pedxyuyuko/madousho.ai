@@ -3,13 +3,20 @@ import type { RouteLocationNormalized } from 'vue-router'
 
 // Lazy imports to avoid circular deps
 const LoginView = () => import('@/views/LoginView.vue')
+const AdminLayout = () => import('@/layouts/AdminLayout.vue')
 const HomeView = () => import('@/views/HomeView.vue')
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     { path: '/login', name: 'login', component: LoginView },
-    { path: '/', name: 'home', component: HomeView },
+    {
+      path: '/',
+      component: AdminLayout,
+      children: [
+        { path: '', name: 'home', component: HomeView },
+      ],
+    },
   ],
 })
 
