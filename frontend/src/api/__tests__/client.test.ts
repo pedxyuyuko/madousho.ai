@@ -20,14 +20,19 @@ vi.mock('axios', async () => {
 
   // Wrap interceptors.use to capture handlers
   const origReqUse = instance.interceptors.request.use.bind(instance.interceptors.request)
-  instance.interceptors.request.use = ((onFulfilled: any, onRejected: any) => {
-    if (onFulfilled) requestOnFulfilled = onFulfilled
+  type ReqFulfilled = (config: InternalAxiosRequestConfig) => InternalAxiosRequestConfig | Promise<InternalAxiosRequestConfig>
+  type ReqRejected = (error: unknown) => unknown
+  type ResFulfilled = (value: unknown) => unknown
+  type ResRejected = (error: unknown) => unknown
+
+  instance.interceptors.request.use = ((onFulfilled: ReqFulfilled | null, onRejected: ReqRejected | null) => {
+    if (onFulfilled) requestOnFulfilled = onFulfilled as (config: InternalAxiosRequestConfig) => Promise<InternalAxiosRequestConfig>
     return origReqUse(onFulfilled, onRejected)
   }) as typeof instance.interceptors.request.use
 
   const origResUse = instance.interceptors.response.use.bind(instance.interceptors.response)
-  instance.interceptors.response.use = ((onFulfilled: any, onRejected: any) => {
-    if (onRejected) responseOnRejected = onRejected
+  instance.interceptors.response.use = ((onFulfilled: ResFulfilled | null, onRejected: ResRejected | null) => {
+    if (onRejected) responseOnRejected = onRejected as (error: AxiosError) => Promise<never>
     return origResUse(onFulfilled, onRejected)
   }) as typeof instance.interceptors.response.use
 

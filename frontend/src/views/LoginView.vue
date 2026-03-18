@@ -25,8 +25,8 @@ async function handleLogin() {
   try {
     await authStore.login(baseUrl.value.trim(), token.value.trim())
     router.push('/')
-  } catch (err: any) {
-    error.value = err?.message || t('login.error.connectionFailed')
+  } catch (err: unknown) {
+    error.value = (err instanceof Error ? err.message : undefined) || t('login.error.connectionFailed')
   } finally {
     isLoading.value = false
   }
