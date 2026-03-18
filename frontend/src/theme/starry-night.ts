@@ -80,6 +80,13 @@ export const starryNightOverrides: GlobalThemeOverrides = {
 
   // ── Component: Button ───────────────────────────────────────────
   Button: {
+    // Default button text (critical for dark mode readability)
+    textColor: '#e2dff0',
+    textColorHover: '#e2dff0',
+    textColorPressed: '#e2dff0',
+    textColorFocus: '#e2dff0',
+    textColorDisabled: 'rgba(226, 223, 240, 0.3)',
+    // Primary
     colorPrimary: '#7c3aed',
     colorHoverPrimary: '#8b5cf6',
     colorPressedPrimary: '#6d28d9',
@@ -88,11 +95,52 @@ export const starryNightOverrides: GlobalThemeOverrides = {
     textColorPrimary: '#e2dff0',
     textColorHoverPrimary: '#e2dff0',
     textColorPressedPrimary: '#e2dff0',
+    textColorDisabledPrimary: 'rgba(226, 223, 240, 0.5)',
     borderPrimary: '1px solid rgba(124, 58, 237, 0.5)',
     borderHoverPrimary: '1px solid #8b5cf6',
     borderPressedPrimary: '1px solid #6d28d9',
+    borderDisabledPrimary: '1px solid rgba(124, 58, 237, 0.2)',
     rippleColorPrimary: '#8b5cf6',
-    // Ghost / default buttons
+    // Info
+    colorInfo: '#6366f1',
+    colorHoverInfo: '#818cf8',
+    colorPressedInfo: '#4f46e5',
+    textColorInfo: '#e2dff0',
+    textColorHoverInfo: '#e2dff0',
+    textColorPressedInfo: '#e2dff0',
+    borderInfo: '1px solid rgba(99, 102, 241, 0.5)',
+    // Success
+    colorSuccess: '#22c55e',
+    colorHoverSuccess: '#4ade80',
+    colorPressedSuccess: '#16a34a',
+    textColorSuccess: '#e2dff0',
+    textColorHoverSuccess: '#e2dff0',
+    textColorPressedSuccess: '#e2dff0',
+    borderSuccess: '1px solid rgba(34, 197, 94, 0.5)',
+    // Warning
+    colorWarning: '#fbbf24',
+    colorHoverWarning: '#fcd34d',
+    colorPressedWarning: '#f59e0b',
+    textColorWarning: '#1a1035',
+    textColorHoverWarning: '#1a1035',
+    textColorPressedWarning: '#1a1035',
+    borderWarning: '1px solid rgba(251, 191, 36, 0.5)',
+    // Error
+    colorError: '#ef4444',
+    colorHoverError: '#f87171',
+    colorPressedError: '#dc2626',
+    textColorError: '#e2dff0',
+    textColorHoverError: '#e2dff0',
+    textColorPressedError: '#e2dff0',
+    borderError: '1px solid rgba(239, 68, 68, 0.5)',
+    // Quaternary (ghost/transparent buttons - ThemeSwitcher uses this)
+    colorQuaternary: 'transparent',
+    colorQuaternaryHover: 'rgba(124, 58, 237, 0.15)',
+    colorQuaternaryPressed: 'rgba(124, 58, 237, 0.25)',
+    textColorQuaternary: '#e2dff0',
+    textColorQuaternaryHover: '#e2dff0',
+    textColorQuaternaryPressed: '#e2dff0',
+    // Ghost / default buttons hover states
     colorHover: 'rgba(124, 58, 237, 0.15)',
     colorPressed: 'rgba(124, 58, 237, 0.25)',
     rippleColor: 'rgba(124, 58, 237, 0.2)',
