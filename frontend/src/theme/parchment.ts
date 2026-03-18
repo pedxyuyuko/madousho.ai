@@ -313,5 +313,26 @@ export const parchmentOverrides: GlobalThemeOverrides = {
     fillColorWarning: '#B8860B',
     fillColorError: '#8B0000',
     railColor: 'rgba(93, 58, 26, 0.15)'
-  }
+  },
+
+  Dropdown: {
+    color: '#EDE0CC',
+    borderRadius: '8px',
+    boxShadow: '0 2px 12px rgba(61, 43, 31, 0.15), 0 0 0 1px rgba(93, 58, 26, 0.15)',
+    peers: {
+      InternalMenu: {
+        borderRadius: '8px',
+        color: '#EDE0CC',
+        itemTextColor: '#3D2B1F',
+        itemTextColorHover: '#3D2B1F',
+        itemTextColorActive: '#8B4513',
+        itemIconColor: 'rgba(61, 43, 31, 0.5)',
+        itemIconColorHover: 'rgba(61, 43, 31, 0.7)',
+        itemColorHover: 'rgba(139, 69, 19, 0.12)',
+        itemColorActive: 'rgba(139, 69, 19, 0.15)',
+        itemColorActiveHover: 'rgba(139, 69, 19, 0.18)',
+        dividerColor: 'rgba(93, 58, 26, 0.2)',
+      },
+    },
+  },
 }

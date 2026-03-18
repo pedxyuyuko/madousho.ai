@@ -223,4 +223,26 @@ export const starryNightOverrides: GlobalThemeOverrides = {
     borderColor: 'rgba(124, 58, 237, 0.2)',
     boxShadow: '0 4px 24px 0 rgba(0, 0, 0, 0.5)',
   },
+
+  // ── Component: Dropdown ────────────────────────────────────────
+  Dropdown: {
+    color: 'rgba(18, 16, 31, 0.95)',
+    borderRadius: '8px',
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(124, 58, 237, 0.2)',
+    peers: {
+      InternalMenu: {
+        borderRadius: '8px',
+        color: 'rgba(18, 16, 31, 0.95)',
+        itemTextColor: 'rgba(226, 223, 240, 0.85)',
+        itemTextColorHover: '#e2dff0',
+        itemTextColorActive: '#8b5cf6',
+        itemIconColor: 'rgba(226, 223, 240, 0.5)',
+        itemIconColorHover: 'rgba(226, 223, 240, 0.7)',
+        itemColorHover: 'rgba(124, 58, 237, 0.15)',
+        itemColorActive: 'rgba(124, 58, 237, 0.2)',
+        itemColorActiveHover: 'rgba(124, 58, 237, 0.25)',
+        dividerColor: 'rgba(124, 58, 237, 0.15)',
+      },
+    },
+  },
 }

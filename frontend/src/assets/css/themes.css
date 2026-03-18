@@ -4,6 +4,8 @@
    THEME CSS VARIABLES (for custom components)
    ============================================ */
 [data-theme="starry-night"] {
+  --color-border: rgba(124, 58, 237, 0.35);
+  --color-border-hover: rgba(124, 58, 237, 0.55);
   --theme-success: #22c55e;
   --theme-success-bg: rgba(34, 197, 94, 0.1);
   --theme-success-border: rgba(34, 197, 94, 0.3);
@@ -12,6 +14,8 @@
 }
 
 [data-theme="parchment"] {
+  --color-border: rgba(93, 58, 26, 0.4);
+  --color-border-hover: rgba(139, 69, 19, 0.55);
   --theme-success: #556B2F;
   --theme-success-bg: rgba(85, 107, 47, 0.1);
   --theme-success-border: rgba(85, 107, 47, 0.3);
