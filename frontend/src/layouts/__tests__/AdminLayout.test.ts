@@ -24,6 +24,10 @@ vi.mock('vue-router', async () => {
     ...actual,
     useRouter: () => ({
       push: mockPush,
+      resolve: ({ name }: { name: string }) => {
+        const routes: Record<string, string> = { home: '/', flows: '/flows', login: '/login' }
+        return { name, path: routes[name] ?? `/${name}` }
+      },
     }),
     useRoute: () => ({
       name: 'home',
@@ -184,7 +188,7 @@ describe('AdminLayout', () => {
     await wrapper.get('[data-testid="logout-btn"]').trigger('click')
 
     expect(mockLogout).toHaveBeenCalledTimes(1)
-    expect(mockPush).toHaveBeenCalledWith('/login')
+    expect(mockPush).toHaveBeenCalledWith({ name: 'login', path: '/login' })
     const logoutOrder = mockLogout.mock.invocationCallOrder[0]
     const pushOrder = mockPush.mock.invocationCallOrder[0]
 

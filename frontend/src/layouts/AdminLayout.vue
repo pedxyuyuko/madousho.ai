@@ -49,21 +49,16 @@ function toggleSidebar() {
   collapsed.value = !collapsed.value
 }
 
-const menuRoutes: Record<string, string> = {
-  home: '/',
-  flows: '/flows',
-}
-
 function handleMenuUpdate(key: string) {
-  const path = menuRoutes[key]
-  if (path) {
-    router.push(path)
+  const resolved = router.resolve({ name: key })
+  if (resolved.name) {
+    router.push(resolved)
   }
 }
 
 async function handleLogout() {
   authStore.logout()
-  await router.push('/login')
+  await router.push(router.resolve({ name: 'login' }))
 }
 </script>
 
