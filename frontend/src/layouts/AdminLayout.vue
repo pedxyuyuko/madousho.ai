@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, h } from 'vue'
 import type { Component } from 'vue'
-import { RouterView, useRouter } from 'vue-router'
+import { RouterView, useRouter, useRoute } from 'vue-router'
 import { NButton, NIcon } from 'naive-ui'
 import {
   ChevronBackOutline,
@@ -18,6 +18,7 @@ import type { MenuItem } from '@/types/menu'
 
 const collapsed = ref(false)
 const router = useRouter()
+const route = useRoute()
 const authStore = useAuthStore()
 const { t } = useI18n()
 
@@ -25,8 +26,8 @@ const renderIcon = (icon: Component) => () => h(NIcon, null, { default: () => h(
 
 const menuItems = computed<MenuItem[]>(() => [
   {
-    label: t('admin.sidebar.dashboard'),
-    key: 'dashboard',
+    label: t('admin.sidebar.home'),
+    key: 'home',
     icon: GridOutline,
   },
   {
@@ -46,6 +47,18 @@ const naiveMenuOptions = computed(() =>
 
 function toggleSidebar() {
   collapsed.value = !collapsed.value
+}
+
+const menuRoutes: Record<string, string> = {
+  home: '/',
+  flows: '/flows',
+}
+
+function handleMenuUpdate(key: string) {
+  const path = menuRoutes[key]
+  if (path) {
+    router.push(path)
+  }
 }
 
 async function handleLogout() {
@@ -102,8 +115,9 @@ async function handleLogout() {
         :collapsed-icon-size="20"
         :root-indent="22"
         :options="naiveMenuOptions"
-        value="dashboard"
+        :value="route.name"
         class="sidebar-menu"
+        @update:value="handleMenuUpdate"
       />
     </n-layout-sider>
 

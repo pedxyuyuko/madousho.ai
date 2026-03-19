@@ -1,11 +1,20 @@
 {
   "sidebar": {
-    "dashboard": "仪表盘",
+    "home": "仪表盘",
     "flows": "工作流",
     "toggle": "切换菜单"
   },
   "header": {
     "logout": "退出登录",
     "title": "魔导书管理后台"
+  },
+  "flows": {
+    "title": "工作流列表",
+    "name": "名称",
+    "uuid": "UUID",
+    "description": "描述",
+    "status": "状态",
+    "empty": "暂无工作流",
+    "error": "加载失败"
   }
 }

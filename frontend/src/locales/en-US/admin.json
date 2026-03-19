@@ -1,11 +1,20 @@
 {
   "sidebar": {
-    "dashboard": "",
+    "home": "",
     "flows": "",
     "toggle": ""
   },
   "header": {
     "logout": "",
     "title": ""
+  },
+  "flows": {
+    "title": "",
+    "name": "",
+    "uuid": "",
+    "description": "",
+    "status": "",
+    "empty": "",
+    "error": ""
   }
 }

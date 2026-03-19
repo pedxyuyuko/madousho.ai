@@ -5,6 +5,7 @@ import type { RouteLocationNormalized } from 'vue-router'
 const LoginView = () => import('@/views/LoginView.vue')
 const AdminLayout = () => import('@/layouts/AdminLayout.vue')
 const HomeView = () => import('@/views/HomeView.vue')
+const FlowsView = () => import('@/views/FlowsView.vue')
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -15,6 +16,7 @@ const router = createRouter({
       component: AdminLayout,
       children: [
         { path: '', name: 'home', component: HomeView },
+        { path: 'flows', name: 'flows', component: FlowsView },
       ],
     },
   ],
