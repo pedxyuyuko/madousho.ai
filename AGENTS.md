@@ -1,13 +1,13 @@
 # Madousho.ai - Project Knowledge Base
 
-**Generated:** 2026-03-15
-**Commit:** d55a51d
+**Generated:** 2026-03-19
+**Commit:** f24a7e9
 **Branch:** frontend
 **Stack:** Python 3.10+ | SQLAlchemy 2.0 | Pydantic v2 | Typer CLI | FastAPI | Alembic | Loguru
 
 ## OVERVIEW
 
-Madousho.ai (魔导书) - Systematic AI Agent Framework. Python package with Typer CLI, SQLAlchemy ORM, Pydantic configuration, and structured logging via Loguru.
+Madousho.ai (魔导书) - Systematic AI Agent Framework. Python package with Typer CLI, SQLAlchemy ORM, Pydantic configuration, and structured logging via Loguru, plus a Vue 3 admin SPA with a themed authenticated shell.
 
 ## STRUCTURE
 
@@ -37,7 +37,7 @@ Madousho.ai (魔导书) - Systematic AI Agent Framework. Python package with Typ
 | Tests | `tests/` | pytest, 90% coverage enforced |
 | Enums | `src/madousho/models/enums.py` | FlowStatus (CREATED, PROCESSING, FINISHED) |
 | Migrations | `alembic/versions/` | Alembic migration scripts |
-| Frontend | `frontend/` | Vue 3 SPA - see `frontend/AGENTS.md` |
+| Frontend | `frontend/` | Vue 3 SPA with `AdminLayout`, dual-theme shell, i18n namespaces, Playwright coverage — see `frontend/AGENTS.md` |
 
 ## CODE MAP
 
@@ -113,3 +113,4 @@ python -m build            # Build distribution packages
 - **Package name**: `madousho-ai` on PyPI, import as `madousho`
 - **SQLite migrations**: Adding NOT NULL columns requires `server_default` parameter
 - **Alembic config**: `alembic.ini` must match project config DB URL
+- **Frontend E2E**: Current admin-layout tests seed auth state in localStorage instead of using login-form flow, because local frontend env may disable MSW and route `/api/v1/protected` to a real backend during manual QA

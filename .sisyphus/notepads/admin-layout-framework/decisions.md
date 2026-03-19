@@ -1,0 +1,3 @@
+- Task 4 implemented the required header order as ThemeSwitcher → LanguageSwitcher → BackendSwitcher → logout button, and menu labels come from `t('admin.sidebar.*')` to match the admin locale.
+- Added a minimal `frontend/src/components/LanguageSwitcher.vue` shim only to satisfy the import contract needed for AdminLayout compilation and unit testing; no extra task-3 behavior was implemented here.
+- Task 4 menu options in `frontend/src/layouts/AdminLayout.vue` were reduced to localized text-only placeholders (`key` + `label`) to match the plan guardrail forbidding menu item icons; only the brand mark and sidebar toggle keep icons.
