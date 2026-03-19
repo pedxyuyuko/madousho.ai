@@ -65,8 +65,17 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   function logout() {
-    isAuthenticated.value = false
-    currentBackendIndex.value = -1
+    const idx = currentBackendIndex.value
+    if (idx >= 0 && idx < backends.value.length) {
+      backends.value.splice(idx, 1)
+      if (backends.value.length > 0) {
+        currentBackendIndex.value = 0
+      } else {
+        currentBackendIndex.value = -1
+        isAuthenticated.value = false
+      }
+      persist()
+    }
   }
 
   function switchBackend(index: number) {
@@ -81,7 +90,7 @@ export const useAuthStore = defineStore('auth', () => {
       backends.value.splice(index, 1)
       if (currentBackendIndex.value === index) {
         currentBackendIndex.value = backends.value.length > 0 ? 0 : -1
-        isAuthenticated.value = false
+        isAuthenticated.value = backends.value.length > 0
       } else if (currentBackendIndex.value > index) {
         currentBackendIndex.value--
       }
