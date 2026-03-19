@@ -5,6 +5,7 @@ import login from './locales/zh-CN/login.json'
 import home from './locales/zh-CN/home.json'
 import backend from './locales/zh-CN/backend.json'
 import theme from './locales/zh-CN/theme.json'
+import admin from './locales/zh-CN/admin.json'
 
 const messages = {
   'zh-CN': {
@@ -13,6 +14,7 @@ const messages = {
     home,
     backend,
     theme,
+    admin,
   },
 }
 

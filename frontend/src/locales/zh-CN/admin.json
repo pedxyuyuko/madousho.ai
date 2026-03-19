@@ -1,0 +1,11 @@
+{
+  "sidebar": {
+    "dashboard": "仪表盘",
+    "flows": "工作流",
+    "toggle": "切换菜单"
+  },
+  "header": {
+    "logout": "退出登录",
+    "title": "魔导书管理后台"
+  }
+}
