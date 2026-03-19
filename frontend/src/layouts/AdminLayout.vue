@@ -1,8 +1,14 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, h } from 'vue'
+import type { Component } from 'vue'
 import { RouterView, useRouter } from 'vue-router'
 import { NButton, NIcon } from 'naive-ui'
-import { ChevronBackOutline, SparklesOutline } from '@vicons/ionicons5'
+import {
+  ChevronBackOutline,
+  SparklesOutline,
+  GridOutline,
+  GitNetworkOutline,
+} from '@vicons/ionicons5'
 import { useI18n } from 'vue-i18n'
 import BackendSwitcher from '@/components/BackendSwitcher.vue'
 import ThemeSwitcher from '@/components/ThemeSwitcher.vue'
@@ -15,14 +21,18 @@ const router = useRouter()
 const authStore = useAuthStore()
 const { t } = useI18n()
 
+const renderIcon = (icon: Component) => () => h(NIcon, null, { default: () => h(icon) })
+
 const menuItems = computed<MenuItem[]>(() => [
   {
     label: t('admin.sidebar.dashboard'),
     key: 'dashboard',
+    icon: GridOutline,
   },
   {
     label: t('admin.sidebar.flows'),
     key: 'flows',
+    icon: GitNetworkOutline,
   },
 ])
 
@@ -30,6 +40,7 @@ const naiveMenuOptions = computed(() =>
   menuItems.value.map((item) => ({
     key: item.key,
     label: item.label,
+    icon: item.icon ? renderIcon(item.icon) : undefined,
   }))
 )
 
@@ -51,7 +62,6 @@ async function handleLogout() {
       :collapsed="collapsed"
       :collapsed-width="64"
       :width="240"
-      show-trigger="bar"
       content-style="display: flex; flex-direction: column;"
       class="admin-sidebar"
       data-testid="admin-sidebar"
@@ -74,6 +84,7 @@ async function handleLogout() {
         quaternary
         circle
         class="sidebar-toggle"
+        :class="{ collapsed }"
         data-testid="sidebar-toggle"
         :aria-label="t('admin.sidebar.toggle')"
         @click="toggleSidebar"
@@ -89,6 +100,7 @@ async function handleLogout() {
         :collapsed="collapsed"
         :collapsed-width="64"
         :collapsed-icon-size="20"
+        :root-indent="22"
         :options="naiveMenuOptions"
         value="dashboard"
         class="sidebar-menu"
@@ -129,13 +141,13 @@ async function handleLogout() {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 20px 16px 12px;
+  padding: 20px 14px 12px;
   min-height: 76px;
 }
 
 .sidebar-brand.collapsed {
   justify-content: center;
-  padding-inline: 12px;
+  padding: 20px 0 12px;
 }
 
 .brand-mark {
@@ -173,8 +185,11 @@ async function handleLogout() {
 }
 
 .sidebar-toggle {
-  align-self: flex-end;
-  margin: 0 16px 12px;
+  margin: 0 15px 12px;
+}
+
+.sidebar-toggle.collapsed {
+  margin: 0 15px 12px;
 }
 
 .sidebar-toggle :deep(.n-icon) {
@@ -187,7 +202,7 @@ async function handleLogout() {
 
 .sidebar-menu {
   flex: 1;
-  padding: 0 10px 16px;
+  padding: 0 0 16px;
 }
 
 .admin-header {
