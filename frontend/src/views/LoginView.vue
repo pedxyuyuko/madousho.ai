@@ -129,9 +129,10 @@ async function handleLogin() {
 <style scoped lang="scss">
 .login-page {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
   width: 100%;
   background: var(--login-bg);
+  overflow: hidden;
 }
 
 // Left gradient panel
