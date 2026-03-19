@@ -4,7 +4,7 @@ test.describe('Home Page', () => {
   test('should display the main heading', async ({ page }) => {
     await page.goto('/');
 
-    await expect(page).toHaveTitle(/Vite App/);
+    await expect(page).toHaveTitle(/Madousho.ai/);
   });
 
   test('should navigate to login when not authenticated', async ({ page }) => {
