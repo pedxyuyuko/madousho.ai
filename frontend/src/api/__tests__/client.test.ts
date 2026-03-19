@@ -22,8 +22,9 @@ vi.mock('axios', async () => {
   const origReqUse = instance.interceptors.request.use.bind(instance.interceptors.request)
   type ReqFulfilled = (config: InternalAxiosRequestConfig) => InternalAxiosRequestConfig | Promise<InternalAxiosRequestConfig>
   type ReqRejected = (error: unknown) => unknown
-  type ResFulfilled = (value: unknown) => unknown
-  type ResRejected = (error: unknown) => unknown
+  type ResponseUseParams = Parameters<typeof instance.interceptors.response.use>
+  type ResFulfilled = ResponseUseParams[0]
+  type ResRejected = ResponseUseParams[1]
 
   instance.interceptors.request.use = ((onFulfilled: ReqFulfilled | null, onRejected: ReqRejected | null) => {
     if (onFulfilled) requestOnFulfilled = onFulfilled as (config: InternalAxiosRequestConfig) => Promise<InternalAxiosRequestConfig>
