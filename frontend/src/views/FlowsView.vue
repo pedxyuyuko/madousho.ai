@@ -9,11 +9,20 @@ const { t } = useI18n()
 const loading = ref(true)
 const error = ref(false)
 const flows = ref<Flow[]>([])
+const expandedFlows = ref<Set<string>>(new Set())
 
 const statusTypeMap: Record<Flow['status'], 'success' | 'warning' | 'default'> = {
   finished: 'success',
   processing: 'warning',
   created: 'default',
+}
+
+const toggleExpanded = (uuid: string) => {
+  if (expandedFlows.value.has(uuid)) {
+    expandedFlows.value.delete(uuid)
+  } else {
+    expandedFlows.value.add(uuid)
+  }
 }
 
 onMounted(async () => {
@@ -51,28 +60,34 @@ onMounted(async () => {
 
     <!-- Data State -->
     <div v-else class="flows-list">
-      <n-card v-for="flow in flows" :key="flow.uuid" class="flow-card">
+      <n-card
+        v-for="flow in flows"
+        :key="flow.uuid"
+        class="flow-card"
+        :class="{ 'flow-card--expanded': expandedFlows.has(flow.uuid) }"
+        hoverable
+        @click="toggleExpanded(flow.uuid)"
+      >
         <template #header>
           <div class="flow-header">
             <span class="flow-name">{{ flow.name }}</span>
+            <n-tag size="small" class="uuid-tag">
+              {{ flow.uuid }}
+            </n-tag>
             <n-tag :type="statusTypeMap[flow.status]" size="small">
               {{ flow.status }}
             </n-tag>
+            <span class="expand-icon" :class="{ 'expanded': expandedFlows.has(flow.uuid) }">
+              ▶
+            </span>
           </div>
         </template>
 
-        <n-collapse>
-          <n-collapse-item :title="t('admin.flows.description')" name="details">
-            <div class="flow-detail">
-              <span class="detail-label">{{ t('admin.flows.description') }}:</span>
-              <span class="detail-value">{{ flow.description ?? '—' }}</span>
-            </div>
-            <div class="flow-detail">
-              <span class="detail-label">{{ t('admin.flows.uuid') }}:</span>
-              <span class="detail-value uuid">{{ flow.uuid }}</span>
-            </div>
-          </n-collapse-item>
-        </n-collapse>
+        <transition name="fade">
+          <div v-if="expandedFlows.has(flow.uuid)" class="flow-description">
+            {{ flow.description ?? '—' }}
+          </div>
+        </transition>
       </n-card>
     </div>
   </div>
@@ -104,35 +119,61 @@ onMounted(async () => {
 
 .flow-card {
   width: 100%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.flow-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.flow-card--expanded {
+  border-left: 3px solid var(--n-primary-color);
 }
 
 .flow-header {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
 .flow-name {
   font-weight: 500;
 }
 
-.flow-detail {
-  display: flex;
-  gap: 0.5rem;
-  padding: 0.25rem 0;
-}
-
-.detail-label {
-  font-weight: 500;
-  color: var(--n-text-color-3);
-}
-
-.detail-value {
-  word-break: break-word;
-}
-
-.detail-value.uuid {
+.uuid-tag {
   font-family: monospace;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
+}
+
+.expand-icon {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: var(--n-text-color-3);
+  transition: transform 0.2s ease;
+}
+
+.expand-icon.expanded {
+  transform: rotate(90deg);
+}
+
+.flow-description {
+  color: var(--n-text-color-2);
+  line-height: 1.6;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--n-border-color);
+  margin-top: 0.5rem;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
