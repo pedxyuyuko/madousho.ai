@@ -169,10 +169,10 @@ export const starryNightOverrides: GlobalThemeOverrides = {
 
   // ── Component: Card ─────────────────────────────────────────────
   Card: {
-    color: 'rgba(18, 16, 31, 0.85)',
-    colorModal: 'rgba(18, 16, 31, 0.92)',
+    color: 'rgba(30, 25, 50, 0.95)',
+    colorModal: 'rgba(30, 25, 50, 0.98)',
     borderRadius: '12px',
-    borderColor: 'rgba(124, 58, 237, 0.15)',
+    borderColor: 'rgba(124, 58, 237, 0.3)',
     boxShadow: '0 4px 24px 0 rgba(0, 0, 0, 0.4)',
     titleTextColor: '#e2dff0',
     textColor: 'rgba(226, 223, 240, 0.9)',

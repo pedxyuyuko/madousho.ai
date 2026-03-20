@@ -9,6 +9,8 @@
   --theme-success: #22c55e;
   --theme-success-bg: rgba(34, 197, 94, 0.1);
   --theme-success-border: rgba(34, 197, 94, 0.3);
+  --theme-warning: #6366f1;
+  --theme-warning-bg: rgba(99, 102, 241, 0.1);
   --theme-text-muted: rgba(226, 223, 240, 0.4);
   --theme-hover: rgba(124, 58, 237, 0.12);
 }
@@ -19,6 +21,8 @@
   --theme-success: #556B2F;
   --theme-success-bg: rgba(85, 107, 47, 0.1);
   --theme-success-border: rgba(85, 107, 47, 0.3);
+  --theme-warning: #B8860B;
+  --theme-warning-bg: rgba(184, 134, 11, 0.1);
   --theme-text-muted: rgba(61, 43, 31, 0.5);
   --theme-hover: rgba(139, 69, 19, 0.1);
 }
