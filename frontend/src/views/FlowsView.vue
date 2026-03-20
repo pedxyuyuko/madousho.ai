@@ -64,15 +64,18 @@ onMounted(async () => {
         v-for="flow in flows"
         :key="flow.uuid"
         class="flow-card"
-        :class="{ 'flow-card--expanded': expandedFlows.has(flow.uuid) }"
+        :class="[
+          `flow-card--status-${flow.status}`,
+          { 'flow-card--expanded': expandedFlows.has(flow.uuid) }
+        ]"
         hoverable
         @click="toggleExpanded(flow.uuid)"
       >
         <template #header>
           <div class="flow-header">
             <span class="flow-name">{{ flow.name }}</span>
-            <n-tag size="small" class="uuid-tag">
-              {{ flow.uuid }}
+            <n-tag v-if="flow.plugin" size="small" type="info">
+              {{ flow.plugin }}
             </n-tag>
             <n-tag :type="statusTypeMap[flow.status]" size="small">
               {{ flow.status }}
@@ -81,13 +84,31 @@ onMounted(async () => {
               ▶
             </span>
           </div>
+          <div class="flow-meta">
+            <span class="meta-uuid">{{ flow.uuid }}</span>
+            <span class="meta-separator">@</span>
+            <n-time :time="new Date(flow.created_at)" format="yyyy-MM-dd HH:mm" />
+          </div>
         </template>
 
-        <transition name="fade">
-          <div v-if="expandedFlows.has(flow.uuid)" class="flow-description">
+        <div class="flow-body">
+          <div class="flow-description">
             {{ flow.description ?? '—' }}
           </div>
-        </transition>
+
+          <transition name="fade">
+            <div v-if="expandedFlows.has(flow.uuid)" class="flow-details">
+              <div class="detail-row" v-if="flow.flow_template">
+                <span class="detail-label">Template:</span>
+                <span class="detail-value">{{ flow.flow_template }}</span>
+              </div>
+              <div class="detail-row" v-if="flow.tasks?.length">
+                <span class="detail-label">Tasks:</span>
+                <span class="detail-value">{{ flow.tasks.join(', ') }}</span>
+              </div>
+            </div>
+          </transition>
+        </div>
       </n-card>
     </div>
   </div>
@@ -102,6 +123,11 @@ onMounted(async () => {
   margin: 0 0 1.5rem;
   font-size: 1.5rem;
   font-weight: 600;
+  color: var(--n-text-color-1);
+}
+
+[data-theme="starry-night"] .flows-title {
+  color: #f5f3ff;
 }
 
 .flows-state {
@@ -117,19 +143,28 @@ onMounted(async () => {
   gap: 1rem;
 }
 
-.flow-card {
+:deep(.flow-card) {
   width: 100%;
   cursor: pointer;
   transition: all 0.2s ease;
+  border-left: 4px solid transparent !important;
 }
 
-.flow-card:hover {
+:deep(.flow-card--status-finished) {
+  border-left-color: var(--theme-success) !important;
+}
+
+:deep(.flow-card--status-processing) {
+  border-left-color: var(--theme-warning) !important;
+}
+
+:deep(.flow-card--status-created) {
+  border-left-color: var(--theme-text-muted) !important;
+}
+
+:deep(.flow-card:hover) {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.flow-card--expanded {
-  border-left: 3px solid var(--n-primary-color);
 }
 
 .flow-header {
@@ -137,6 +172,25 @@ onMounted(async () => {
   align-items: center;
   gap: 0.75rem;
   flex-wrap: wrap;
+}
+
+.flow-meta {
+  font-size: 0.75rem;
+  color: var(--n-text-color-3);
+  margin-top: 0.25rem;
+}
+
+.meta-uuid {
+  font-family: monospace;
+}
+
+.meta-separator {
+  margin: 0 0.25rem;
+}
+
+.flow-body {
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--n-border-color);
 }
 
 .flow-name {
@@ -162,9 +216,28 @@ onMounted(async () => {
 .flow-description {
   color: var(--n-text-color-2);
   line-height: 1.6;
+  margin-bottom: 0.5rem;
+}
+
+.flow-details {
   padding-top: 0.5rem;
-  border-top: 1px solid var(--n-border-color);
-  margin-top: 0.5rem;
+  border-top: 1px dashed var(--n-border-color);
+}
+
+.detail-row {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+  font-size: 0.875rem;
+}
+
+.detail-label {
+  color: var(--n-text-color-3);
+  font-weight: 500;
+}
+
+.detail-value {
+  color: var(--n-text-color-2);
 }
 
 .fade-enter-active,
