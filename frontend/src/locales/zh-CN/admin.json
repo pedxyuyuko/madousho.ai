@@ -15,6 +15,16 @@
     "description": "描述",
     "status": "状态",
     "empty": "暂无工作流",
-    "error": "加载失败"
+    "error": "加载失败",
+    "keywordPlaceholder": "搜索名称或描述",
+    "statusPlaceholder": "选择状态",
+    "statusCreated": "已创建",
+    "statusProcessing": "处理中",
+    "statusFinished": "已完成",
+    "sortNewest": "最新优先",
+    "sortOldest": "最早优先",
+    "sortLabel": "排序",
+    "reset": "重置",
+    "filteredEmpty": "没有匹配的工作流"
   }
 }

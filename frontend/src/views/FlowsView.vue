@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import apiClient from '@/api/client'
 import type { Flow, FlowListResponse } from '@/types/flow'
@@ -10,12 +10,91 @@ const loading = ref(true)
 const error = ref(false)
 const flows = ref<Flow[]>([])
 const expandedFlows = ref<Set<string>>(new Set())
+const currentRequestId = ref(0)
+
+// Toolbar state
+const keyword = ref('')
+const selectedStatus = ref<Flow['status'] | null>(null)
+const createdAtSort = ref<'asc' | 'desc'>('desc')
 
 const statusTypeMap: Record<Flow['status'], 'success' | 'warning' | 'default'> = {
   finished: 'success',
   processing: 'warning',
   created: 'default',
 }
+
+// Status options for select (no synthetic "all" option; clearable handles that)
+const statusOptions = computed(() => [
+  { label: t('admin.flows.statusCreated'), value: 'created' },
+  { label: t('admin.flows.statusProcessing'), value: 'processing' },
+  { label: t('admin.flows.statusFinished'), value: 'finished' },
+])
+
+// Sort options for select
+const sortOptions = computed(() => [
+  { label: t('admin.flows.sortNewest'), value: 'desc' },
+  { label: t('admin.flows.sortOldest'), value: 'asc' },
+])
+
+// Check if any backend query is active (for filtered-empty detection)
+const isQueryActive = computed(() => {
+  return keyword.value.trim() !== '' || selectedStatus.value !== null
+})
+
+// Build query params for backend request
+function buildQueryParams() {
+  const trimmedKeyword = keyword.value.trim()
+  const params: Record<string, string> = {}
+
+  if (trimmedKeyword) {
+    params.name = trimmedKeyword
+  }
+
+  if (selectedStatus.value) {
+    params.status = selectedStatus.value
+  }
+
+  return Object.keys(params).length === 0 ? undefined : { params }
+}
+
+// Parse created_at timestamp
+function parseCreatedAt(value: string): number | null {
+  const timestamp = Date.parse(value)
+  return Number.isNaN(timestamp) ? null : timestamp
+}
+
+// Computed displayed flows with frontend-local sorting only
+const displayedFlows = computed(() => {
+  const direction = createdAtSort.value
+
+  return [...flows.value].sort((left, right) => {
+    const leftTime = parseCreatedAt(left.created_at)
+    const rightTime = parseCreatedAt(right.created_at)
+
+    if (leftTime === null && rightTime === null) {
+      return left.uuid.localeCompare(right.uuid)
+    }
+
+    if (leftTime === null) {
+      return 1
+    }
+
+    if (rightTime === null) {
+      return -1
+    }
+
+    if (leftTime === rightTime) {
+      return left.uuid.localeCompare(right.uuid)
+    }
+
+    return direction === 'asc' ? leftTime - rightTime : rightTime - leftTime
+  })
+})
+
+// Query-active empty state must stay distinct from the default fetch-empty state.
+const isFilteredEmpty = computed(() => {
+  return isQueryActive.value && flows.value.length === 0
+})
 
 const toggleExpanded = (uuid: string) => {
   if (expandedFlows.value.has(uuid)) {
@@ -25,23 +104,90 @@ const toggleExpanded = (uuid: string) => {
   }
 }
 
-onMounted(async () => {
+// Reset all filters to defaults
+function resetFilters() {
+  keyword.value = ''
+  selectedStatus.value = null
+  createdAtSort.value = 'desc'
+}
+
+// Fetch flows with backend-supported query params only.
+async function fetchFlows() {
+  loading.value = true
+  error.value = false
+
+  const requestId = ++currentRequestId.value
+
   try {
-    const response = await apiClient.get<FlowListResponse>('/flows')
-    flows.value = response.data.items
+    const queryParams = buildQueryParams()
+    const response = await apiClient.get<FlowListResponse>('/flows', queryParams)
+
+    // Only apply response if this is still the latest request
+    if (requestId === currentRequestId.value) {
+      flows.value = response.data.items
+    }
   } catch {
-    // 401 interceptor already redirects to /login
-    // 403 and other errors show error state
-    error.value = true
+    // Only apply error if this is still the latest request
+    if (requestId === currentRequestId.value) {
+      // 401 interceptor already redirects to /login
+      // 403 and other errors show error state
+      error.value = true
+    }
   } finally {
-    loading.value = false
+    if (requestId === currentRequestId.value) {
+      loading.value = false
+    }
   }
+}
+
+// Watch for filter changes and refetch
+watch([keyword, selectedStatus], () => {
+  fetchFlows()
+})
+
+onMounted(() => {
+  fetchFlows()
 })
 </script>
 
 <template>
   <div class="flows-view">
     <h2 class="flows-title">{{ t('admin.flows.title') }}</h2>
+
+    <div class="flows-toolbar" data-testid="flows-toolbar">
+      <n-form :inline="true">
+        <n-space :size="12" :wrap="true">
+          <n-input
+            v-model:value="keyword"
+            :placeholder="t('admin.flows.keywordPlaceholder')"
+            clearable
+            data-testid="flows-keyword-input"
+            class="toolbar-input"
+          />
+          <n-select
+            v-model:value="selectedStatus"
+            :options="statusOptions"
+            :placeholder="t('admin.flows.statusPlaceholder')"
+            clearable
+            data-testid="flows-status-select"
+            class="toolbar-select"
+          />
+          <n-select
+            v-model:value="createdAtSort"
+            :options="sortOptions"
+            data-testid="flows-sort-select"
+            class="toolbar-select toolbar-select--sort"
+          />
+          <n-button
+            data-testid="flows-reset-button"
+            @click="resetFilters"
+            class="toolbar-reset"
+          >
+            {{ t('admin.flows.reset') }}
+          </n-button>
+        </n-space>
+      </n-form>
+    </div>
 
     <!-- Loading State -->
     <div v-if="loading" class="flows-state">
@@ -53,17 +199,23 @@ onMounted(async () => {
       <n-result status="error" :title="t('admin.flows.error')" />
     </div>
 
-    <!-- Empty State -->
+    <!-- Filtered Empty State (query active but no results) -->
+    <div v-else-if="isFilteredEmpty" class="flows-state">
+      <n-empty :description="t('admin.flows.filteredEmpty')" data-testid="flows-filtered-empty" />
+    </div>
+
+    <!-- Fetch Empty State (no query, no results) -->
     <div v-else-if="flows.length === 0" class="flows-state">
-      <n-empty :description="t('admin.flows.empty')" />
+      <n-empty :description="t('admin.flows.empty')" data-testid="flows-fetch-empty" />
     </div>
 
     <!-- Data State -->
     <div v-else class="flows-list">
       <n-card
-        v-for="flow in flows"
+        v-for="flow in displayedFlows"
         :key="flow.uuid"
         class="flow-card"
+        data-testid="flows-card"
         :class="[
           `flow-card--status-${flow.status}`,
           { 'flow-card--expanded': expandedFlows.has(flow.uuid) }
@@ -128,6 +280,26 @@ onMounted(async () => {
 
 [data-theme="starry-night"] .flows-title {
   color: #f5f3ff;
+}
+
+.flows-toolbar {
+  margin-bottom: 1.5rem;
+}
+
+.toolbar-input {
+  width: 200px;
+}
+
+.toolbar-select {
+  width: 140px;
+}
+
+.toolbar-select--sort {
+  width: 120px;
+}
+
+.toolbar-reset {
+  min-width: 80px;
 }
 
 .flows-state {

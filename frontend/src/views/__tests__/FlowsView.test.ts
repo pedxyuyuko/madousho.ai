@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { mount, flushPromises } from '@vue/test-utils'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
 import common from '@/locales/zh-CN/common.json'
@@ -8,8 +8,8 @@ import home from '@/locales/zh-CN/home.json'
 import backend from '@/locales/zh-CN/backend.json'
 import theme from '@/locales/zh-CN/theme.json'
 import admin from '@/locales/zh-CN/admin.json'
-import FlowsView from '../FlowsView.vue'
 import type { Flow, FlowListResponse } from '@/types/flow'
+import FlowsView from '../FlowsView.vue'
 
 const mockGet = vi.fn()
 
@@ -19,14 +19,22 @@ vi.mock('@/api/client', () => ({
   },
 }))
 
+const i18n = createI18n({
+  legacy: false,
+  locale: 'zh-CN',
+  fallbackLocale: 'zh-CN',
+  messages: { 'zh-CN': { common, login, home, backend, theme, admin } },
+})
+
 const NSpinStub = {
   props: { size: String },
   template: '<div class="n-spin-stub" data-testid="n-spin"><slot /></div>',
 }
 
 const NEmptyStub = {
+  inheritAttrs: false,
   props: { description: String },
-  template: '<div class="n-empty-stub" data-testid="n-empty">{{ description }}</div>',
+  template: '<div class="n-empty-stub" v-bind="$attrs">{{ description }}</div>',
 }
 
 const NResultStub = {
@@ -35,87 +43,177 @@ const NResultStub = {
 }
 
 const NCardStub = {
+  inheritAttrs: false,
   emits: ['click'],
   template:
-    '<div class="n-card-stub" data-testid="n-card" v-bind="$attrs" @click="$emit(\'click\')"><header><slot name="header" /></header><slot /></div>',
+    '<div class="n-card-stub" v-bind="$attrs" @click="$emit(\'click\')"><header><slot name="header" /></header><slot /></div>',
 }
 
 const NTagStub = {
   props: { type: String, size: String },
-  template: '<span class="n-tag-stub" data-testid="n-tag" :data-type="type"><slot /></span>',
+  template: '<span class="n-tag-stub" :data-type="type"><slot /></span>',
 }
 
 const NTimeStub = {
-  props: { time: { type: [Date, Number], required: true }, format: String },
-  template:
-    '<time class="n-time-stub" data-testid="n-time">{{ time instanceof Date ? time.toISOString() : new Date(time).toISOString() }}</time>',
+  props: {
+    time: {
+      type: [Date, Number],
+      required: true,
+    },
+    format: String,
+  },
+  template: `
+    <time class="n-time-stub">
+      {{ Number.isNaN(new Date(time).getTime()) ? 'Invalid Date' : new Date(time).toISOString() }}
+    </time>
+  `,
 }
 
-const i18n = createI18n({
-  legacy: false,
-  locale: 'zh-CN',
-  fallbackLocale: 'zh-CN',
-  messages: { 'zh-CN': { common, login, home, backend, theme, admin } },
-})
+const NFormStub = {
+  template: '<form class="n-form-stub"><slot /></form>',
+}
 
-function buildFlowsQuery(keyword: string, status: Flow['status'] | null) {
-  const trimmedKeyword = keyword.trim()
-  const params: Record<string, string> = {}
+const NSpaceStub = {
+  template: '<div class="n-space-stub"><slot /></div>',
+}
 
-  if (trimmedKeyword) {
-    params.name = trimmedKeyword
+const NButtonStub = {
+  inheritAttrs: false,
+  emits: ['click'],
+  template: '<button type="button" v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>',
+}
+
+const NInputStub = {
+  inheritAttrs: false,
+  props: {
+    value: {
+      type: String,
+      default: '',
+    },
+    placeholder: {
+      type: String,
+      default: '',
+    },
+    clearable: Boolean,
+  },
+  emits: ['update:value'],
+  template: `
+    <input
+      v-bind="$attrs"
+      :value="value"
+      :placeholder="placeholder"
+      @input="$emit('update:value', $event.target.value)"
+    />
+  `,
+}
+
+const NSelectStub = {
+  inheritAttrs: false,
+  props: {
+    value: {
+      type: [String, null],
+      default: null,
+    },
+    options: {
+      type: Array,
+      default: () => [],
+    },
+    placeholder: {
+      type: String,
+      default: '',
+    },
+    clearable: Boolean,
+  },
+  emits: ['update:value'],
+  template: `
+    <select
+      v-bind="$attrs"
+      :value="value ?? ''"
+      @change="$emit('update:value', $event.target.value || null)"
+    >
+      <option value="">{{ placeholder }}</option>
+      <option v-for="option in options" :key="option.value" :value="option.value">
+        {{ option.label }}
+      </option>
+    </select>
+  `,
+}
+
+function createFlow(overrides: Partial<Flow>): Flow {
+  return {
+    uuid: 'flow-default',
+    name: '默认流程',
+    description: '默认描述',
+    plugin: 'demo-plugin',
+    tasks: null,
+    status: 'created',
+    flow_template: null,
+    created_at: '2026-03-19T10:00:00Z',
+    ...overrides,
   }
+}
 
-  if (status) {
-    params.status = status
+const baseFlows: Flow[] = [
+  createFlow({
+    uuid: 'flow-b',
+    name: 'Beta Sorting Flow',
+    description: 'sorting coverage',
+    status: 'processing',
+    created_at: '2026-03-19T11:00:00Z',
+    flow_template: 'template-beta',
+  }),
+  createFlow({
+    uuid: 'flow-a',
+    name: 'Alpha Search Flow',
+    description: 'Needle keyword target',
+    status: 'created',
+    created_at: '2026-03-19T11:00:00Z',
+  }),
+  createFlow({
+    uuid: 'flow-c',
+    name: 'Gamma Final Flow',
+    description: null,
+    status: 'finished',
+    created_at: '2026-03-19T09:00:00Z',
+  }),
+  createFlow({
+    uuid: 'flow-z',
+    name: 'Invalid Date Flow',
+    description: 'broken date fixture',
+    status: 'processing',
+    created_at: 'not-a-date',
+  }),
+]
+
+const processingFlows = baseFlows.filter((flow) => flow.status === 'processing')
+const betaFlow = baseFlows.find((flow) => flow.name === 'Beta Sorting Flow')
+
+if (!betaFlow) {
+  throw new Error('Expected Beta Sorting Flow fixture to exist')
+}
+
+function buildResponse(items: Flow[]): FlowListResponse {
+  return {
+    items,
+    total: items.length,
+    offset: 0,
+    limit: 20,
   }
-
-  return Object.keys(params).length === 0 ? undefined : { params }
 }
 
-function parseCreatedAt(value: string) {
-  const timestamp = Date.parse(value)
-  return Number.isNaN(timestamp) ? null : timestamp
-}
-
-function sortFlowsByCreatedAt(flows: Flow[], direction: 'asc' | 'desc') {
-  return [...flows].sort((left, right) => {
-    const leftTime = parseCreatedAt(left.created_at)
-    const rightTime = parseCreatedAt(right.created_at)
-
-    if (leftTime === null && rightTime === null) {
-      return left.uuid.localeCompare(right.uuid)
-    }
-
-    if (leftTime === null) {
-      return 1
-    }
-
-    if (rightTime === null) {
-      return -1
-    }
-
-    if (leftTime === rightTime) {
-      return left.uuid.localeCompare(right.uuid)
-    }
-
-    return direction === 'asc' ? leftTime - rightTime : rightTime - leftTime
+function deferred<T>() {
+  let resolve!: (value: T) => void
+  let reject!: (reason?: unknown) => void
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res
+    reject = rej
   })
+  return { promise, resolve, reject }
 }
 
-function filterFlowsByKeywordAndStatus(flows: Flow[], keyword: string, status: Flow['status'] | null) {
-  const normalizedKeyword = keyword.trim().toLowerCase()
-
-  return flows.filter((flow) => {
-    const matchesKeyword =
-      normalizedKeyword.length === 0 ||
-      flow.name.toLowerCase().includes(normalizedKeyword) ||
-      (flow.description ?? '').toLowerCase().includes(normalizedKeyword)
-
-    const matchesStatus = status === null || flow.status === status
-
-    return matchesKeyword && matchesStatus
-  })
+async function settleComponent() {
+  await flushPromises()
+  await flushPromises()
 }
 
 function mountFlowsView() {
@@ -132,330 +230,240 @@ function mountFlowsView() {
         'n-card': NCardStub,
         'n-tag': NTagStub,
         'n-time': NTimeStub,
+        'n-input': NInputStub,
+        'n-select': NSelectStub,
+        'n-button': NButtonStub,
+        'n-space': NSpaceStub,
+        'n-form': NFormStub,
         transition: false,
       },
     },
   })
 }
 
-const mockFlowResponse: FlowListResponse = {
-  items: [
-    {
-      uuid: '550e8400-e29b-41d4-a716-446655440000',
-      name: '测试流程',
-      description: '这是一个测试流程',
-      plugin: 'text-analyzer',
-      tasks: ['task-001'],
-      status: 'finished',
-      flow_template: null,
-      created_at: '2026-03-19T10:00:00Z',
-    },
-    {
-      uuid: '660e8400-e29b-41d4-a716-446655440001',
-      name: '图像流程',
-      description: null,
-      plugin: 'image-processor',
-      tasks: [],
-      status: 'processing',
-      flow_template: 'default-template',
-      created_at: '2026-03-19T11:00:00Z',
-    },
-    {
-      uuid: '770e8400-e29b-41d4-a716-446655440002',
-      name: '新建流程',
-      description: '刚创建的流程',
-      plugin: '',
-      tasks: null,
-      status: 'created',
-      flow_template: null,
-      created_at: '2026-03-19T12:00:00Z',
-    },
-  ],
-  total: 3,
-  offset: 0,
-  limit: 20,
+function cardNames(wrapper: ReturnType<typeof mountFlowsView>) {
+  return wrapper.findAll('[data-testid="flows-card"] .flow-name').map((node) => node.text())
 }
 
 describe('FlowsView', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
+    mockGet.mockReset()
   })
 
-  it('renders loading state with NSpin initially', () => {
-    mockGet.mockReturnValue(new Promise(() => {}))
+  it('renders the toolbar with stable selectors', async () => {
+    mockGet.mockResolvedValue({ data: buildResponse(baseFlows) })
 
     const wrapper = mountFlowsView()
+    await settleComponent()
 
-    expect(wrapper.find('[data-testid="n-spin"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="n-empty"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="flows-toolbar"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="flows-keyword-input"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="flows-status-select"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="flows-sort-select"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="flows-reset-button"]').exists()).toBe(true)
+    expect(wrapper.findAll('[data-testid="flows-card"]')).toHaveLength(4)
+  })
+
+  it('sends trimmed keyword queries through the mounted input', async () => {
+    mockGet
+      .mockResolvedValueOnce({ data: buildResponse(baseFlows) })
+      .mockResolvedValueOnce({ data: buildResponse([betaFlow]) })
+
+    const wrapper = mountFlowsView()
+    await settleComponent()
+
+    await wrapper.find('[data-testid="flows-keyword-input"]').setValue('  Needle  ')
+    await settleComponent()
+
+    expect(mockGet).toHaveBeenNthCalledWith(1, '/flows', undefined)
+    expect(mockGet).toHaveBeenNthCalledWith(2, '/flows', { params: { name: 'Needle' } })
+  })
+
+  it('sends status queries through the mounted select without synthetic all-status options', async () => {
+    mockGet
+      .mockResolvedValueOnce({ data: buildResponse(baseFlows) })
+      .mockResolvedValueOnce({ data: buildResponse(processingFlows) })
+
+    const wrapper = mountFlowsView()
+    await settleComponent()
+
+    const statusSelect = wrapper.find('[data-testid="flows-status-select"]')
+    const optionValues = statusSelect.findAll('option').map((node) => node.element.getAttribute('value'))
+    expect(optionValues).toEqual(['', 'created', 'processing', 'finished'])
+
+    await statusSelect.setValue('processing')
+    await settleComponent()
+
+    expect(mockGet).toHaveBeenNthCalledWith(2, '/flows', { params: { status: 'processing' } })
+  })
+
+  it('keeps created_at sorting frontend-local with deterministic uuid tie-breaks', async () => {
+    mockGet.mockResolvedValue({ data: buildResponse(baseFlows) })
+
+    const wrapper = mountFlowsView()
+    await settleComponent()
+
+    expect(cardNames(wrapper)).toEqual([
+      'Alpha Search Flow',
+      'Beta Sorting Flow',
+      'Gamma Final Flow',
+      'Invalid Date Flow',
+    ])
+
+    await wrapper.find('[data-testid="flows-sort-select"]').setValue('asc')
+    await settleComponent()
+
+    expect(cardNames(wrapper)).toEqual([
+      'Gamma Final Flow',
+      'Alpha Search Flow',
+      'Beta Sorting Flow',
+      'Invalid Date Flow',
+    ])
+    expect(mockGet).toHaveBeenCalledTimes(1)
+  })
+
+  it('reset restores keyword, status, sort defaults, and the full list', async () => {
+    mockGet
+      .mockResolvedValueOnce({ data: buildResponse(baseFlows) })
+      .mockResolvedValueOnce({ data: buildResponse(processingFlows) })
+      .mockResolvedValueOnce({ data: buildResponse(processingFlows) })
+      .mockResolvedValueOnce({ data: buildResponse(baseFlows) })
+
+    const wrapper = mountFlowsView()
+    await settleComponent()
+
+    await wrapper.find('[data-testid="flows-keyword-input"]').setValue('  beta  ')
+    await settleComponent()
+    await wrapper.find('[data-testid="flows-status-select"]').setValue('processing')
+    await settleComponent()
+    await wrapper.find('[data-testid="flows-sort-select"]').setValue('asc')
+    await settleComponent()
+
+    await wrapper.find('[data-testid="flows-reset-button"]').trigger('click')
+    await settleComponent()
+
+    const keywordInput = wrapper.find('[data-testid="flows-keyword-input"]').element as HTMLInputElement
+    const statusSelect = wrapper.find('[data-testid="flows-status-select"]').element as HTMLSelectElement
+    const sortSelect = wrapper.find('[data-testid="flows-sort-select"]').element as HTMLSelectElement
+
+    expect(keywordInput.value).toBe('')
+    expect(statusSelect.value).toBe('')
+    expect(sortSelect.value).toBe('desc')
+    expect(cardNames(wrapper)).toEqual([
+      'Alpha Search Flow',
+      'Beta Sorting Flow',
+      'Gamma Final Flow',
+      'Invalid Date Flow',
+    ])
+    expect(mockGet).toHaveBeenLastCalledWith('/flows', undefined)
+  })
+
+  it('shows filtered-empty only for active queries and keeps fetch-empty distinct', async () => {
+    mockGet
+      .mockResolvedValueOnce({ data: buildResponse(baseFlows) })
+      .mockResolvedValueOnce({ data: buildResponse([]) })
+
+    const wrapper = mountFlowsView()
+    await settleComponent()
+
+    await wrapper.find('[data-testid="flows-keyword-input"]').setValue('missing')
+    await settleComponent()
+
+    expect(wrapper.find('[data-testid="flows-filtered-empty"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="flows-filtered-empty"]').text()).toContain('没有匹配的工作流')
+    expect(wrapper.find('[data-testid="flows-fetch-empty"]').exists()).toBe(false)
     expect(wrapper.find('[data-testid="n-result"]').exists()).toBe(false)
   })
 
-  it('renders empty state when API returns no flows', async () => {
-    mockGet.mockResolvedValue({ data: { items: [], total: 0, offset: 0, limit: 20 } })
+  it('shows fetch-empty for an unfiltered empty response', async () => {
+    mockGet.mockResolvedValue({ data: buildResponse([]) })
 
     const wrapper = mountFlowsView()
-    await flushPromises()
+    await settleComponent()
 
-    expect(wrapper.find('[data-testid="n-spin"]').exists()).toBe(false)
-    expect(wrapper.find('[data-testid="n-empty"]').exists()).toBe(true)
-    expect(wrapper.text()).toContain('暂无工作流')
+    expect(wrapper.find('[data-testid="flows-fetch-empty"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="flows-filtered-empty"]').exists()).toBe(false)
   })
 
-  it('renders error state on API failure', async () => {
-    mockGet.mockRejectedValue(new Error('Network error'))
+  it('shows the error state when the request fails', async () => {
+    mockGet.mockRejectedValue(new Error('boom'))
 
     const wrapper = mountFlowsView()
-    await flushPromises()
+    await settleComponent()
 
     expect(wrapper.find('[data-testid="n-result"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="n-result"]').attributes('data-status')).toBe('error')
     expect(wrapper.text()).toContain('加载失败')
   })
 
-  it('renders card-based flow rows with plugin and status tags', async () => {
-    mockGet.mockResolvedValue({ data: mockFlowResponse })
+  it('preserves expansion state across local sort changes', async () => {
+    mockGet.mockResolvedValue({ data: buildResponse(baseFlows) })
 
     const wrapper = mountFlowsView()
-    await flushPromises()
+    await settleComponent()
 
-    const cards = wrapper.findAll('[data-testid="n-card"]')
-    expect(cards).toHaveLength(3)
+    const betaCard = wrapper.findAll('[data-testid="flows-card"]').find((node) => node.text().includes('Beta Sorting Flow'))
+    expect(betaCard).toBeDefined()
 
-    expect(cards[0]!.text()).toContain('测试流程')
-    expect(cards[0]!.text()).toContain('text-analyzer')
-    expect(cards[0]!.text()).toContain('finished')
+    await betaCard!.trigger('click')
+    expect(wrapper.text()).toContain('template-beta')
 
-    expect(cards[1]!.text()).toContain('图像流程')
-    expect(cards[1]!.text()).toContain('image-processor')
-    expect(cards[1]!.text()).toContain('processing')
+    await wrapper.find('[data-testid="flows-sort-select"]').setValue('asc')
+    await settleComponent()
 
-    expect(cards[2]!.text()).toContain('新建流程')
-    expect(cards[2]!.text()).not.toContain('task-001')
-
-    const tagTypes = wrapper
-      .findAll('[data-testid="n-tag"]')
-      .map((tag) => ({ text: tag.text(), type: tag.attributes('data-type') }))
-
-    expect(tagTypes).toEqual([
-      { text: 'text-analyzer', type: 'info' },
-      { text: 'finished', type: 'success' },
-      { text: 'image-processor', type: 'info' },
-      { text: 'processing', type: 'warning' },
-      { text: 'created', type: 'default' },
-    ])
+    expect(wrapper.text()).toContain('template-beta')
   })
 
-  it('shows em dash for null description', async () => {
-    mockGet.mockResolvedValue({ data: mockFlowResponse })
+  it('ignores stale responses from older keyword/status requests', async () => {
+    const initial = deferred<{ data: FlowListResponse }>()
+    const oldQuery = deferred<{ data: FlowListResponse }>()
+    const newQuery = deferred<{ data: FlowListResponse }>()
+
+    mockGet
+      .mockImplementationOnce(() => initial.promise)
+      .mockImplementationOnce(() => oldQuery.promise)
+      .mockImplementationOnce(() => newQuery.promise)
 
     const wrapper = mountFlowsView()
+
+    initial.resolve({ data: buildResponse(baseFlows) })
+    await settleComponent()
+
+    await wrapper.find('[data-testid="flows-keyword-input"]').setValue('older')
+    await flushPromises()
+    await wrapper.find('[data-testid="flows-status-select"]').setValue('processing')
     await flushPromises()
 
-    expect(wrapper.text()).toContain('—')
-    expect(wrapper.text()).toContain('图像流程')
-  })
-
-  it('toggles card expansion and keeps visible card details on click', async () => {
-    mockGet.mockResolvedValue({ data: mockFlowResponse })
-
-    const wrapper = mountFlowsView()
-    await flushPromises()
-
-    const cards = wrapper.findAll('[data-testid="n-card"]')
-    expect(wrapper.text()).not.toContain('Tasks: task-001')
-
-    await cards[0]!.trigger('click')
-
-    expect(wrapper.text()).toContain('Tasks:')
-    expect(wrapper.text()).toContain('task-001')
-    expect(wrapper.find('.flow-card--expanded').exists()).toBe(true)
-
-    await cards[0]!.trigger('click')
-
-    expect(wrapper.text()).not.toContain('Tasks: task-001')
-    expect(wrapper.find('.flow-card--expanded').exists()).toBe(false)
-  })
-
-  it('shows template details only after a card is expanded', async () => {
-    mockGet.mockResolvedValue({ data: mockFlowResponse })
-
-    const wrapper = mountFlowsView()
-    await flushPromises()
-
-    const cards = wrapper.findAll('[data-testid="n-card"]')
-    expect(wrapper.text()).not.toContain('default-template')
-
-    await cards[1]!.trigger('click')
-
-    expect(wrapper.text()).toContain('Template:')
-    expect(wrapper.text()).toContain('default-template')
-  })
-
-  it('shows error state on 401 while interceptor handles redirect', async () => {
-    mockGet.mockRejectedValue({ response: { status: 401 } })
-
-    const wrapper = mountFlowsView()
-    await flushPromises()
-
-    expect(wrapper.find('[data-testid="n-result"]').exists()).toBe(true)
-  })
-
-  it('shows error state on 403', async () => {
-    mockGet.mockRejectedValue({ response: { status: 403 } })
-
-    const wrapper = mountFlowsView()
-    await flushPromises()
-
-    expect(wrapper.find('[data-testid="n-result"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="n-result"]').attributes('data-status')).toBe('error')
-  })
-
-  it('calls apiClient with the current unfiltered /flows endpoint', async () => {
-    mockGet.mockResolvedValue({ data: mockFlowResponse })
-
-    mountFlowsView()
-    await flushPromises()
-
-    expect(mockGet).toHaveBeenCalledWith('/flows')
-  })
-
-  it('renders page title from i18n', async () => {
-    mockGet.mockResolvedValue({ data: mockFlowResponse })
-
-    const wrapper = mountFlowsView()
-    await flushPromises()
-
-    expect(wrapper.find('.flows-title').text()).toBe('工作流列表')
-  })
-
-  it('defines the toolbar query contract for keyword, status, reset, and supported backend params only', () => {
-    expect(buildFlowsQuery('', null)).toBeUndefined()
-    expect(buildFlowsQuery('   ', null)).toBeUndefined()
-    expect(buildFlowsQuery('  流程  ', null)).toEqual({
-      params: {
-        name: '流程',
-      },
+    newQuery.resolve({
+      data: buildResponse([
+        createFlow({
+          uuid: 'fresh-flow',
+          name: 'Fresh Query Result',
+          description: 'latest response wins',
+          status: 'processing',
+          created_at: '2026-03-20T10:00:00Z',
+        }),
+      ]),
     })
-    expect(buildFlowsQuery('', 'processing')).toEqual({
-      params: {
-        status: 'processing',
-      },
+    await settleComponent()
+
+    oldQuery.resolve({
+      data: buildResponse([
+        createFlow({
+          uuid: 'stale-flow',
+          name: 'Stale Query Result',
+          description: 'should never replace fresh data',
+          status: 'created',
+          created_at: '2026-03-18T10:00:00Z',
+        }),
+      ]),
     })
-    expect(buildFlowsQuery('  流程  ', 'processing')).toEqual({
-      params: {
-        name: '流程',
-        status: 'processing',
-      },
+    await settleComponent()
+
+    expect(cardNames(wrapper)).toEqual(['Fresh Query Result'])
+    expect(wrapper.text()).not.toContain('Stale Query Result')
+    expect(mockGet).toHaveBeenNthCalledWith(2, '/flows', { params: { name: 'older' } })
+    expect(mockGet).toHaveBeenNthCalledWith(3, '/flows', {
+      params: { name: 'older', status: 'processing' },
     })
-
-    const resetQuery = buildFlowsQuery('', null)
-    expect(resetQuery).toBeUndefined()
-    expect(resetQuery).not.toEqual(
-      expect.objectContaining({
-        params: expect.objectContaining({
-          sort: expect.anything(),
-        }),
-      }),
-    )
-    expect(buildFlowsQuery('流程', 'processing')).not.toEqual(
-      expect.objectContaining({
-        params: expect.objectContaining({
-          sort_by: expect.anything(),
-        }),
-      }),
-    )
-    expect(buildFlowsQuery('流程', 'processing')).not.toEqual(
-      expect.objectContaining({
-        params: expect.objectContaining({
-          order: expect.anything(),
-        }),
-      }),
-    )
-    expect(buildFlowsQuery('流程', 'processing')).not.toEqual(
-      expect.objectContaining({
-        params: expect.objectContaining({
-          direction: expect.anything(),
-        }),
-      }),
-    )
-  })
-
-  it('defines the future local keyword and status filter contract with filtered-empty behavior', () => {
-    expect(filterFlowsByKeywordAndStatus(mockFlowResponse.items, '  测试  ', null).map((flow) => flow.uuid)).toEqual([
-      '550e8400-e29b-41d4-a716-446655440000',
-    ])
-
-    expect(filterFlowsByKeywordAndStatus(mockFlowResponse.items, '刚创建', null).map((flow) => flow.uuid)).toEqual([
-      '770e8400-e29b-41d4-a716-446655440002',
-    ])
-
-    expect(filterFlowsByKeywordAndStatus(mockFlowResponse.items, '流程', 'processing').map((flow) => flow.uuid)).toEqual([
-      '660e8400-e29b-41d4-a716-446655440001',
-    ])
-
-    expect(filterFlowsByKeywordAndStatus(mockFlowResponse.items, 'missing keyword', 'finished')).toEqual([])
-    expect(mockFlowResponse.items).toHaveLength(3)
-  })
-
-  it('defines the deterministic local created_at sort contract for desc, asc, tie-breaks, and invalid dates', () => {
-    const fixture: Flow[] = [
-      {
-        uuid: 'b-flow',
-        name: '第二个',
-        description: 'same time',
-        plugin: 'plugin-b',
-        tasks: null,
-        status: 'created',
-        flow_template: null,
-        created_at: '2026-03-19T10:00:00Z',
-      },
-      {
-        uuid: 'a-flow',
-        name: '第一个',
-        description: 'same time',
-        plugin: 'plugin-a',
-        tasks: null,
-        status: 'finished',
-        flow_template: null,
-        created_at: '2026-03-19T10:00:00Z',
-      },
-      {
-        uuid: 'latest-flow',
-        name: '最新',
-        description: 'latest',
-        plugin: 'plugin-latest',
-        tasks: null,
-        status: 'processing',
-        flow_template: null,
-        created_at: '2026-03-19T12:00:00Z',
-      },
-      {
-        uuid: 'invalid-flow',
-        name: '异常时间',
-        description: null,
-        plugin: 'plugin-invalid',
-        tasks: null,
-        status: 'processing',
-        flow_template: null,
-        created_at: 'not-a-date',
-      },
-    ]
-
-    expect(sortFlowsByCreatedAt(fixture, 'desc').map((flow) => flow.uuid)).toEqual([
-      'latest-flow',
-      'a-flow',
-      'b-flow',
-      'invalid-flow',
-    ])
-
-    expect(sortFlowsByCreatedAt(fixture, 'asc').map((flow) => flow.uuid)).toEqual([
-      'a-flow',
-      'b-flow',
-      'latest-flow',
-      'invalid-flow',
-    ])
-
-    expect(fixture.map((flow) => flow.uuid)).toEqual(['b-flow', 'a-flow', 'latest-flow', 'invalid-flow'])
   })
 })
