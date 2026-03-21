@@ -225,12 +225,19 @@ onMounted(() => {
       >
         <template #header>
           <div class="flow-header">
-            <span class="flow-name">{{ flow.name }}</span>
+            <div class="flow-title-group">
+              <span
+                v-if="flow.status === 'processing'"
+                class="flow-status-beacon"
+                aria-hidden="true"
+              />
+              <span class="flow-name">{{ flow.name }}</span>
+            </div>
             <n-tag v-if="flow.plugin" size="small" type="info">
               {{ flow.plugin }}
             </n-tag>
             <n-tag :type="statusTypeMap[flow.status]" size="small">
-              {{ flow.status }}
+              <span class="flow-status">{{ flow.status }}</span>
             </n-tag>
             <span class="expand-icon" :class="{ 'expanded': expandedFlows.has(flow.uuid) }">
               ▶
@@ -346,6 +353,13 @@ onMounted(() => {
   flex-wrap: wrap;
 }
 
+.flow-title-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+}
+
 .flow-meta {
   font-size: 0.75rem;
   color: var(--n-text-color-3);
@@ -367,6 +381,42 @@ onMounted(() => {
 
 .flow-name {
   font-weight: 500;
+}
+
+.flow-status {
+  display: inline-flex;
+  align-items: center;
+}
+
+.flow-status-beacon {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  flex-shrink: 0;
+  background: var(--theme-warning);
+  opacity: 0.72;
+  animation: flow-status-beacon-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes flow-status-beacon-pulse {
+  0%,
+  100% {
+    opacity: 0.58;
+    transform: scale(0.92);
+  }
+
+  50% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flow-status-beacon {
+    animation: none;
+    transform: none;
+    opacity: 0.82;
+  }
 }
 
 .uuid-tag {

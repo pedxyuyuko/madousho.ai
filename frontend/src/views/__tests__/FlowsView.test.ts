@@ -322,6 +322,27 @@ describe('FlowsView', () => {
     expect(mockGet).toHaveBeenCalledTimes(1)
   })
 
+  it('renders a processing indicator only before processing flow titles', async () => {
+    mockGet.mockResolvedValue({ data: buildResponse(baseFlows) })
+
+    const wrapper = mountFlowsView()
+    await settleComponent()
+
+    const processingBeacons = wrapper.findAll('.flow-title-group .flow-status-beacon')
+    expect(processingBeacons).toHaveLength(processingFlows.length)
+
+    const processingCards = wrapper
+      .findAll('[data-testid="flows-card"]')
+      .filter((node) => node.classes().includes('flow-card--status-processing'))
+    expect(processingCards).toHaveLength(processingFlows.length)
+    expect(processingCards.every((node) => node.find('.flow-title-group .flow-status-beacon').exists())).toBe(true)
+
+    const nonProcessingCards = wrapper
+      .findAll('[data-testid="flows-card"]')
+      .filter((node) => !node.classes().includes('flow-card--status-processing'))
+    expect(nonProcessingCards.every((node) => node.find('.flow-title-group .flow-status-beacon').exists() === false)).toBe(true)
+  })
+
   it('reset restores keyword, status, sort defaults, and the full list', async () => {
     mockGet
       .mockResolvedValueOnce({ data: buildResponse(baseFlows) })
