@@ -23,9 +23,16 @@ test.describe('Flows page', () => {
         window.localStorage.setItem(key, value)
       }
     }, AUTH_STORAGE)
+    await page.route('**/src/mocks/browser.ts*', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/javascript',
+        body: 'export const worker = { start: async () => undefined }',
+      })
+    })
   })
 
-  test('happy path: renders flow cards with expandable details', async ({ page }) => {
+  test('renders flow cards and expands the current card details on click', async ({ page }) => {
     await page.route('**/api/v1/flows', (route) => {
       route.fulfill({
         status: 200,
@@ -62,7 +69,6 @@ test.describe('Flows page', () => {
 
     await page.goto('/flows')
     await expect(page).toHaveURL('/flows')
-
     await expect(page.locator('.flows-title')).toHaveText('工作流列表')
 
     const cards = page.locator('.flow-card')
@@ -70,15 +76,18 @@ test.describe('Flows page', () => {
 
     const firstCard = cards.first()
     await expect(firstCard.locator('.flow-name')).toHaveText('文本分析流程')
+    await expect(firstCard).toContainText('text-analyzer')
+    await expect(firstCard).toContainText('created')
+    await expect(firstCard).not.toContainText('task-001')
 
-    await firstCard.locator('.n-collapse-item__header').click()
+    await firstCard.click()
 
-    const uuidSpan = firstCard.locator('.detail-value.uuid')
-    await expect(uuidSpan).toBeVisible()
-    await expect(uuidSpan).toHaveText('550e8400-e29b-41d4-a716-446655440000')
+    await expect(firstCard).toContainText('Tasks:')
+    await expect(firstCard).toContainText('task-001, task-002')
+    await expect(firstCard.locator('.expand-icon')).toHaveClass(/expanded/)
   })
 
-  test('empty state: shows NEmpty when no flows exist', async ({ page }) => {
+  test('shows fetch-empty state when no flows exist', async ({ page }) => {
     await page.route('**/api/v1/flows', (route) => {
       route.fulfill({
         status: 200,
@@ -90,11 +99,10 @@ test.describe('Flows page', () => {
     await page.goto('/flows')
     await expect(page).toHaveURL('/flows')
 
-    await expect(page.locator('.n-empty')).toBeVisible()
-    await expect(page.locator('.n-empty__description')).toHaveText('暂无工作流')
+    await expect(page.getByText('暂无工作流')).toBeVisible()
   })
 
-  test('error state: shows error result when API fails', async ({ page }) => {
+  test('shows error state when the flows request fails', async ({ page }) => {
     await page.route('**/api/v1/flows', (route) => {
       route.fulfill({
         status: 500,
@@ -109,12 +117,72 @@ test.describe('Flows page', () => {
     await expect(page.getByText('加载失败')).toBeVisible()
   })
 
-  test('menu highlighting: sidebar shows flows as active', async ({ page }) => {
+  test('keeps the sidebar menu highlighting on the flows route', async ({ page }) => {
     await page.goto('/flows')
     await expect(page).toHaveURL('/flows')
 
     const flowsMenuItem = page.locator('.n-menu-item-content--selected')
     await expect(flowsMenuItem).toBeVisible()
     await expect(flowsMenuItem).toContainText('工作流')
+  })
+
+  test('keeps the current request contract limited to the bare /flows fetch without unsupported params', async ({ page }) => {
+    const requests: string[] = []
+
+    await page.route('**/api/v1/flows**', (route) => {
+      requests.push(route.request().url())
+
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          items: [
+            {
+              uuid: 'flow-z',
+              name: 'Zeta 流程',
+              description: 'latest',
+              plugin: 'plugin-z',
+              tasks: null,
+              status: 'processing',
+              flow_template: null,
+              created_at: '2026-03-19T12:00:00Z',
+            },
+            {
+              uuid: 'flow-a',
+              name: 'Alpha 流程',
+              description: 'earliest',
+              plugin: 'plugin-a',
+              tasks: null,
+              status: 'processing',
+              flow_template: null,
+              created_at: '2026-03-19T09:00:00Z',
+            },
+          ],
+          total: 2,
+          offset: 0,
+          limit: 20,
+        }),
+      })
+    })
+
+    await page.goto('/flows')
+
+    await expect.poll(() => requests.length).toBe(1)
+    await expect.poll(() => requests[0] ?? '').toContain('/api/v1/flows')
+    expect(requests.some((url) => url.includes('sort='))).toBeFalsy()
+    expect(requests.some((url) => url.includes('sort_by='))).toBeFalsy()
+    expect(requests.some((url) => url.includes('order='))).toBeFalsy()
+    expect(requests.some((url) => url.includes('direction='))).toBeFalsy()
+
+    const requestUrl = new URL(requests[0]!)
+    expect(requestUrl.searchParams.get('name')).toBeNull()
+    expect(requestUrl.searchParams.get('status')).toBeNull()
+    expect(requestUrl.searchParams.get('sort')).toBeNull()
+    expect(requestUrl.searchParams.get('sort_by')).toBeNull()
+    expect(requestUrl.searchParams.get('order')).toBeNull()
+    expect(requestUrl.searchParams.get('direction')).toBeNull()
+
+    await expect(page.getByText('Zeta 流程')).toBeVisible()
+    await expect(page.getByText('Alpha 流程')).toBeVisible()
   })
 })
