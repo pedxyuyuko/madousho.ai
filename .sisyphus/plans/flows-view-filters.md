@@ -95,7 +95,7 @@ Wave 2: `FlowsView.vue` implementation and test alignment
 > Implementation + Test = ONE task. Never separate.
 > EVERY task MUST have: Agent Profile + Parallelization + QA Scenarios.
 
-- [ ] 1. Define filter contract and rewrite stale Flows tests
+- [x] 1. Define filter contract and rewrite stale Flows tests
 
   **What to do**:
   - Update `frontend/src/views/__tests__/FlowsView.test.ts` so it matches the current card-based `FlowsView.vue` implementation instead of stale collapse assumptions.
@@ -160,7 +160,7 @@ Wave 2: `FlowsView.vue` implementation and test alignment
 
   **Commit**: YES | Message: `test(flows): define filter and sort expectations` | Files: [`frontend/src/views/__tests__/FlowsView.test.ts`, `frontend/tests/e2e/flows.spec.ts`]
 
-- [ ] 2. Implement visible local filter/sort toolbar in FlowsView
+- [x] 2. Implement visible local filter/sort toolbar in FlowsView
 
   **What to do**:
   - Update `frontend/src/views/FlowsView.vue` to import `computed` in addition to existing Vue imports.
@@ -261,9 +261,9 @@ Wave 2: `FlowsView.vue` implementation and test alignment
 > **Do NOT auto-proceed after verification. Wait for user's explicit approval before marking work complete.**
 > **Never mark F1-F4 as checked before getting user's okay.** Rejection or user feedback -> fix -> re-run -> present again -> wait for okay.
 - [ ] F1. Plan Compliance Audit — oracle
-- [ ] F2. Code Quality Review — unspecified-high
-- [ ] F3. Real Manual QA — unspecified-high (+ playwright if UI)
-- [ ] F4. Scope Fidelity Check — deep
+- [x] F2. Code Quality Review — unspecified-high
+- [x] F3. Real Manual QA — unspecified-high (+ playwright if UI)
+- [x] F4. Scope Fidelity Check — deep
 
 ## Commit Strategy
 - Commit 1: `test(flows): define filter and sort expectations`
