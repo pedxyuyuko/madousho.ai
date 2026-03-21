@@ -5,8 +5,13 @@
     "toggle": "切换菜单"
   },
   "header": {
+    "createFlow": "创建工作流",
     "logout": "退出登录",
     "title": "魔导书管理后台"
+  },
+  "createFlow": {
+    "title": "创建工作流",
+    "description": "创建工作流页面正在准备中。"
   },
   "flows": {
     "title": "工作流列表",

@@ -6,6 +6,7 @@ const LoginView = () => import('@/views/LoginView.vue')
 const AdminLayout = () => import('@/layouts/AdminLayout.vue')
 const HomeView = () => import('@/views/HomeView.vue')
 const FlowsView = () => import('@/views/FlowsView.vue')
+const CreateFlowPlaceholderView = () => import('@/views/CreateFlowPlaceholderView.vue')
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -17,6 +18,7 @@ const router = createRouter({
       children: [
         { path: '', name: 'home', component: HomeView },
         { path: 'flows', name: 'flows', component: FlowsView },
+        { path: 'flows/create', name: 'flows-create', component: CreateFlowPlaceholderView },
       ],
     },
   ],

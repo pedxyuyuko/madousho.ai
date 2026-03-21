@@ -5,8 +5,13 @@
     "toggle": ""
   },
   "header": {
+    "createFlow": "",
     "logout": "",
     "title": ""
+  },
+  "createFlow": {
+    "title": "",
+    "description": ""
   },
   "flows": {
     "title": "",
@@ -15,6 +20,16 @@
     "description": "",
     "status": "",
     "empty": "",
-    "error": ""
+    "error": "",
+    "keywordPlaceholder": "",
+    "statusPlaceholder": "",
+    "statusCreated": "",
+    "statusProcessing": "",
+    "statusFinished": "",
+    "sortNewest": "",
+    "sortOldest": "",
+    "sortLabel": "",
+    "reset": "",
+    "filteredEmpty": ""
   }
 }

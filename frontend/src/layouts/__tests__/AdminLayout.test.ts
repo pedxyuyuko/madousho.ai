@@ -25,7 +25,12 @@ vi.mock('vue-router', async () => {
     useRouter: () => ({
       push: mockPush,
       resolve: ({ name }: { name: string }) => {
-        const routes: Record<string, string> = { home: '/', flows: '/flows', login: '/login' }
+        const routes: Record<string, string> = {
+          home: '/',
+          flows: '/flows',
+          'flows-create': '/flows/create',
+          login: '/login',
+        }
         return { name, path: routes[name] ?? `/${name}` }
       },
     }),
@@ -95,6 +100,7 @@ const NIconStub = {
 const ThemeSwitcherStub = { template: '<div data-testid="theme-switcher-stub">Theme</div>' }
 const LanguageSwitcherStub = { template: '<div data-testid="language-switcher-stub">Lang</div>' }
 const BackendSwitcherStub = { template: '<div data-testid="backend-switcher-stub">Backend</div>' }
+const AddOutlineStub = { template: '<svg class="add-outline" />' }
 const ChevronBackOutlineStub = { template: '<svg class="chevron-back-outline" />' }
 const SparklesOutlineStub = { template: '<svg class="sparkles-outline" />' }
 const RouterViewStub = { template: '<div class="router-view-stub" />' }
@@ -115,6 +121,7 @@ function mountAdminLayout() {
         ThemeSwitcher: ThemeSwitcherStub,
         LanguageSwitcher: LanguageSwitcherStub,
         BackendSwitcher: BackendSwitcherStub,
+        AddOutline: AddOutlineStub,
         ChevronBackOutline: ChevronBackOutlineStub,
         SparklesOutline: SparklesOutlineStub,
       },
@@ -134,8 +141,24 @@ describe('AdminLayout', () => {
     expect(wrapper.find('[data-testid="admin-sidebar"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="admin-header"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="sidebar-toggle"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="create-flow-btn"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="logout-btn"]').exists()).toBe(true)
     expect(wrapper.findComponent(RouterViewStub).exists()).toBe(true)
+  })
+
+  it('renders the create-flow button in the left header section', () => {
+    const wrapper = mountAdminLayout()
+
+    expect(wrapper.get('.header-primary').text()).toContain('创建工作流')
+    expect(wrapper.get('.header-primary [data-testid="create-flow-btn"]').text()).toBe('创建工作流')
+  })
+
+  it('renders the create-flow button with the shell-local class and add icon in the icon slot', () => {
+    const wrapper = mountAdminLayout()
+    const createFlowButton = wrapper.get('.header-primary [data-testid="create-flow-btn"]')
+
+    expect(createFlowButton.classes()).toContain('create-flow-btn')
+    expect(createFlowButton.find('.add-outline').exists()).toBe(true)
   })
 
   it('renders localized Dashboard and Flows menu items', () => {
@@ -178,7 +201,24 @@ describe('AdminLayout', () => {
     const actionChildren = wrapper.get('.header-actions').element.children
     const actionTexts = Array.from(actionChildren).map((element) => element.textContent?.trim())
 
-    expect(actionTexts).toEqual(['Theme', 'Lang', 'Backend', '退出登录'])
+    expect(actionTexts).toEqual(['Theme', 'Lang', 'Backend', ''])
+  })
+
+  it('uses the localized logout label as the icon button tooltip and aria label', () => {
+    const wrapper = mountAdminLayout()
+    const logoutButton = wrapper.get('[data-testid="logout-btn"]')
+
+    expect(logoutButton.attributes('title')).toBe('退出登录')
+    expect(logoutButton.attributes('aria-label')).toBe('退出登录')
+  })
+
+  it('navigates to the create-flow placeholder route by name when create-flow is clicked', async () => {
+    mockPush.mockResolvedValue(undefined)
+    const wrapper = mountAdminLayout()
+
+    await wrapper.get('[data-testid="create-flow-btn"]').trigger('click')
+
+    expect(mockPush).toHaveBeenCalledWith({ name: 'flows-create', path: '/flows/create' })
   })
 
   it('calls auth logout then redirects to /login when logout is clicked', async () => {

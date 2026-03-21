@@ -4,10 +4,12 @@ import type { Component } from 'vue'
 import { RouterView, useRouter, useRoute } from 'vue-router'
 import { NButton, NIcon } from 'naive-ui'
 import {
+  AddOutline,
   ChevronBackOutline,
   SparklesOutline,
   GridOutline,
   GitNetworkOutline,
+  LogOutOutline,
 } from '@vicons/ionicons5'
 import { useI18n } from 'vue-i18n'
 import BackendSwitcher from '@/components/BackendSwitcher.vue'
@@ -54,6 +56,10 @@ function handleMenuUpdate(key: string) {
   if (resolved.name) {
     router.push(resolved)
   }
+}
+
+async function handleCreateFlow() {
+  await router.push(router.resolve({ name: 'flows-create' }))
 }
 
 async function handleLogout() {
@@ -118,13 +124,38 @@ async function handleLogout() {
 
     <n-layout>
       <n-layout-header bordered class="admin-header" data-testid="admin-header">
-        <div class="header-spacer" />
+        <div class="header-primary">
+          <n-button
+            type="primary"
+            class="create-flow-btn"
+            data-testid="create-flow-btn"
+            @click="handleCreateFlow"
+          >
+            <template #icon>
+              <n-icon>
+                <AddOutline />
+              </n-icon>
+            </template>
+            {{ t('admin.header.createFlow') }}
+          </n-button>
+        </div>
         <div class="header-actions">
           <ThemeSwitcher />
           <LanguageSwitcher />
           <BackendSwitcher />
-          <n-button tertiary type="default" data-testid="logout-btn" @click="handleLogout">
-            {{ t('admin.header.logout') }}
+
+          <n-button
+            type="primary"
+            data-testid="logout-btn"
+            :aria-label="t('admin.header.logout')"
+            :title="t('admin.header.logout')"
+            @click="handleLogout"
+          >
+            <template #icon>
+              <n-icon>
+                <LogOutOutline />
+              </n-icon>
+            </template>
           </n-button>
         </div>
       </n-layout-header>
@@ -217,14 +248,20 @@ async function handleLogout() {
 .admin-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   min-height: 72px;
   padding: 0 24px;
   border-bottom: 1px solid var(--color-border);
   backdrop-filter: blur(12px);
 }
 
-.header-spacer {
-  flex: 1;
+.header-primary {
+  display: inline-flex;
+  align-items: center;
+}
+
+.create-flow-btn {
+  position: relative;
 }
 
 .header-actions {
